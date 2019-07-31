@@ -1,0 +1,61 @@
+# SpeakReader - Voice to Text WebServer
+#
+# Service Unit file for systemd system manager
+#
+# INSTALLATION NOTES
+#
+#   1. Copy this file into your systemd service unit directory (often '/lib/systemd/system')
+#      and name it 'speakreader.service' with the following command:
+#       cp /opt/SpeakReader/init-scripts/init.systemd /lib/systemd/system/speakreader.service
+#
+#   2. Edit the new speakreader.service file with configuration settings as required.
+#      More details in the "CONFIGURATION NOTES" section shown below.
+#
+#   3. Enable boot-time autostart with the following commands:
+#       systemctl daemon-reload
+#       systemctl enable speakreader.service
+#
+#   4. Start now with the following command:
+#       systemctl start speakreader.service
+#
+# CONFIGURATION NOTES
+#
+#    - The example settings in this file assume that you will run SpeakReader as user: speakreader
+#    - The example settings in this file assume that SpeakReader is installed to: /opt/SpeakReader
+#
+#    - To create this user and give it ownership of the SpeakReader directory:
+#       Ubuntu/Debian: sudo addgroup speakreader && sudo adduser --system --no-create-home speakreader --ingroup speakreader
+#       CentOS/Fedora: sudo adduser --system --no-create-home speakreader
+#       sudo chown speakreader:speakreader -R /opt/SpeakReader
+#
+#    - To give SpeakReader access to the sound device, connect the user to the audio group:
+#	sudo usermod -a -G audio speakreader
+#
+#    - Adjust ExecStart= to point to:
+#       1. Your SpeakReader executable
+#          - Default: /opt/SpeakReader/start.py
+#       2. Your config file (recommended is to put it somewhere in /etc)
+#          - Default: --config /opt/SpeakReader/config.ini
+#       3. Your datadir (recommended is to NOT put it in your SpeakReader exec dir)
+#          - Default: --datadir /opt/SpeakReader
+#
+#    - Adjust User= and Group= to the user/group you want SpeakReader to run as.
+#
+#    - WantedBy= specifies which target (i.e. runlevel) to start SpeakReader for.
+#       multi-user.target equates to runlevel 3 (multi-user text mode)
+#       graphical.target  equates to runlevel 5 (multi-user X11 graphical mode)
+
+[Unit]
+Description=SpeakReader - Voice to Text Webserver
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/opt/SpeakReader/bin/python3 /opt/SpeakReader/start.py --config /opt/SpeakReader/config.ini --datadir /opt/SpeakReader --quiet --daemon --nolaunch
+GuessMainPID=no
+Type=forking
+User=speakreader
+Group=speakreader
+
+[Install]
+WantedBy=multi-user.target

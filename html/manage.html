@@ -1,0 +1,930 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>SpeakReader - ${title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+    <link rel="stylesheet" href="${http_root}css/speakreader.css${cache_param}">
+</head>
+
+<body class="manage-content">
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12 title">
+            <h4 class="text-center text-nowrap title">SpeakReader Management Console</h4>
+        </div>
+    </div>
+    <div class="row">
+
+        <!-- Nav tabs -->
+        <nav id="navbar" class="navbar navbar-expand-sm mt-1 mb-1 pt-1 pb-1">
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="fas fa-bars fa-lg"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarToggler">
+                <ul class="navbar-nav mr-auto nav-pills mt-1 mb-1" role="tablist">
+                    <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#tabs-status" role="tab" aria-controls="tabs-status" aria-selected="true">Status</a></li>
+                    <li class="nav-item"><a class="nav-link"        data-toggle="pill" href="#tabs-settings" role="tab" aria-controls="tabs-settings" aria-selected="false">Settings</a></li>
+                    <li class="nav-item"><a class="nav-link"        data-toggle="pill" href="#tabs-transcripts" role="tab" aria-controls="tabs-transcripts" aria-selected="false">Transcripts</a></li>
+                    <li class="nav-item"><a class="nav-link"        data-toggle="pill" href="#tabs-logs" role="tab" aria-controls="tabs-logs" aria-selected="false">Logs</a></li>
+                </ul>
+            </div>
+
+            <a id="signout-button" class="signout-button" href="/auth/logout">Sign Out</a>
+
+        </nav>
+    </div>
+
+    <div class="tab-content">
+
+        <div class="tab-pane fade show active mt-1" id="tabs-status" role="tabpanel" aria-labelledby="tabs-status-tab">
+
+            <div class="row">
+                <div class="col">
+                    <div class="d-md-flex flex-row justify-content-between">
+                        <div class="col-md-3 btn-group order-0" role="group" aria-label="btn1">
+                            <button type="button" id="tes-button" class="btn btn-primary" value="start">Start</button>
+                        </div>
+
+                        <div class="col-md-3 btn-group order-2" role="group" aria-label="btn2">
+                            <button type="button" id="restart-button" class="btn btn-primary" value="restart" >Restart</button>
+                            <button type="button" id="shutdown-button" class="btn btn-primary" value="shutdown">Shutdown</button>
+                        </div>
+
+                        <div class="col-md-5 text-center align-middle order-1">
+                            <div class="status-view-container">
+                                <p class="status-view-title font-weight-bold">Monitor</p>
+                                <div class="d-flex justify-content-around align-items-center mb-1" role="radiogroup">
+                                    <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="off">Off</label>
+                                    <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="transcript" checked>Transcript</label>
+                                    <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="console">Console</label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col-md-5">
+                    <span class="font-weight-bold">Transcribe Engine Status: </span><span id="tes-status"></span>
+                </div>
+                <div class="col-md text-md-right">
+                    <span class="font-weight-bold listeningOn-div">Listening On: </span><span id="listeningOn"></span>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col">
+
+                    <div id="transcript-container" class="transcript-container">
+                        <div id="transcript" class="transcript">
+                            <p></p>
+                        </div>
+                        <button id="bottom-button" class="bottom-button"><i class="fas fa-chevron-down"></i></button>
+
+                        <div id="transcript-settings" class="transcript-settings">
+                            <div class="row">
+                                <div class="col text-center">
+                                    <button id="fontsize-button-down" class="fontsize-button-down fontsize-button">A-</button>
+                                    <button id="fontsize-button-up" class="fontsize-button-up fontsize-button">A+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="log-container" class="log-container">
+                        <div id="console-log" class="console-log">
+                            <p></p>
+                        </div>
+                        <button id="log-bottom-button" class="bottom-button"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="tab-pane fade" id="tabs-settings" role="tabpanel" aria-labelledby="tabs-settings-tab">
+
+            <div class="row">
+                <div class="col">
+                    <div class="product-info-container">
+                        <div class="row">
+                            <div class="col">
+                                <span class="d-block font-weight-bold">Product Information</span>
+                                <span class="d-block ml-2">${productInfo['product']} ${productInfo['current_version']}</span>
+                            </div>
+                            <div class="col" id="update-available">
+                                    <span class="d-block text-right font-weight-bold">Update Available: ${productInfo['latest_version']}</span>
+                                    <button id="update-now-button" class="btn btn-primary text-nowrap float-right mr-3 update-now-button">Update Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <form action="configUpdate" method="post" class="form" id="configForm" validated="true">
+                        <div id="config-container" class="config-container">
+                            <div class="form-section">
+                                <div class="col">
+                                    <div class="padded-header">
+                                        <h4>General</h4>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inputDeviceSelection" class="font-weight-bold">Input Device Selection</label>
+                                        <select id="inputDeviceSelection" class="form-control col-md-6" name="input_device"></select>
+                                        <small class="form-text">Select the microphone or line-in input device that SpeakReader will listen on.</small>
+                                    </div>
+
+                                    <div class="form-group form-check">
+                                        <input id="show_interim_results" type="checkbox" class="form-check-input" name="show_interim_results" value="1">
+                                        <label for="show_interim_results" class="font-weight-bold form-check-label">Show Interim Results</label>
+                                        <small class="form-text">Show interim result text during transcription. Unchecking this will only show the final result text.</small>
+                                    </div>
+
+                                    <div class="form-group form-check">
+                                        <input id="start_transcribe_on_startup" type="checkbox" class="form-check-input" name="start_transcribe_on_startup" value="1"/>
+                                        <label for="start_transcribe_on_startup" class="font-weight-bold form-check-label">Start Transcribe Engine on Startup</label>
+                                        <small class="form-text">Automatically start the Transcribe Engine when SpeakReader starts.</small>
+                                    </div>
+
+                                    <div class="form-group form-check">
+                                        <input id="launch_browser" type="checkbox" class="form-check-input" name="launch_browser" value="1">
+                                        <label for="launch_browser" class="font-weight-bold form-check-label">Launch Management Console on Startup</label>
+                                        <small class="form-text">Launch a web browser with the SpeakReader Management Console on startup.</small>
+                                    </div>
+
+                                    <div class="form-group form-check">
+                                        <div>
+                                            <input id="enable_censorship" type="checkbox" class="form-check-input" name="enable_censorship" value="1"/>
+                                            <label for="enable_censorship" class="font-weight-bold form-check-label">Enable Censorship</label>
+                                            <small class="form-text">Enable profanity filters and censorship.</small>
+                                        </div>
+                                        <div class="form-sub-group">
+                                            <button id="censored-words-button" class="btn btn-primary censored-words-button">Edit</button>
+                                            <label for="censored-words-button" class="font-weight-bold">Edit Censored Words List</label>
+                                            <small class="form-text">Optional: Define additional words you never want to see in the transcript.</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="credentials_file" class="font-weight-bold">GoogleAPI Credentials JSON File</label>
+                                        <div class="input-group">
+                                            <input id="credentials_file" class="form-control col-md-11" type="text" name="credentials_file" value="">
+                                            <div class="input-group-append">
+                                                <button id="upload_credentials_button" class="btn btn-secondary">Upload</button>
+                                            </div>
+                                        </div>
+                                        <small class="form-text">Required: Select and Upload your GoogleAPI JSON credentials file.</small>
+                                        <input id="upload_credentials_file" type="file" name="upload_credentials_file" style="display: none;" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="transcripts_folder" class="font-weight-bold">Transcripts Folder</label>
+                                        <input id="transcripts_folder" type="text" class="form-control" name="transcripts_folder" value="" size="30">
+                                        <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the transcripts.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="log_dir" class="font-weight-bold">Logs Folder</label>
+                                        <input id="log_dir" type="text" class="form-control" name="log_dir" value="" size="30">
+                                        <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the SpeakReader console logs.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <div class="col">
+                                    <div class="padded-header">
+                                        <h4>Web Interface</h4>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="http_port" class="font-weight-bold">HTTP Port</label>
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <input id="http_port" type="text" class="form-control" name="http_port" value="" required>
+                                            </div>
+                                            <div id="http_port_error" class="alert alert-danger" role="alert"></div>
+                                        </div>
+                                        <small class="form-text">Port to bind the web server to. Note that ports below 1024 may require root authority.<br><strong>Changing this value will restart SpeakReader.</strong></small>
+                                    </div>
+
+                                    <div class="form-group form-check">
+                                        <div>
+                                            <input id="enable_https" type="checkbox" class="form-check-input" name="enable_https" value="1" />
+                                            <label for="enable_https" class="font-weight-bold form-check-label">Enable HTTPS</label>
+                                            <small class="form-text">Enable HTTPS for the web server to use encrypted communication.<br><strong>Changing protocols will require restarting SpeakReader.</strong></small>
+                                        </div>
+                                        <div class="form-sub-group">
+                                            <div class="form-sub-group">
+                                                <label for="https_cert" class="font-weight-bold">HTTPS Certificate</label>
+                                                <input type="text" class="form-control http-settings" id="https_cert" name="https_cert" value="" />
+                                                <small class="form-text">The location of the SSL certificate.</small>
+                                            </div>
+
+                                            <div class="form-sub-group">
+                                                <label for="https_key" class="font-weight-bold">HTTPS Key</label>
+                                                <input type="text" class="form-control http-settings" id="https_key" name="https_key" value="" />
+                                                <small class="form-text">The location of the SSL key.</small>
+                                            </div>
+
+                                            <div class="form-sub-group">
+                                                <label for="https_cert_chain" class="font-weight-bold">HTTPS Certificate Chain</label>
+                                                <input type="text" class="form-control http-settings" id="https_cert_chain" name="https_cert_chain" value="" />
+                                                <small class="form-text">The location of the SSL certificate chain. Optional if the certificate file does not contain the full chain.</small>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <div class="col">
+                                    <div class="padded-header">
+                                        <h4>Authentication</h4>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="http_username" class="font-weight-bold">HTTP Username</label>
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <input id="http_username" type="text" class="form-control" name="http_username" value="" />
+                                            </div>
+                                            <div id="http_username_error" class="alert alert-danger" role="alert"></div>
+                                        </div>
+                                        <small class="form-text">Username for SpeakReader Management Console authentication. Leave empty to disable.</small>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="http_password" class="font-weight-bold">HTTP Password</label>
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <input id="http_password" type="password" class="form-control" name="http_password" value="">
+                                                <input id="set_http_password" type="hidden" name="set_http_password" value="0">
+                                            </div>
+                                            <div id="http_password_error" class="alert alert-danger" role="alert"></div>
+                                        </div>
+                                        <small class="form-text">Password for SpeakReader Management Console authentication. Leave empty to disable.</small>
+                                    </div>
+
+                                    <div class="form-group form-check">
+                                        <div class="row">
+                                            <div class="col">
+                                                <input id="http_hash_password" type="checkbox" class="form-check-input" name="http_hash_password" value="1" />
+                                                <label for="http_hash_password" class="font-weight-bold form-check-label">Hash Password in the Config File</label>
+                                            </div>
+                                            <div id="http_hash_password_error" class="alert alert-danger" role="alert"></div>
+                                        </div>
+                                        <small class="form-text">Store a hashed password in the config file.<br />Warning: Your password cannot be recovered if forgotten!</small>
+                                    </div>
+
+                                    <div class="form-group form-check">
+                                        <input id="http_basic_auth" type="checkbox" class="form-check-input" name="http_basic_auth" value="1" />
+                                        <label for="http_basic_auth" class="font-weight-bold form-check-label">Use Basic Authentication</label>
+                                        <small class="form-text">Use basic HTTP authentication instead of the HTML login form.!</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col" role="group">
+                                <button id="save-button" class="btn btn-primary save-button">Save</button>
+                                <label for="save-button" class="font-weight-bold">Save your configuration changes.</label>
+                            </div>
+
+                        </div>
+
+                        <div id="censored-words-container" class="censored-words-container" style="display: none; z-index: 999;">
+                            <div class="row">
+                                <div class="col">
+                                    <h4 class="text-center">Censored Words</h4>
+                                    <p>If the Enable Censorship configuration option is checked, words or phrases on this list will be censored from the transcript in addition to the words censored by the speech-to-text API profanity filter.<br>Place each word or series of words on separate lines.</p>
+                                    <textarea id="censored_words" rows="20" cols="1" name="censored_words" style="width: 100%;"></textarea>
+                                </div>
+                                <button id="close-censored-words" class="close-button"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade show mt-3" id="tabs-transcripts" role="tabpanel" aria-labelledby="tabs-transcripts-tab">
+            <div class="row">
+                <div class="col">
+                    <table id="transcripts-list" class="display hover row-border stripe nowrap" style="width: 100%;"></table>
+                    <div id="view-transcript-container">
+                        <div class="row mb-2">
+                            <div class="col-md-10">
+                                <h5 id="view-transcript-filename" class="view-transcript-filename mt-2 ml-3"></h5>
+                            </div>
+                            <div class="col text-center">
+                                <button id="close-transcript" class="btn btn-secondary close-button">Close</button>
+                            </div>
+                        </div>
+                        <div id="view-transcript" class="view-transcript transcript-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade show mt-3" id="tabs-logs" role="tabpanel" aria-labelledby="tabs-logs-tab">
+            <div class="row">
+                <div class="col">
+                    <table id="logs-list" class="display hover row-border stripe nowrap" style="width: 100%;"></table>
+                    <div id="view-log-container">
+                        <div class="row mb-2">
+                            <div class="col-md-10">
+                                <h5 id="view-log-filename" class="view-log-filename mt-2 ml-3"></h5>
+                            </div>
+                            <div class="col text-center">
+                                <button id="close-log" class="btn btn-secondary close-button">Close</button>
+                            </div>
+                        </div>
+                        <div id="view-log" class="view-log log-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="${http_root}js/eventsource.min.js"></script>
+<script src="${http_root}js/NoSleep.min.js"></script>
+<script src="${http_root}js/speakreader.js${cache_param}"></script>
+<script src="${http_root}js/speakreader-listen.js${cache_param}"></script>
+<script>
+// Global Variables
+var logStream = "";
+var prev_username = "";
+var prev_hashed_password = "";
+
+function test() {
+    var x = 0;
+    $.getJSON({
+        url: 'view_file',
+        dataType: 'JSON',
+        data: { "log": "active" },
+        success: function (jqXHR, status) {
+            var newHTML = jqXHR.responseJSON.data;
+            $('#console-log').html(jqXHR.responseJSON.data);
+            var x = 0;
+        },
+    });
+}
+
+function startLogStream() {
+
+    // Create Log Stream.
+    logStream = new EventSource('/streamLog?sessionID=' + sessionID);
+    logStream.onmessage = function (e) {
+        var data = JSON.parse(e.data);
+        var offset = scrollDoc ? window.innerHeight - $('#log-container').prop("clientHeight") + 2 : 0;
+        atBottom = $('#log-container').prop("scrollTop") + $('#log-container').prop("clientHeight") + offset >= $('#log-container').prop("scrollHeight");
+
+        switch (data.event) {
+            case 'close':
+                logStream.close();
+                break;
+
+            case 'reload':
+                $("#console-log").html(data.logRecord);
+                break;
+
+            case 'logRecord':
+                $("#console-log").append(data.logRecord);
+                break;
+        }
+
+        if ( atBottom ) {
+            $('#log-container').scrollTop($('#log-container').prop("scrollHeight"));
+        }
+    };
+
+    resizeContainers();
+};
+
+function stopLogStream() {
+    if ( logStream !== "" && logStream.readyState === 1 ) {
+        logStream.close();
+        navigator.sendBeacon("removeLogListener", sessionID);
+        logStream = "";
+    }
+};
+
+function setStatusView(s) {
+    var statusView = $('input[type=radio][name=status_view]:checked').val();
+    setCookie("statusView", statusView, 365);
+    $('#transcript-settings').slideUp();
+    switch (  statusView ) {
+        case 'off':
+            stopTranscriptStream();
+            stopLogStream();
+            $('#transcript-container').hide();
+            $('#log-container').hide();
+            break;
+
+        case 'transcript':
+            stopLogStream();
+            $('#log-container').hide();
+            $('#transcript-container').show();
+            startTranscriptStream();
+            break;
+
+        case 'console':
+            stopTranscriptStream();
+            $('#transcript-container').hide();
+            $('#log-container').show();
+            startLogStream();
+            break;
+    }
+};
+
+function resizeContainers() {
+    var listenHeight = window.innerHeight - $('#transcript-container').parent().prop('offsetTop') - 20;
+    $('#transcript-container').height(listenHeight);
+    var logHeight = window.innerHeight - $('#log-container').parent().prop('offsetTop') - 20;
+    $('#log-container').height(logHeight);
+
+    var bottom = window.innerHeight - $('#transcript-container').parent().prop('offsetTop') - $('#transcript-container').prop('clientHeight');
+    var width = $('#transcript-container').prop('scrollWidth');
+    $('#transcript-settings').css({'bottom': bottom + 'px', 'width': width + 'px'});
+
+    var viewContainerHeight = window.innerHeight - $('#view-log-container').offsetParent().prop('offsetTop') - 15;
+    $('#view-log-container').height(viewContainerHeight);
+    var viewContainerHeight = viewContainerHeight - $('#view-log').prop('offsetTop');
+    $('#view-log').height(viewContainerHeight - 20);
+
+    var viewContainerHeight = window.innerHeight - $('#view-transcript-container').offsetParent().prop('offsetTop') - 15;
+    $('#view-transcript-container').height(viewContainerHeight);
+    var viewContainerHeight = viewContainerHeight - $('#view-transcript').prop('offsetTop');
+    $('#view-transcript').height(viewContainerHeight - 20);
+}
+
+function postSaveChecks(jqXHR) {
+    var response = JSON.parse(jqXHR.responseText);
+    var x = $('#set_http_password').val();
+    $('#listeningOn').text($('#inputDeviceSelection').val());
+    $('#upload_credentials_file').val("");
+    $('#http_password').val("");
+    $('#set_http_password').val(0);
+    $('#credentials_file').val(response.credentials_file);
+    if ( response.logout ) {
+        window.location.href = "auth/logout";
+    }
+};
+
+function getSettings() {
+    $.ajax({
+        url: 'get_settings',
+        type: 'GET',
+        success: function (data, textStatus) {
+            var config = data.config;
+
+            // Check boxes
+            $('#show_interim_results').prop('checked', config.show_interim_results);
+            $('#start_transcribe_on_startup').prop('checked', config.start_transcribe_on_startup);
+            $('#launch_browser').prop('checked', config.launch_browser);
+            $('#enable_censorship').prop('checked', config.enable_censorship);
+            $('#http_basic_auth').prop('checked', config.http_basic_auth);
+            $('#http_hash_password').prop('checked', config.http_hash_password);
+            $('#enable_https').prop('checked', config.enable_https);
+
+            // Text Values
+            $('#credentials_file').val(config.credentials_file);
+            $('#transcripts_folder').val(config.transcripts_folder);
+            $('#log_dir').val(config.log_dir);
+            $('#http_port').val(config.http_port);
+            $('#https_cert').val(config.https_cert);
+            $('#https_cert_chain').val(config.https_cert_chain);
+            $('#https_key').val(config.https_key);
+            $('#http_username').val(config.http_username);
+            $('#hashed_password').val(config.hashed_password);
+            $('#censored_words').val(config.censored_words);
+
+            prev_username = config.http_username;
+            prev_hashed_password = config.hashed_password;
+            if ( prev_username !== "" ) {
+                $('#signout-button').show();
+            } else {
+                $('#signout-button').hide();
+            }
+
+            initConfigCheckbox('#enable_https');
+            initConfigCheckbox('#enable_censorship');
+        }
+    });
+};
+
+function saveSettings() {
+    if ( $('#configForm').attr('validated') === 'true' ) {
+        $.ajax({
+            url: 'configUpdate',
+            type: 'POST',
+            dataType: 'JSON',
+            data: new FormData($('#configForm')[0]),
+            processData: false,
+            contentType: false,
+            complete: function (jqXHR, textStatus) {
+                postSaveChecks(jqXHR);
+            }
+        });
+    }
+    return false;
+};
+
+function verifyAuthentication() {
+    $('#configForm').attr('validated', 'false');
+    var username = $('#http_username').val();
+    var password = $('#http_password').val();
+    $('#http_username_error').hide();
+    $('#http_password_error').hide();
+    $('#http_hash_password_error').hide();
+    if ( username !== '' && password === '' ) {
+        $('#http_password_error').html("<span>Password is required when Username is not blank.</span>").show();
+        return false;
+    }
+    if ( username === '' && password !== '' ) {
+        $('#http_username_error').html("<span>Username is required when Password is not blank.</span>").show();
+        return false;
+    }
+    $('#configForm').attr('validated', 'true');
+    return true;
+}
+
+$(document).ready(function() {
+
+    getSettings();
+
+    $('#upload_credentials_button').on('click', function(e) {
+        e.preventDefault();
+        $('#upload_credentials_file').trigger('click');
+    });
+
+    window.addEventListener('beforeunload', function(event) {
+        tesHandler.close();
+        noSleep.disable();
+        stopTranscriptStream();
+        stopLogStream();
+        return false;
+    }, false);
+
+    $('.navbar-toggler').on('click', function(){
+        if ( $('#navbarToggler').hasClass('show') ) {
+            $( '.navbar-collapse' ).collapse('hide');
+            return false;
+        }
+    });
+
+    $('.navbar-nav>li>a').on('click', function(){
+	    $( '#navbar .navbar-nav' ).find( 'li.active' ).removeClass( 'active' );
+	    $( '#navbar .nav-item' ).find( 'a.active' ).removeClass( 'active' );
+	    $( this ).parent( 'li' ).addClass( 'active' );
+        $( '.navbar-collapse' ).collapse('hide');
+    });
+
+    $('#save-button').click(function() {
+        saveSettings();
+        return false;
+    });
+
+    $('#shutdown-button').click(function() {
+        $.ajax({url: "shutdown"});
+        tesHandler.close();
+        setTimeout(function(){ window.close(); }, 4000);
+    });
+
+    $('#restart-button').click(function() {
+        $.ajax({url: "restart"});
+        tesHandler.close();
+        setTimeout(function(){ location.reload(); }, 12000);
+    });
+
+    $('#tes-button').click(function() {
+        if ( $(this).val() === "start") {
+            $.ajax({url: "startTranscribe"});
+        } else {
+            $.ajax({url: "stopTranscribe"});
+        }
+    });
+
+    window.addEventListener('resize', function() {
+        resizeContainers();
+    }, true);
+
+    // SSE handler for transcribeEngineStatus
+    var tesHandler = new EventSource('transcribeEngineStatus');
+    tesHandler.onmessage = function (e) {
+        var tesStatus = e.data;
+        switch (tesStatus) {
+            case "Close":
+                tesHandler.close();
+                break;
+
+            case "True":
+                $('#tes-button').css("background-color", "green").text("Stop").val("stop");
+                $('#tes-status').text("Online");
+                $('.listeningOn-div').show();
+                break;
+
+            case "False":
+                $('#tes-button').css("background-color", "red").text("Start").val("start");
+                $('#tes-status').text("Offline");
+                $('.listeningOn-div').hide();
+                break;
+        }
+    };
+
+
+    // Populate inputDeviceSelection with list of Input Devices
+    $.getJSON('/get_input_device_list', function (result) {
+        var inputDeviceSelection = $('#inputDeviceSelection');
+        inputDeviceSelection.empty();
+        if ( result.length === 0 ) {
+            inputDeviceSelection.append($('<option></option>').text('No Devices Available'));
+        }
+        $.each(result, function (key, device) {
+            inputDeviceSelection.append($('<option></option>').val(device.name).text(device.name));
+            if (device.selected) {
+                inputDeviceSelection.val(device.name).prop('selected', true);
+            }
+        })
+        $('#listeningOn').text($('#inputDeviceSelection').val());
+    });
+
+    var transcripts_table = $('#transcripts-list').DataTable({
+        "paging": false,
+        "searching": false,
+        "info": false,
+        "ajax": { "url": "get_files_list",
+                  "data": { "list": "transcripts" },
+                },
+        "ordering": true,
+        "order": [ 2 , 'desc' ],
+        "columns": [
+            { "className": "dt-center pl-1 pr-0", "data": null, "orderable": false, "defaultContent": '<i class="fas fa-eye view" data-toggle="tooltip" data-placement="top" title="View"></i>' },
+            { "className": "dt-center pl-0 pr-1", "data": null, "orderable": false, "defaultContent": '<i class="fas fa-download download" data-toggle="tooltip" data-placement="top" title="Download"></i>' },
+            { "title": "File Name", "data": "name" },
+            { "title": "Created", "data": "created" },
+            { "className": "dt-center pl-1 pr-1", "data": null, "orderable": false, "defaultContent": '<i class="fas fa-trash-alt delete" style="color: red;" data-toggle="tooltip" data-placement="top" title="Delete"></i>' },
+        ],
+        "drawCallback": function( settings ) {
+            $('[data-toggle="tooltip"]').tooltip();
+        },
+    });
+    transcripts_table.draw();
+
+    $('#transcripts-list tbody').on( 'click', 'i', function () {
+        var data = transcripts_table.row( $(this).parents('tr') ).data();
+        if ( $(this).hasClass("view") )   {
+            $.ajax({
+                url: 'view_file',
+                dataType: 'JSON',
+                data: { "transcript": data.name },
+                complete: function (jqXHR, status) {
+                    $('#view-transcript').html(jqXHR.responseJSON.data);
+                    $('#transcripts-list').hide();
+                    $('#view-transcript-container').show();
+                    $('#view-transcript-filename').text(data.name);
+                    resizeContainers();
+                },
+            });
+        };
+
+        if ( $(this).hasClass("delete") ) {
+            $(this).tooltip('hide');
+            $.ajax({
+                url: 'delete_file',
+                dataType: 'JSON',
+                data: { "transcript": data.name },
+                complete: function () { transcripts_table.ajax.reload(); },
+            });
+        };
+
+        if ( $(this).hasClass("download") ) {
+            window.location.href = "download_file?transcript=" + data.name;
+        };
+    });
+
+    $('#close-transcript').click(function() {
+        $('#view-transcript-container').hide();
+        $('#transcripts-list').show();
+        return false;
+    });
+
+    var logs_table = $('#logs-list').DataTable({
+        "paging": false,
+        "searching": false,
+        "info": false,
+        "ajax": { "url": "get_files_list",
+                  "data": { "list": "logs" },
+                },
+        "ordering": true,
+        "order": [ 2 , 'desc' ],
+        "columns": [
+            { "className": "dt-center pl-1 pr-0", "data": null, "orderable": false, "defaultContent": '<i class="fas fa-eye view" data-toggle="tooltip" data-placement="top" title="View"></i>' },
+            { "className": "dt-center pl-0 pr-1", "data": null, "orderable": false, "defaultContent": '<i class="fas fa-download download" data-toggle="tooltip" data-placement="top" title="Download"></i>' },
+            { "title": "File Name", "data": "name" },
+            { "title": "Created", "data": "created" },
+            { "className": "dt-center pl-1 pr-1", "data": null, "orderable": false, "defaultContent": '<i class="fas fa-trash-alt delete" style="color: red;" data-toggle="tooltip" data-placement="top" title="Delete"></i>' },
+        ],
+        "drawCallback": function( settings ) {
+            $('[data-toggle="tooltip"]').tooltip();
+        },
+    });
+    logs_table.draw();
+
+    $('#logs-list tbody').on( 'click', 'i', function () {
+        var data = logs_table.row( $(this).parents('tr') ).data();
+        if ( $(this).hasClass("view") )   {
+            $.ajax({
+                url: 'view_file',
+                dataType: 'JSON',
+                data: { "log": data.name },
+                complete: function (jqXHR, status) {
+                    $('#view-log').html(jqXHR.responseJSON.data);
+                    $('#logs-list').hide();
+                    $('#view-log-container').show();
+                    $('#view-log-filename').text(data.name);
+                    resizeContainers();
+                },
+            });
+        };
+
+        if ( $(this).hasClass("delete") ) {
+            $(this).tooltip('hide');
+            $.ajax({
+                url: 'delete_file',
+                dataType: 'JSON',
+                data: { "log": data.name },
+                complete: function () { logs_table.ajax.reload(); },
+            });
+        };
+
+        if ( $(this).hasClass("download") ) {
+            window.location.href = "download_file?log=" + data.name;
+        };
+    });
+
+    $('#close-log').click(function() {
+        $('#view-log-container').hide();
+        $('#logs-list').show();
+        return false;
+    });
+
+    $('#enable_https').click(function() {
+        if ( $(this).prop('checked') && $('#http_port').val() == '80' ) {
+            $('#http_port').val('443');
+        }
+        if ( !$(this).prop('checked') && $('#http_port').val() == '443' ) {
+            $('#http_port').val('80');
+        }
+    });
+
+    $('#close-censored-words').click(function() {
+        $('#config-container').show();
+        $('#censored-words-container').hide();
+        return false;
+    });
+
+    $('#censored-words-button').click(function() {
+        $('#config-container').hide();
+        $('#censored-words-container').show();
+        return false;
+    });
+
+    $('#update-now-button').click(function() {
+        $('#update-available').hide();
+    });
+
+    $('#http_port').change(function() {
+        var port = $('#http_port').val();
+        $('#http_port_error').hide();
+        $('#configForm').attr('validated', 'false');
+
+        if ( port === '' ) {
+            $('#http_port_error').html("<span>Port is required.</span>").show();
+            return;
+        }
+        var isNum = /^\d+$/.test(port);
+        if ( isNum ) {
+            port = parseInt(port);
+        }
+        if ( !isNum || ( isNum && ( port < 1 || port > 64535 ) ) ) {
+            $('#http_port_error').html("<span>Port must be an integer between 1 and 65535.</span>").show();
+            return;
+        }
+        $('#configForm').attr('validated', 'true');
+    });
+
+    $('#http_username').change(function() {
+        if ( prev_username === "" ) {
+            verifyAuthentication();
+        }
+    });
+
+    $('#http_password').change(function() {
+        if ( verifyAuthentication() ) {
+            $("#set_http_password").val(1);
+        }
+    });
+
+    $('#http_hash_password').change(function() {
+        $('#configForm').attr('validated', 'false');
+        $('#http_hash_password_error').hide();
+        if ( !$(this).prop('checked')
+        && prev_hashed_password === 1
+        && $('#http_username').val() !== ""
+        && $('#http_password').val() === "" ) {
+            $('#http_hash_password_error').html("<span>New password must be set. Cannot unhash any existing password.</span>").show();
+            return;
+        }
+        $('#configForm').attr('validated', 'true');
+
+    });
+
+    var update_available = ${productInfo['update_available']}
+    if ( update_available ) {
+        $('#update-available').show();
+    } else {
+        $('#update-available').hide();
+    }
+
+    $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
+        $('#view-log-container').hide();
+        $('#logs-list').show();
+        $('#view-transcript-container').hide();
+        $('#transcripts-list').show();
+        resizeContainers();
+        var target = $(e.target).attr("href");
+        if ((target === '#tabs-settings')) {
+            getSettings();
+        }
+    });
+
+    $('input[type=radio][name=status_view]').change(function() {
+        setStatusView();
+        resizeContainers();
+    });
+
+    var statusView = getCookie("statusView");
+    if ( statusView !== "" ) {
+        $('input[type=radio][name=status_view][value="' +statusView+ '"]').prop('checked', true);
+        setCookie("statusView", statusView, 365);
+    }
+
+    $('#log-bottom-button').click(function() {
+        $('#log-container').scrollTop($('#log-container').prop("scrollHeight"));
+        return false;
+    });
+
+    function showLogButton(e) {
+        var atBottom = $('#log-container').prop("scrollTop") + $('#log-container').prop("clientHeight") >= $('#log-container').prop("scrollHeight");
+        if ( atBottom ) {
+            $('#log-bottom-button').hide();
+        } else {
+            $('#log-bottom-button').show();
+            if ( !scrollDoc ) {
+                var top = $('#log-container').prop("offsetTop") + $('#log-container').parent().prop("offsetTop") + 5;
+                var left = $('#log-container').prop("offsetLeft") + $('#log-container').parent().prop("offsetLeft") + $('#log-container').prop("clientWidth") - $('#log-bottom-button').prop("offsetWidth") - 5;
+                $( "#log-bottom-button" ).css({"top": top + "px", "left": left + "px"});
+                if ( e.type === "resize") {
+                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                    window.scrollTo(window.scrollX, window.scrollY + 1);
+                }
+            }
+        }
+    };
+    window.addEventListener('scroll', showLogButton, true);
+    window.addEventListener('resize', showLogButton, true);
+
+    setStatusView();
+    resizeContainers();
+    showLogButton();
+
+});
+
+</script>
+</body>
+</html>

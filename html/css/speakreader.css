@@ -1,0 +1,272 @@
+
+body,
+.listen-content {
+    font-family: 'Open Sans', Arial, sans-serif;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #f2f2f2;
+}
+
+.manage-content {
+    background-color: #ffffb3;
+}
+
+.container {
+    max-width: 900px;
+    min-width: 400px;
+    padding: 0px 15px 15px 15px;
+    background-color: #80ff80;
+}
+
+.transcript-container,
+.log-container {
+    background-color: #f2f2f2;
+    position: relative;
+    width: 100%;
+    min-height: 100px;
+}
+
+#transcript-container {
+    overflow-y: auto;
+}
+
+#log-container {
+    overflow: auto;
+}
+
+.config-container .form-group {
+    background-color: #5cd65c;
+    padding: 10px 25px 10px 25px;
+    margin-bottom: 10px;
+}
+
+.config-container .form-section {
+    border: 2px solid black;
+    margin-bottom: 20px;
+    padding-top: 10px;
+}
+
+.status-view-container {
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: yellow;
+}
+
+.status-view-title {
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+.form-sub-group {
+    padding: 10px 0px 0px 0px;
+}
+
+.navbar {
+    background-color: orange;
+    width: 100%;
+}
+
+.title {
+    background-color: #999999;
+    margin: 0px;
+    padding: 4px 0px 4px 0px;
+    font-size: 28px;
+}
+
+.censored-words-container {
+    background-color: #f2f2f2;
+    position: relative;
+    width: 100%;
+    padding: 0px 10px 0px 10px;
+}
+
+.product-info-container {
+    background-color: grey;
+    padding: 5px 25px 5px 25px;
+    margin: 5px 0px 15px 0px;
+}
+
+#transcript-settings {
+    background-color: #99bbff;
+    border-top: 2px solid black;
+    position: fixed;
+    bottom: 0px;
+    display: none;
+    width: 100%;
+}
+
+.transcript {
+    line-height: 1.4;
+    margin: 5px 0px 10px 0px;
+    color: black;
+    padding: 0px 10px 0px 10px;
+}
+
+.console-log {
+    line-height: 1.4;
+    margin: 5px 0px 10px 0px;
+    color: black;
+    padding: 0px 10px 0px 10px;
+}
+
+#bottom-button,
+#log-bottom-button {
+    z-index: 999;
+    font-size: 22px;
+    line-height: 1.0;
+    padding: 6px 6px 6px 6px;
+    position: fixed;
+    background-color: #009900;
+    color: white;
+    border: 2px solid black;
+    border-radius: 7px;
+    top: 5px;
+    right: 5px;
+    display: none;
+}
+
+#close-censored-words {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    color: white;
+    background-color: black;
+}
+
+.close-button {
+}
+
+.signout-button {
+    display: none;
+}
+
+.update-now-button {
+    background-color: green;
+    color: white;
+}
+
+#view-transcript-container,
+#view-log-container {
+    display: none;
+}
+
+#view-transcript,
+#view-log {
+    overflow: auto;
+    padding: 10px 10px 10px 10px;
+    min-height: 100px;
+    height: 100%;
+    width: 100%;
+}
+
+#log {
+}
+
+#console-log>p,
+#view-log>p {
+    margin: 0px;
+    white-space: nowrap;
+}
+
+.fontsize-button {
+    margin: 10px 0px 10px 0px;
+    background-color: #bfbfbf;
+    height: 40px;
+    width: 60px;
+    letter-spacing: 5px;
+    border: 1px solid black;
+    border-radius: 5px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.fontsize-button-down {
+    font-size: 15px;
+}
+
+.fontsize-button-up {
+    font-size: 20px;
+}
+
+.login-container {
+    margin-right: auto;
+    margin-left: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 100%;
+}
+
+.login-container .form-group {
+    margin-bottom: 20px;
+}
+.login-container .form-group label {
+    font-weight: 400;
+}
+.login-container .form-control {
+    height: 38px;
+    line-height: 1.5em;
+}
+.login-container .login-button {
+    text-transform: uppercase;
+}
+.login-container .remember-group {
+    color: #999;
+    display: inline-block;
+    margin-top: 7.5px;
+}
+.login-container .remember-group .control-label {
+    display: inline;
+    margin-bottom: 0;
+    font-weight: 400;
+    cursor: pointer;
+}
+.login-alert {
+    text-align: center;
+    padding: 8px;
+    display: none;
+    width: 100%;
+}
+
+@media screen and (min-device-width: 980px) /* Desktop */ {
+    .listen-content {
+        font-size: 16px;
+    }
+}
+
+@media screen and (max-device-width: 979px) /* Tablet */ {
+    .listen-content {
+        font-size: 3.5vw;
+    }
+}
+
+@media screen and (max-device-width: 800px) /* Tablet */ {
+    .listen-content {
+        font-size: 3.2vw;
+    }
+}
+
+@media screen and (max-device-width: 500px) /* Mobile */ {
+    .listen-content {
+        font-size: 3.5vw;
+    }
+    .container {
+        padding: 0px 2px 10px 2px;
+    }
+    .title {
+        font-size: 18px;
+    }
+}
+
+.alert {
+    display: none;
+    padding-inline-start: 30px;
+    padding: 0px 15px 0px 15px;
+    margin-bottom: auto;
+    margin-top: auto;
+}
+
+.alert-danger {
+    border-color: red;
+    background-color: #f5c6cb;
+    color: red;
+}

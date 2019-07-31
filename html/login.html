@@ -1,0 +1,121 @@
+﻿<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>SpeakReader - ${title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <link rel="stylesheet" href="${http_root}css/speakreader.css${cache_param}">
+</head>
+
+<body>
+<div class="content">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md title">
+                <h4 class="text-center text-nowrap title">SpeakReader Management Console</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="login-container mt-4">
+                <div class="row">
+                    <div class="col">
+                        <div id="sign-in-alert" class="alert alert-danger login-alert"></div>
+                    </div>
+                </div>
+                <form id="login-form">
+                    <div class="form-row">
+                        <div class="col-sm-6 ml-auto mr-auto">
+                            <div class="form-group">
+                                <label for="username" class="control-label">Username</label>
+                                <input type="text" id="username" name="username" class="form-control" autocorrect="off" autocapitalize="off" autofocus>
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="control-label">Password</label>
+                                <input type="password" id="password" name="password" class="form-control">
+                            </div>
+                            <div class="form-group form-check">
+                                <input id="remember_me" type="checkbox" class="form-check-input" name="remember_me" value="1" title="for 30 days" checked="checked">
+                                <label for="remember_me" class="form-check-label">Remember Me</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="login-default" class="row">
+                        <div class="col text-center mb-3">
+                            <small>The default username and password is <span class="font-italic font-weight-bold">admin</span> and <span class="font-italic font-weight-bold">admin</span>.
+                            This should be changed in the Settings page.</small>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col text-center">
+                            <button id="sign-in" type="submit" class="btn btn-primary login-button"><i class="fa fa-sign-in"></i>Sign In</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="${http_root}js/speakreader.js${cache_param}"></script>
+<script>
+
+    var login_default = ${login_default};
+    if ( login_default ) {
+        $('#login-default').show();
+    } else {
+        $('#login-default').hide();
+    }
+
+    $('#login-form').submit(function(event) {
+        event.preventDefault();
+        signIn();
+    });
+
+    function signIn() {
+        $('.login-container button').prop('disabled', true);
+        $('#sign-in').html('<i class="fa fa-refresh fa-spin"></i>Sign In');
+
+        const username = $('#username').val();
+        const password = $('#password').val();
+        const remember_me = $('#remember_me').is(':checked') ? '1' : '0';
+
+        var data = {
+            username: username,
+            password: password,
+            remember_me: remember_me
+        };
+
+        $.ajax({
+            url: '${http_root}auth/signin',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            statusCode: {
+                200: function() {
+                    window.location = "/manage";
+                },
+                401: function() {
+                    $('#sign-in-alert').text('Incorrect username or password.').show();
+                    $('#username').focus();
+                }
+            },
+            complete: function() {
+                $('.login-container button').prop('disabled', false);
+                $('#sign-in').html('<i class="fa fa-sign-in"></i>Sign In');
+            }
+        });
+    }
+</script>
+</body>
+</html>

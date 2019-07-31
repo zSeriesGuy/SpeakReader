@@ -1,0 +1,16 @@
+# requirements.in
+#   Used by pip-tools to generate requirements.txt
+#
+CherryPy
+portend
+Mako
+google-cloud-speech
+google-api-python-client
+configobj
+PyAudio
+pywin32; sys_platform == "win32"
+pyjwt
+httplib2
+python-dateutil
+tzlocal
+passlib

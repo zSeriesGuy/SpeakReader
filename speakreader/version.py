@@ -1,0 +1,2 @@
+﻿GITHUB_BRANCH = "Master"
+VERSION_RELEASE = "V1.0.00"

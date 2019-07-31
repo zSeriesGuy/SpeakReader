@@ -1,0 +1,73 @@
+## Installation Instructions
+SpeakReader has been installed and tested on Windows 10 and Ubuntu 18.04 using Python 3.6.8.
+
+### Windows
+
+Install the latest version of [Python 3](https://www.python.org/downloads/windows/). Download the Windows installer and complete the installation with all the default options.
+
+##### Method 1 (easy):
+* Download SpeakReader from GitHub: https://github.com/zSeriesGuy/SpeakReader/zipball/master
+* Extract the ZIP file.
+* Open a CMD window.
+* CD to the directory where you unzipped SpeakReader.
+* Type: `python -m venv .\`
+* Type: `.\scripts\activate`
+* Type: `python -m pip install --upgrade pip setuptools`
+* Type: `python -m pip install wheel pip-tools`
+* Type: `pip3 install .\PyAudioWheels\PyAudio-0.2.11-cp37-cp37m-win_amd64.whl`
+* Type: `pip3 install -r requirements.txt`
+* Type: `.\scripts\python start.py` to start SpeakReader.
+* SpeakReader will be loaded in your browser or listening on http://localhost:8880
+* You can change the port in the Configuration tab of the management page or by editing config.ini.
+
+##### Method 2 (preferred):
+> NOTE: This method is preferred because it adds the support to Windows to be able to auto update SpeakReader. This will install extra shell extensions and make adjustments to your path environment. 
+
+* Go to https://gitforwindows.org/ and download git.
+* Run the installation with the default options.
+* Right click on your desktop and select "Git Gui".
+* Select "Clone Existing Repository".
+* In the "Source Location" enter: https://github.com/zSeriesGuy/SpeakReader.git
+* In the "Target Directory" enter a new folder where you want to install SpeakReader to (e.g. C:\SpeakReader).
+* Click "Clone".
+* When it's finished a Git Gui windows will appear, just close this window.
+* Go to Method 1 and continue at the "Open a CMD Window".
+
+
+### Linux
+SpeakReader will be installed to `/opt/SpeakReader`.
+
+* Open a terminal
+* Install Git
+    * Ubuntu/Debian: `sudo apt-get install git-core`
+* Install prerequisites:
+    * Ubuntu/Debian:
+        * `sudo apt-get install build-essential libffi-dev libssl-dev libxml2-dev libxslt1-dev libjpeg8-dev zlib1g-dev alsa-utils portaudio19-dev`
+        * `sudo apt-get install python3 python3-venv python3-all-dev`
+* Type: `cd /opt`
+* Type: `sudo git clone https://github.com/zSeriesGuy/SpeakReader.git`
+* Type: `cd SpeakReader`
+* Type: `python3 -m venv /opt/SpeakReader`
+* Type: `source /opt/SpeakReader/bin/activate`
+* Type: `python -m pip install --upgrade pip setuptools wheel pip-tools`
+* Type: `pip3 install -r /opt/SpeakReader/requirements.txt`
+* Type: `sudo usermod -aG audio userid` where userid is the user that you signed in to the terminal with.   
+* Type: `/opt/SpeakReader/bin/python3 /opt/SpeakReader/start.py` to start SpeakReader
+* SpeakReader will be loaded in your browser or listening on http://localhost:8880
+
+To run SpeakReader in the background as a Daemon on startup:
+
+* Ubuntu/Debian:
+    * `sudo cp /opt/SpeakReader/init-scripts/speakreader.service /lib/systemd/system`
+    * `sudo systemctl daemon-reload`
+    * `sudo addgroup speakreader && sudo adduser --system --no-create-home speakreader --ingroup speakreader`
+    * `sudo usermod -aG audio speakreader`  
+    * `sudo chown -R speakreader:speakreader /opt/SpeakReader`
+    * `sudo systemctl enable speakreader`
+    * `sudo systemctl start speakreader`
+    
+    If you configure SpeakReader to listen on port 80 or 443 (or any port below 1024), you will need to run SpeakReader as **root** user.
+    
+    * Edit `/lib/systemd/system/speakreader/service` and change user and group to *root*.
+    * `sudo systemctl daemon-reload`
+    * `sudo systemctl restart speakreader`
