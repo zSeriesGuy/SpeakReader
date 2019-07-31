@@ -16,7 +16,7 @@ from mako import exceptions
 from passlib.hash import pbkdf2_sha256
 
 import speakreader
-from speakreader import logger
+from speakreader import logger, versioncheck
 from speakreader.session import get_session_info, get_session_user_id
 from speakreader.webauth import AuthController, requireAuth, is_admin
 
@@ -32,7 +32,7 @@ def serve_template(templatename, **kwargs):
     http_root = speakreader.CONFIG.HTTP_ROOT
     server_name = speakreader.PRODUCT
     # TODO: Remove timestamp from cache_param when done.
-    cache_param = '?v=' + speakreader.VERSION + '-' + datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+    cache_param = '?v=' + speakreader.RELEASE + '-' + datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
 
     template_dir = os.path.join(str(speakreader.PROG_DIR), 'html')
 
@@ -78,9 +78,9 @@ class WebInterface(object):
 
         productInfo = {
             "product": speakreader.PRODUCT,
-            "current_version": speakreader.VERSION,
-            "latest_version": speakreader.latest_version,
-            "update_available": int(speakreader.update_available),
+            "current_version": speakreader.RELEASE,
+            "latest_version": versioncheck.LATEST_RELEASE,
+            "update_available": int(versioncheck.UPDATE_AVAILABLE),
         }
 
         return serve_template(templatename="manage.html", title="Management Console", productInfo=productInfo)

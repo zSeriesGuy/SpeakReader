@@ -56,6 +56,7 @@ _CONFIG_DEFINITIONS = {
     'GIT_TOKEN': (str, 'Update', ''),
     'GIT_USER': (str, 'Update', 'zSeriesGuy'),
     'GIT_REPO': (str, 'Update', 'SpeakReader'),
+    'DO_NOT_OVERRIDE_GIT_BRANCH': (int, 'Update', 0),
 
     'HTTP_ENVIRONMENT': (str, 'General', 'production'),
     'ANON_REDIRECT': (str, 'General', 'http://www.nullrefer.com/?'),

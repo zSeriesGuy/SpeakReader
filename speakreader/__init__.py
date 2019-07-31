@@ -13,7 +13,7 @@ try:
 except ImportError:
     no_browser = True
 
-from speakreader import webstart, logger, config, version
+from speakreader import webstart, logger, config, version, versioncheck
 from speakreader.transcribeEngine import TranscribeEngine
 from speakreader.queueManager import QueueManager
 
@@ -27,11 +27,7 @@ PRODUCT = 'SpeakReader'
 BRANCH = version.GITHUB_BRANCH
 RELEASE = version.VERSION_RELEASE
 
-latest_version = "V1.1.0"
-update_available = True
-
 # TODO: Update checks and auto update from GITHUB
-# TODO: Add active console log viewer
 
 class SpeakReader(object):
     _INITIALIZED = False
@@ -92,6 +88,8 @@ class SpeakReader(object):
                 logger.debug("Generating JWT secret...")
                 CONFIG.JWT_SECRET = generate_uuid()
                 CONFIG.write()
+
+            versioncheck.version_init()
 
             self.get_input_device()
 

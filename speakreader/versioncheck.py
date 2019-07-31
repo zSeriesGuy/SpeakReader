@@ -18,90 +18,104 @@ import platform
 import re
 import subprocess
 import tarfile
+import json
 
 import speakreader
-from speakreader import logger, CONFIG
+from speakreader import logger
 import requests
+
+INSTALL_TYPE = None
+INSTALLED_VERSION_HASH = None
+INSTALLED_RELEASE = None
+LATEST_VERSION_HASH = None
+COMMITS_BEHIND = None
+LATEST_RELEASE = None
+UPDATE_AVAILABLE = False
 
 
 def version_init():
+
+    global INSTALL_TYPE
+    global INSTALLED_VERSION_HASH
+    global INSTALLED_RELEASE
+    global LATEST_VERSION_HASH
+    global COMMITS_BEHIND
+    global INSTALLED_RELEASE
+    global LATEST_RELEASE
+    global UPDATE_AVAILABLE
+    
     # Get the previous version from the version lock file
-    version_lock_file = os.path.join(CONFIG.DATA_DIR, "version.lock")
-    prev_version = None
+    version_lock_file = os.path.join(speakreader.DATA_DIR, "version.lock")
+    release_lock_file = os.path.join(speakreader.DATA_DIR, "release.lock")
+
+    # Get the currently installed version. Returns None, 'win32' or the git hash.
+    INSTALL_TYPE, INSTALLED_VERSION_HASH, speakreader.CONFIG.GIT_REMOTE, speakreader.CONFIG.GIT_BRANCH = getInstalledVersion()
+    INSTALLED_RELEASE = speakreader.RELEASE
+
+    # Get the previous version hash from the file
+    prev_version_hash = None
     if os.path.isfile(version_lock_file):
         try:
             with open(version_lock_file, "r") as fp:
-                prev_version = fp.read()
+                prev_version_hash = fp.read()
         except IOError as e:
             logger.error("Unable to read previous version from file '%s': %s" %
                          (version_lock_file, e))
-
-    # Get the currently installed version. Returns None, 'win32' or the git hash.
-    CURRENT_VERSION, CONFIG.GIT_REMOTE, CONFIG.GIT_BRANCH = getVersion()
-
-    # Write current version to a file, so we know which version did work.
-    # This allows one to restore to that version. The idea is that if we
-    # arrive here, most parts of SpeakReader seem to work.
-    if CURRENT_VERSION:
-        try:
-            with open(version_lock_file, "w") as fp:
-                fp.write(CURRENT_VERSION)
-        except IOError as e:
-            logger.error("Unable to write current version to file '%s': %s" %
-                         (version_lock_file, e))
-
-    # Check for new versions
-    if CONFIG.CHECK_GITHUB_ON_STARTUP and CONFIG.CHECK_GITHUB:
-        try:
-            LATEST_VERSION = check_update()
-        except Exception as e:
-            logger.exception("Unhandled exception: %s" % e)
-            LATEST_VERSION = CURRENT_VERSION
-    else:
-        LATEST_VERSION = CURRENT_VERSION
+            if INSTALLED_VERSION_HASH:
+                try:
+                    with open(version_lock_file, "w") as fp:
+                        fp.write(INSTALLED_VERSION_HASH)
+                except IOError as e:
+                    logger.error("Unable to write current version to file '%s': %s" %
+                                 (version_lock_file, e))
 
     # Get the previous release from the file
-    release_file = os.path.join(CONFIG.DATA_DIR, "release.lock")
-    PREV_RELEASE = speakreader.RELEASE
-    if os.path.isfile(release_file):
+    if os.path.isfile(release_lock_file):
         try:
-            with open(release_file, "r") as fp:
-                PREV_RELEASE = fp.read()
+            with open(release_lock_file, "r") as fp:
+                INSTALLED_RELEASE = fp.read()
         except IOError as e:
             logger.error("Unable to read previous release from file '%s': %s" %
-                         (release_file, e))
+                         (release_lock_file, e))
+            try:
+                with open(release_lock_file, "w") as fp:
+                    fp.write(speakreader.RELEASE)
+            except IOError as e:
+                logger.error("Unable to write current release to file '%s': %s" %
+                             (release_lock_file, e))
+
+    # Check for new versions
+    if speakreader.CONFIG.CHECK_GITHUB_ON_STARTUP and speakreader.CONFIG.CHECK_GITHUB:
+        try:
+            LATEST_VERSION_HASH = check_update()
+        except Exception as e:
+            logger.exception("Unhandled exception: %s" % e)
+            LATEST_VERSION_HASH = INSTALLED_VERSION_HASH
+    else:
+        LATEST_VERSION_HASH = INSTALLED_VERSION_HASH
 
     # Check if the release was updated
-    if speakreader.RELEASE != PREV_RELEASE:
-        CONFIG.UPDATE_SHOW_CHANGELOG = 1
-        CONFIG.write()
+    if speakreader.RELEASE != INSTALLED_RELEASE:
+        speakreader.CONFIG.UPDATE_SHOW_CHANGELOG = 1
+        speakreader.CONFIG.write()
         _UPDATE = True
 
-    # Write current release version to file for update checking
-    try:
-        with open(release_file, "w") as fp:
-            fp.write(speakreader.RELEASE)
-    except IOError as e:
-        logger.error("Unable to write current release to file '%s': %s" %
-                     (release_file, e))
 
+def getInstalledVersion():
 
-def getVersion():
+    install_type = current_commit_hash = remote_name = branch_name = None
 
     if os.path.isdir(os.path.join(speakreader.PROG_DIR, '.git')):
-
-        speakreader.INSTALL_TYPE = 'git'
+        install_type = 'git'
         output, err = runGit('rev-parse HEAD')
 
-        if not output:
+        if output:
+            if re.match('^[a-z0-9]+$', output):
+                current_commit_hash = output
+            else:
+                logger.error('Output does not look like a hash, not using it.')
+        else:
             logger.error('Could not find latest installed version.')
-            cur_commit_hash = None
-
-        cur_commit_hash = str(output)
-
-        if not re.match('^[a-z0-9]+$', cur_commit_hash):
-            logger.error('Output does not look like a hash, not using it.')
-            cur_commit_hash = None
 
         if speakreader.CONFIG.DO_NOT_OVERRIDE_GIT_BRANCH and speakreader.CONFIG.GIT_BRANCH:
             branch_name = speakreader.CONFIG.GIT_BRANCH
@@ -111,65 +125,65 @@ def getVersion():
             remote_branch = remote_branch.rsplit('/', 1) if remote_branch else []
             if len(remote_branch) == 2:
                 remote_name, branch_name = remote_branch
-            else:
-                remote_name = branch_name = None
 
             if not remote_name and speakreader.CONFIG.GIT_REMOTE:
                 logger.error('Could not retrieve remote name from git. Falling back to %s.' % speakreader.CONFIG.GIT_REMOTE)
                 remote_name = speakreader.CONFIG.GIT_REMOTE
+
             if not remote_name:
                 logger.error('Could not retrieve remote name from git. Defaulting to origin.')
-                branch_name = 'origin'
+                remote_name = 'origin'
 
             if not branch_name and speakreader.CONFIG.GIT_BRANCH:
                 logger.error('Could not retrieve branch name from git. Falling back to %s.' % speakreader.CONFIG.GIT_BRANCH)
                 branch_name = speakreader.CONFIG.GIT_BRANCH
+
             if not branch_name:
                 logger.error('Could not retrieve branch name from git. Defaulting to master.')
                 branch_name = 'master'
 
-        return cur_commit_hash, remote_name, branch_name
-
     else:
-
-        speakreader.INSTALL_TYPE = 'source'
+        install_type = 'source'
+        remote_name = 'origin'
+        branch_name = speakreader.BRANCH
 
         version_file = os.path.join(speakreader.PROG_DIR, 'version.txt')
 
-        if not os.path.isfile(version_file):
-            return None, 'origin', speakreader.BRANCH
+        if os.path.isfile(version_file):
+            with open(version_file, 'r') as f:
+                current_commit_hash = f.read().strip(' \n\r')
 
-        with open(version_file, 'r') as f:
-            current_version = f.read().strip(' \n\r')
-
-        if current_version:
-            return current_version, 'origin', speakreader.BRANCH
-        else:
-            return None, 'origin', speakreader.BRANCH
+    return install_type, current_commit_hash, remote_name, branch_name
 
 
 def check_update(auto_update=False, notify=False):
+    global INSTALL_TYPE
+    global INSTALLED_VERSION_HASH
+    global UPDATE_AVAILABLE
+    global COMMITS_BEHIND
+    global LATEST_RELEASE
+
     check_github(auto_update=auto_update, notify=notify)
 
-    if not speakreader.CURRENT_VERSION:
-        speakreader.UPDATE_AVAILABLE = None
-    elif speakreader.COMMITS_BEHIND > 0 and speakreader.speakreader.BRANCH in ('master', 'beta') and \
-            speakreader.speakreader.RELEASE != speakreader.LATEST_RELEASE:
+    if not INSTALLED_VERSION_HASH:
+        UPDATE_AVAILABLE = None
+    elif COMMITS_BEHIND > 0 and speakreader.BRANCH in ('master', 'beta') and \
+            speakreader.RELEASE != LATEST_RELEASE:
         speakreader.UPDATE_AVAILABLE = 'release'
-    elif speakreader.COMMITS_BEHIND > 0 and speakreader.CURRENT_VERSION != speakreader.LATEST_VERSION and \
-            speakreader.INSTALL_TYPE != 'win':
-        speakreader.UPDATE_AVAILABLE = 'commit'
+    elif COMMITS_BEHIND > 0 and INSTALLED_VERSION_HASH != LATEST_VERSION_HASH and \
+            INSTALL_TYPE != 'win':
+        UPDATE_AVAILABLE = 'commit'
     else:
-        speakreader.UPDATE_AVAILABLE = False
+        UPDATE_AVAILABLE = False
 
-    if speakreader.WIN_SYS_TRAY_ICON:
-        if speakreader.UPDATE_AVAILABLE:
-            icon = os.path.join(speakreader.PROG_DIR, 'data/interfaces/', speakreader.CONFIG.INTERFACE, 'images/logo_tray-update.ico')
-            hover_text = speakreader.PRODUCT + ' - Update Available!'
-        else:
-            icon = os.path.join(speakreader.PROG_DIR, 'data/interfaces/', speakreader.CONFIG.INTERFACE, 'images/logo_tray.ico')
-            hover_text = speakreader.PRODUCT + ' - No Update Available'
-        speakreader.WIN_SYS_TRAY_ICON.update(icon=icon, hover_text=hover_text)
+    # if speakreader.WIN_SYS_TRAY_ICON:
+    #     if speakreader.UPDATE_AVAILABLE:
+    #         icon = os.path.join(speakreader.PROG_DIR, 'data/interfaces/', speakreader.CONFIG.INTERFACE, 'images/logo_tray-update.ico')
+    #         hover_text = speakreader.PRODUCT + ' - Update Available!'
+    #     else:
+    #         icon = os.path.join(speakreader.PROG_DIR, 'data/interfaces/', speakreader.CONFIG.INTERFACE, 'images/logo_tray.ico')
+    #         hover_text = speakreader.PRODUCT + ' - No Update Available'
+    #     speakreader.WIN_SYS_TRAY_ICON.update(icon=icon, hover_text=hover_text)
 
 
 def runGit(args):
@@ -178,9 +192,6 @@ def runGit(args):
         git_locations = ['"' + speakreader.CONFIG.GIT_PATH + '"']
     else:
         git_locations = ['git']
-
-    if platform.system().lower() == 'darwin':
-        git_locations.append('/usr/local/git/bin/git')
 
     output = err = None
 
@@ -191,7 +202,7 @@ def runGit(args):
             logger.debug('Trying to execute: "' + cmd + '" with shell in ' + speakreader.PROG_DIR)
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, cwd=speakreader.PROG_DIR)
             output, err = p.communicate()
-            output = output.strip()
+            output = output.strip().decode('utf-8')
 
             logger.debug('Git output: ' + output)
         except OSError:
@@ -211,7 +222,14 @@ def runGit(args):
 
 
 def check_github(auto_update=False, notify=False):
-    speakreader.COMMITS_BEHIND = 0
+    global INSTALL_TYPE
+    global INSTALLED_VERSION_HASH
+    global UPDATE_AVAILABLE
+    global COMMITS_BEHIND
+    global LATEST_RELEASE
+    global LATEST_VERSION_HASH
+
+    COMMITS_BEHIND = 0
 
     # Get the latest version available from github
     logger.info('Retrieving latest version information from GitHub')
@@ -219,52 +237,58 @@ def check_github(auto_update=False, notify=False):
                                                              speakreader.CONFIG.GIT_REPO,
                                                              speakreader.CONFIG.GIT_BRANCH)
     if speakreader.CONFIG.GIT_TOKEN: url = url + '?access_token=%s' % speakreader.CONFIG.GIT_TOKEN
-    version = request.request_json(url, timeout=20, validator=lambda x: type(x) == dict)
+    response = requests.get(url, timeout=20)
 
-    if version is None:
+    if response.ok:
+        version = response.json()
+    else:
         logger.warn('Could not get the latest version from GitHub. Are you running a local development version?')
-        return speakreader.CURRENT_VERSION
+        return
 
-    speakreader.LATEST_VERSION = version['sha']
-    logger.debug("Latest version is %s", speakreader.LATEST_VERSION)
+    LATEST_VERSION_HASH = version['sha']
+    logger.debug("Latest version is %s", LATEST_VERSION_HASH)
 
     # See how many commits behind we are
-    if not speakreader.CURRENT_VERSION:
-        logger.info('You are running an unknown version of Tautulli. Run the updater to identify your version')
-        return speakreader.LATEST_VERSION
+    if not INSTALLED_VERSION_HASH:
+        logger.info('You are running an unknown version of SpeakReader. Run the updater to identify your version')
+        return
 
-    if speakreader.LATEST_VERSION == speakreader.CURRENT_VERSION:
-        logger.info('Tautulli is up to date')
-        return speakreader.LATEST_VERSION
+    if LATEST_VERSION_HASH == INSTALLED_VERSION_HASH:
+        logger.info('SpeakReader is up to date')
+        return
 
     logger.info('Comparing currently installed version with latest GitHub version')
     url = 'https://api.github.com/repos/%s/%s/compare/%s...%s' % (speakreader.CONFIG.GIT_USER,
                                                                   speakreader.CONFIG.GIT_REPO,
-                                                                  speakreader.LATEST_VERSION,
-                                                                  speakreader.CURRENT_VERSION)
+                                                                  LATEST_VERSION_HASH,
+                                                                  INSTALLED_VERSION_HASH)
     if speakreader.CONFIG.GIT_TOKEN: url = url + '?access_token=%s' % speakreader.CONFIG.GIT_TOKEN
-    commits = request.request_json(url, timeout=20, whitelist_status_code=404, validator=lambda x: type(x) == dict)
+    response = requests.get(url, timeout=20, whitelist_status_code=404, validator=lambda x: type(x) == dict)
 
-    if commits is None:
+    if response.ok:
+        commits = response.json()
+    else:
         logger.warn('Could not get commits behind from GitHub.')
-        return speakreader.LATEST_VERSION
+        return
 
     try:
-        speakreader.COMMITS_BEHIND = int(commits['behind_by'])
-        logger.debug("In total, %d commits behind", speakreader.COMMITS_BEHIND)
+        COMMITS_BEHIND = int(commits['behind_by'])
+        logger.debug("In total, %d commits behind", COMMITS_BEHIND)
     except KeyError:
         logger.info('Cannot compare versions. Are you running a local development version?')
-        speakreader.COMMITS_BEHIND = 0
+        COMMITS_BEHIND = 0
 
-    if speakreader.COMMITS_BEHIND > 0:
-        logger.info('New version is available. You are %s commits behind' % speakreader.COMMITS_BEHIND)
+    if COMMITS_BEHIND > 0:
+        logger.info('New version is available. You are %s commits behind' % COMMITS_BEHIND)
 
         url = 'https://api.github.com/repos/%s/%s/releases' % (speakreader.CONFIG.GIT_USER, speakreader.CONFIG.GIT_REPO)
-        releases = request.request_json(url, timeout=20, whitelist_status_code=404, validator=lambda x: type(x) == list)
+        response = requests.get(url, timeout=20)
 
-        if releases is None:
+        if response.ok:
+            releases = response.json()
+        else:
             logger.warn('Could not get releases from GitHub.')
-            return speakreader.LATEST_VERSION
+            return
 
         if speakreader.CONFIG.GIT_BRANCH == 'master':
             release = next((r for r in releases if not r['prerelease']), releases[0])
@@ -275,22 +299,14 @@ def check_github(auto_update=False, notify=False):
         else:
             release = releases[0]
 
-        speakreader.LATEST_RELEASE = release['tag_name']
-
-        if notify:
-            speakreader.NOTIFY_QUEUE.put({'notify_action': 'on_plexpyupdate',
-                                     'plexpy_download_info': release,
-                                     'plexpy_update_commit': speakreader.LATEST_VERSION,
-                                     'plexpy_update_behind': speakreader.COMMITS_BEHIND})
+        LATEST_RELEASE = release['tag_name']
 
         if auto_update:
             logger.info('Running automatic update.')
-            speakreader.shutdown(restart=True, update=True)
+            #speakreader.shutdown(restart=True, update=True)
 
-    elif speakreader.COMMITS_BEHIND == 0:
-        logger.info('Tautulli is up to date')
-
-    return speakreader.LATEST_VERSION
+    elif COMMITS_BEHIND == 0:
+        logger.info('SpeakReader is up to date')
 
 
 def update():
@@ -389,7 +405,7 @@ def checkout_git_branch():
         output, err = runGit('pull %s %s' % (speakreader.CONFIG.GIT_REMOTE, speakreader.CONFIG.GIT_BRANCH))
 
 
-def read_changelog(latest_only=False, since_prev_release=False):
+def read_changelog(latest_only=False, since_INSTALLED_RELEASE=False):
     changelog_file = os.path.join(speakreader.PROG_DIR, 'CHANGELOG.md')
 
     if not os.path.isfile(changelog_file):
@@ -421,7 +437,7 @@ def read_changelog(latest_only=False, since_prev_release=False):
                     elif latest_only:
                         latest_version_found = True
                     # Add a space to the end of the release to match tags
-                    elif since_prev_release and str(speakreader.PREV_RELEASE) + ' ' in header_text:
+                    elif since_INSTALLED_RELEASE and str(speakreader.INSTALLED_RELEASE) + ' ' in header_text:
                         break
 
                     output[-1] += '<h' + header_level + '>' + header_text + '</h' + header_level + '>'
@@ -444,7 +460,7 @@ def read_changelog(latest_only=False, since_prev_release=False):
                     output.append('')
                     prev_level = 0
 
-        if since_prev_release:
+        if since_INSTALLED_RELEASE:
             output.reverse()
 
         return ''.join(output)
