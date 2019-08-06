@@ -80,7 +80,7 @@ class Version(object):
 
         # Check for new versions
         if speakreader.CONFIG.CHECK_GITHUB:
-            self.INSTALLED_VERSION_HASH = initial_hash
+            #self.INSTALLED_VERSION_HASH = initial_hash
             self.check_github()
         else:
             self.LATEST_VERSION_HASH = self.INSTALLED_VERSION_HASH
@@ -254,6 +254,7 @@ class Version(object):
                 )
                 return
 
+            logger.info("Update Complete")
 
 
 def runGit(args):
