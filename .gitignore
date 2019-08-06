@@ -13,6 +13,7 @@ venv*/*
 *.ini
 *.lock
 *.json
+version.txt
 logs/*
 transcripts/*
 

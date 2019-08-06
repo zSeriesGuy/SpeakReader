@@ -32,7 +32,7 @@ def serve_template(templatename, **kwargs):
     http_root = speakreader.CONFIG.HTTP_ROOT
     server_name = speakreader.PRODUCT
     # TODO: Remove timestamp from cache_param when done.
-    cache_param = '?v=' + speakreader.RELEASE + '-' + datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+    cache_param = '?v=' + speakreader.VERSION_RELEASE + '-' + datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
 
     template_dir = os.path.join(str(speakreader.PROG_DIR), 'html')
 
@@ -75,12 +75,11 @@ class WebInterface(object):
     @cherrypy.expose
     @requireAuth()
     def manage(self, **kwargs):
-
         productInfo = {
             "product": speakreader.PRODUCT,
-            "current_version": speakreader.RELEASE,
-            "latest_version": versioncheck.LATEST_RELEASE,
-            "update_available": int(versioncheck.UPDATE_AVAILABLE),
+            "current_version": self.SR.versionInfo.INSTALLED_RELEASE,
+            "latest_version": self.SR.versionInfo.LATEST_RELEASE,
+            "update_available": int(bool(self.SR.versionInfo.UPDATE_AVAILABLE)),
         }
 
         return serve_template(templatename="manage.html", title="Management Console", productInfo=productInfo)
@@ -202,6 +201,13 @@ class WebInterface(object):
     @requireAuth(is_admin())
     def stopTranscribe(self, **kwargs):
         self.SR.stopTranscribeEngine()
+        return {'result': 'success'}
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    @requireAuth(is_admin())
+    def update(self, **kwargs):
+        self.SR.versionInfo.update()
         return {'result': 'success'}
 
     @cherrypy.expose

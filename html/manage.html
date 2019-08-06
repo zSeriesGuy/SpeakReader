@@ -811,7 +811,10 @@ $(document).ready(function() {
     });
 
     $('#update-now-button').click(function() {
-        $('#update-available').hide();
+        $.ajax({
+            url: 'update',
+            complete: function () { $('#update-available').hide(); },
+        });
     });
 
     $('#http_port').change(function() {

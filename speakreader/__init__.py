@@ -25,7 +25,7 @@ INIT_LOCK = threading.Lock()
 
 # Identify Our Application
 PRODUCT = 'SpeakReader'
-VERSION_RELEASE = "V1.0.00"
+VERSION_RELEASE = "V1.0.00-beta"
 GITHUB_BRANCH = "Master"
 
 # TODO: Update checks and auto update from GITHUB
@@ -92,8 +92,14 @@ class SpeakReader(object):
                 CONFIG.JWT_SECRET = generate_uuid()
                 CONFIG.write()
 
-            versionInfo = Version()
+            ###################################################################################################
+            #  Get Version Information and check for updates
+            ###################################################################################################
+            self.versionInfo = Version()
 
+            d = self.versionInfo.__dict__
+            for k, v in d.items():
+                print(str(k) + ": " + str(v))
             self.get_input_device()
 
 

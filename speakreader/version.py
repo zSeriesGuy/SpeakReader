@@ -151,6 +151,7 @@ class Version(object):
             logger.info('New version is available. You are %s commits behind' % self.COMMITS_BEHIND)
 
             url = 'https://api.github.com/repos/%s/%s/releases' % (speakreader.CONFIG.GIT_USER, speakreader.CONFIG.GIT_REPO)
+            if speakreader.CONFIG.GIT_TOKEN: url = url + '?access_token=%s' % speakreader.CONFIG.GIT_TOKEN
             response = requests.get(url, timeout=20)
 
             if response.ok:
@@ -172,6 +173,87 @@ class Version(object):
 
         elif self.COMMITS_BEHIND == 0:
             logger.info('SpeakReader is up to date')
+
+
+
+    def update(self):
+        if self.INSTALL_TYPE == 'xgit':
+            output, err = runGit('pull ' + speakreader.CONFIG.GIT_REMOTE + ' ' + speakreader.CONFIG.GIT_BRANCH)
+
+            if not output:
+                logger.error('Unable to download latest version')
+                return
+
+            for line in output.split('\n'):
+
+                if 'Already up-to-date.' in line:
+                    logger.info('No update available, not updating')
+                    logger.info('Output: ' + str(output))
+                elif line.endswith(('Aborting', 'Aborting.')):
+                    logger.error('Unable to update from git: ' + line)
+                    logger.info('Output: ' + str(output))
+
+        else:
+            tar_download_url = 'https://api.github.com/repos/{}/{}/tarball/{}'.format(speakreader.CONFIG.GIT_USER, speakreader.CONFIG.GIT_REPO, speakreader.CONFIG.GIT_BRANCH)
+            if speakreader.CONFIG.GIT_TOKEN: tar_download_url = tar_download_url + '?access_token=%s' % speakreader.CONFIG.GIT_TOKEN
+            update_dir = os.path.join(speakreader.PROG_DIR, 'update')
+            version_path = os.path.join(speakreader.PROG_DIR, 'version.txt')
+
+            logger.info('Downloading update from: ' + tar_download_url)
+            data = requests.get(tar_download_url, timeout=5)
+
+            if not data:
+                logger.error("Unable to retrieve new version from '%s', can't update", tar_download_url)
+                return
+
+            download_name = speakreader.CONFIG.GIT_BRANCH + '-github'
+            tar_download_path = os.path.join(speakreader.PROG_DIR, download_name)
+
+            # Save tar to disk
+            with open(tar_download_path, 'wb') as f:
+                f.write(data.content)
+
+            # Extract the tar to update folder
+            logger.info('Extracting file: ' + tar_download_path)
+            tar = tarfile.open(tar_download_path)
+            tar.extractall(update_dir)
+            tar.close()
+
+            # Delete the tar.gz
+            logger.info('Deleting file: ' + tar_download_path)
+            os.remove(tar_download_path)
+
+            # Find update dir name
+            update_dir_contents = [x for x in os.listdir(update_dir) if os.path.isdir(os.path.join(update_dir, x))]
+            if len(update_dir_contents) != 1:
+                logger.error("Invalid update data, update failed: " + str(update_dir_contents))
+                return
+            content_dir = os.path.join(update_dir, update_dir_contents[0])
+
+            # walk temp folder and move files to main folder
+            for dirname, dirnames, filenames in os.walk(content_dir):
+                dirname = dirname[len(content_dir) + 1:]
+                for curfile in filenames:
+                    old_path = os.path.join(content_dir, dirname, curfile)
+                    new_path = os.path.join(speakreader.PROG_DIR, dirname, curfile)
+
+                    if os.path.isfile(new_path):
+                        os.remove(new_path)
+                        #logger.debug("os.remove: " + new_path)
+                    os.renames(old_path, new_path)
+                    #logger.debug("os.renames: " + "oldPath: " + old_path + " newPath: " + new_path )
+
+            # Update version.txt
+            try:
+                with open(version_path, 'w') as f:
+                    f.write(str(self.LATEST_VERSION_HASH))
+            except IOError as e:
+                logger.error(
+                    "Unable to write current version to version.txt, update not complete: %s",
+                    e
+                )
+                return
+
 
 
 def runGit(args):
