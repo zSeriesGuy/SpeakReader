@@ -25,7 +25,7 @@ INIT_LOCK = threading.Lock()
 
 # Identify Our Application
 PRODUCT = 'SpeakReader'
-VERSION_RELEASE = "V1.1.01"
+VERSION_RELEASE = "V1.1.02"
 GITHUB_BRANCH = "Master"
 
 # TODO: Update checks and auto update from GITHUB
