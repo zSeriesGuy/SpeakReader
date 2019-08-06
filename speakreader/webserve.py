@@ -182,12 +182,13 @@ class WebInterface(object):
 
         if restartSpeakReader:
             self.restart()
+            return {'portchanged': True}
 
-        if restartTranscribeEngine and self.SR.transcribeEngine.is_started:
+        if restartTranscribeEngine and self.SR.transcribeEngine.is_online:
             self.SR.stopTranscribeEngine()
             self.SR.startTranscribeEngine()
 
-        return {'result': 'success', 'credentials_file': kwargs['credentials_file'], 'logout': logout}
+        return {'result': 'success', 'credentials_file': kwargs['credentials_file'], 'logout': logout, 'portchanged': False}
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -206,6 +207,7 @@ class WebInterface(object):
     @cherrypy.expose
     @requireAuth(is_admin())
     def shutdown(self, **kwargs):
+        self.SR.queueManager.closeAllListeners()
         return self.do_state_change('shutdown', 'Shutting Down', 15)
         # self.SR.shutdown()
         # return {'result': 'success'}
@@ -213,6 +215,7 @@ class WebInterface(object):
     @cherrypy.expose
     @requireAuth(is_admin())
     def restart(self, **kwargs):
+        self.SR.queueManager.closeAllListeners()
         return self.do_state_change('restart', 'Restarting', 30)
 
     def do_state_change(self, signal, title, timer, **kwargs):
@@ -231,73 +234,42 @@ class WebInterface(object):
     ###################################################################################################
     #  Event Sources
     ###################################################################################################
+
     @cherrypy.expose
     def removeListener(self, **kwargs):
         cl = cherrypy.request.headers['Content-Length']
-        sessionID = cherrypy.request.body.read(int(cl))
-        self.SR.queueManager.removeListener(sessionID=sessionID.decode('utf-8'))
+        data = json.loads(cherrypy.request.body.read(int(cl)))
+        self.SR.queueManager.removeListener(type=data['type'], sessionID=data['sessionID'])
 
     @cherrypy.expose
-    def streamTranscript(self, **kwargs):
+    def addListener(self, **kwargs):
         cherrypy.response.headers["Content-Type"] = "text/event-stream;charset=utf-8"
-        def eventSource(listenerQueue):
-            while self.SR.queueManager.is_started:
+        type = kwargs.get('type', None)
+        sessionID = kwargs.get('sessionID', None)
+        remoteIP = cherrypy.request.remote.ip
+        def eventSource(type, listenerQueue, remoteIP, sessionID):
+            while self.SR.queueManager.is_initialized:
                 try:
                     data = listenerQueue.get(timeout=5)
                 except queue.Empty:
                     continue
                 if data == None:
+                    close_event = json.dumps({"event": "close"})
+                    yield 'data: {}\n\n'.format(close_event)
                     break
                 yield 'data: {}\n\n'.format(data)
-            #logger.debug("Exiting stream loop for sessionID: " + listenerQueue.sessionID)
+            logger.debug("Exiting " + type.capitalize() + " Listener loop for IP: " + remoteIP + " with sessionID: " + sessionID)
 
-        listenerQueue = self.SR.queueManager.addListener(kwargs.get('sessionID', ''))
-        return eventSource(listenerQueue)
-    streamTranscript._cp_config = {'response.stream': True}
+        listenerQueue = self.SR.queueManager.addListener(type=type, remoteIP=remoteIP, sessionID=sessionID)
 
-    @cherrypy.expose
-    def removeLogListener(self, **kwargs):
-        cl = cherrypy.request.headers['Content-Length']
-        sessionID = cherrypy.request.body.read(int(cl))
-        logger.removeLogListener(sessionID=sessionID.decode('utf-8'))
+        if type == 'transcript':
+            if self.SR.transcribeEngine.is_online:
+                listenerQueue.put_nowait(json.dumps(self.SR.transcribeEngine.ONLINE_MESSAGE))
+            else:
+                listenerQueue.put_nowait(json.dumps(self.SR.transcribeEngine.OFFLINE_MESSAGE))
 
-    @cherrypy.expose
-    def streamLog(self, **kwargs):
-        cherrypy.response.headers["Content-Type"] = "text/event-stream;charset=utf-8"
-
-        def eventSource(listenerQueue):
-            result = self.view_file(log="active")
-            data = {"event": "reload",
-                    "logRecord": result['data'],
-                    }
-            data = json.dumps(data)
-            yield 'data: {}\n\n'.format(data)
-
-            getData = True
-            while getData:
-                try:
-                    data = listenerQueue.get(timeout=5)
-                except queue.Empty:
-                    continue
-
-                if isinstance(data, logger.logging.LogRecord):
-                    data = {"event": "logRecord",
-                            "logRecord": "<p>" + data.getMessage() + "</p>",
-                           }
-                elif data['event'] == 'close' or data == None:
-                    data = {"event": "close"}
-                    getData = False
-
-                data = json.dumps(data)
-                yield 'data: {}\n\n'.format(data)
-                if not getData:
-                    break
-
-            logger.debug("Exiting Log stream loop for sessionID: " + listenerQueue.sessionID)
-
-        listenerQueue = logger.addLogListener(kwargs.get('sessionID', ''))
-        return eventSource(listenerQueue)
-    streamLog._cp_config = {'response.stream': True}
+        return eventSource(type, listenerQueue, remoteIP, sessionID)
+    addListener._cp_config = {'response.stream': True}
 
     @cherrypy.expose
     @requireAuth(is_admin())
@@ -306,7 +278,7 @@ class WebInterface(object):
 
         def eventSource():
             while self.SR.is_initialized:
-                yield 'data: {}\n\n'.format(self.SR.transcribeEngine.is_started)
+                yield 'data: {}\n\n'.format(self.SR.transcribeEngine.is_online)
                 time.sleep(1.0)
             yield 'data: {}\n\n'.format('Close')
 
@@ -375,18 +347,9 @@ class WebInterface(object):
     @requireAuth(is_admin())
     def view_file(self, **kwargs):
         if kwargs.get('log'):
-            if kwargs['log'] == 'active':
-                file = None
-                for handler in logger.logging.getLogger("SpeakReader").handlers[:]:
-                    if isinstance(handler, logger.handlers.RotatingFileHandler):
-                        file = handler.baseFilename
-                        break
-            else:
-                file = os.path.join(speakreader.CONFIG.LOG_DIR, kwargs['log'])
-
-            if file:
-                with open(file) as f:
-                    data = '<p>' + f.read().replace("\n", "</p><p>") + '</p>'
+            file = os.path.join(speakreader.CONFIG.LOG_DIR, kwargs['log'])
+            with open(file) as f:
+                data = '<p>' + f.read().replace("\n", "</p><p>") + '</p>'
 
         elif kwargs.get('transcript'):
             file = os.path.join(speakreader.CONFIG.TRANSCRIPTS_FOLDER, kwargs['transcript'])

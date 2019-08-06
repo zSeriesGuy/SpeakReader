@@ -185,7 +185,7 @@ def main():
     # Start the logger, disable console if needed
     logger.initLogger(console=not QUIET, log_dir=CONFIG.LOG_DIR if log_writable else None, verbose=VERBOSE)
 
-    logger.info("Initializing {} {}".format(speakreader.PRODUCT, speakreader.RELEASE))
+    logger.info("Initializing {} {}".format(speakreader.PRODUCT, speakreader.VERSION_RELEASE))
     logger.info("{} {} ({}{})".format(
         PLATFORM, PLATFORM_RELEASE, PLATFORM_VERSION,
         ' - {}'.format(PLATFORM_LINUX_DISTRO) if PLATFORM_LINUX_DISTRO else ''

@@ -380,24 +380,10 @@ var logStream = "";
 var prev_username = "";
 var prev_hashed_password = "";
 
-function test() {
-    var x = 0;
-    $.getJSON({
-        url: 'view_file',
-        dataType: 'JSON',
-        data: { "log": "active" },
-        success: function (jqXHR, status) {
-            var newHTML = jqXHR.responseJSON.data;
-            $('#console-log').html(jqXHR.responseJSON.data);
-            var x = 0;
-        },
-    });
-}
-
 function startLogStream() {
 
     // Create Log Stream.
-    logStream = new EventSource('/streamLog?sessionID=' + sessionID);
+    logStream = new EventSource('/addListener?type=log&sessionID=' + sessionID);
     logStream.onmessage = function (e) {
         var data = JSON.parse(e.data);
         var offset = scrollDoc ? window.innerHeight - $('#log-container').prop("clientHeight") + 2 : 0;
@@ -406,14 +392,15 @@ function startLogStream() {
         switch (data.event) {
             case 'close':
                 logStream.close();
+                logStream = "";
                 break;
 
             case 'reload':
-                $("#console-log").html(data.logRecord);
+                $("#console-log").html(data.record);
                 break;
 
-            case 'logRecord':
-                $("#console-log").append(data.logRecord);
+            case 'logrecord':
+                $("#console-log").append("<p>" + data.record + "</p>");
                 break;
         }
 
@@ -427,9 +414,7 @@ function startLogStream() {
 
 function stopLogStream() {
     if ( logStream !== "" && logStream.readyState === 1 ) {
-        logStream.close();
-        navigator.sendBeacon("removeLogListener", sessionID);
-        logStream = "";
+        navigator.sendBeacon("removeListener", JSON.stringify({"type": "log", "sessionID": sessionID}));
     }
 };
 
@@ -484,6 +469,17 @@ function resizeContainers() {
 
 function postSaveChecks(jqXHR) {
     var response = JSON.parse(jqXHR.responseText);
+    if ( response.portchanged ) {
+        var port = parseInt($('#http_port').val());
+        var hostname = window.location.hostname;
+        if ( $('#enable_https').prop('checked') ) {
+            var protocol = 'https:';
+        } else {
+            var protocol = 'http:';
+        }
+        var url = protocol + "//" + hostname + ":" + port + "/manage";
+        setTimeout(function () { window.location = url; }, 10000);
+    }
     var x = $('#set_http_password').val();
     $('#listeningOn').text($('#inputDeviceSelection').val());
     $('#upload_credentials_file').val("");
@@ -612,13 +608,13 @@ $(document).ready(function() {
     $('#shutdown-button').click(function() {
         $.ajax({url: "shutdown"});
         tesHandler.close();
-        setTimeout(function(){ window.close(); }, 4000);
+        setTimeout(function(){ window.close(); }, 5000);
     });
 
     $('#restart-button').click(function() {
         $.ajax({url: "restart"});
         tesHandler.close();
-        setTimeout(function(){ location.reload(); }, 12000);
+        setTimeout(function(){ location.reload(); }, 10000);
     });
 
     $('#tes-button').click(function() {

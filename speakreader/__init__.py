@@ -13,7 +13,8 @@ try:
 except ImportError:
     no_browser = True
 
-from speakreader import webstart, logger, config, version, versioncheck
+from speakreader import webstart, logger, config, version
+from speakreader.version import Version
 from speakreader.transcribeEngine import TranscribeEngine
 from speakreader.queueManager import QueueManager
 
@@ -24,10 +25,12 @@ INIT_LOCK = threading.Lock()
 
 # Identify Our Application
 PRODUCT = 'SpeakReader'
-BRANCH = version.GITHUB_BRANCH
-RELEASE = version.VERSION_RELEASE
+VERSION_RELEASE = "V1.0.00"
+GITHUB_BRANCH = "Master"
 
 # TODO: Update checks and auto update from GITHUB
+# TODO: Add modal windows for shutdown and restart
+# TODO: Do something about certgen. Do you need it?
 
 class SpeakReader(object):
     _INITIALIZED = False
@@ -89,7 +92,7 @@ class SpeakReader(object):
                 CONFIG.JWT_SECRET = generate_uuid()
                 CONFIG.write()
 
-            versioncheck.version_init()
+            versionInfo = Version()
 
             self.get_input_device()
 
@@ -102,7 +105,7 @@ class SpeakReader(object):
             ###################################################################################################
             #  Initialize the Transcribe Engine
             ###################################################################################################
-            self.transcribeEngine = TranscribeEngine(self.queueManager)
+            self.transcribeEngine = TranscribeEngine(self.queueManager.transcriptHandler.getReceiverQueue())
 
             if CONFIG.START_TRANSCRIBE_ON_STARTUP :
                 self.startTranscribeEngine()
@@ -139,7 +142,7 @@ class SpeakReader(object):
             logger.warn("API Credentials not available. Can't start Transcribe Engine.")
             return
 
-        if self.transcribeEngine.is_started:
+        if self.transcribeEngine.is_online:
             logger.info("Transcribe Engine already started.")
             return
 
@@ -153,7 +156,7 @@ class SpeakReader(object):
     #  Stop the Transcribe Engine
     ###################################################################################################
     def stopTranscribeEngine(self):
-        if self.transcribeEngine.is_started:
+        if self.transcribeEngine.is_online:
             self.transcribeEngine.stop()
 
     ###################################################################################################

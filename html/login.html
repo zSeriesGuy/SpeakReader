@@ -47,12 +47,6 @@
                             </div>
                         </div>
                     </div>
-                    <div id="login-default" class="row">
-                        <div class="col text-center mb-3">
-                            <small>The default username and password is <span class="font-italic font-weight-bold">admin</span> and <span class="font-italic font-weight-bold">admin</span>.
-                            This should be changed in the Settings page.</small>
-                        </div>
-                    </div>
                     <div class="row">
                         <div class="col text-center">
                             <button id="sign-in" type="submit" class="btn btn-primary login-button"><i class="fa fa-sign-in"></i>Sign In</button>
@@ -69,13 +63,6 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script src="${http_root}js/speakreader.js${cache_param}"></script>
 <script>
-
-    var login_default = ${login_default};
-    if ( login_default ) {
-        $('#login-default').show();
-    } else {
-        $('#login-default').hide();
-    }
 
     $('#login-form').submit(function(event) {
         event.preventDefault();

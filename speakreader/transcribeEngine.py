@@ -6,7 +6,6 @@ import speakreader
 from speakreader import logger
 from speakreader.microphoneStream import MicrophoneStream
 
-
 # Audio recording parameters
 STREAMING_LIMIT = 50000
 SAMPLE_RATE = 44100
@@ -17,37 +16,38 @@ class TranscribeEngine:
 
     _INITIALIZED = False
     _transcribeThread = None
-    _STARTED = False
+    _ONLINE = False
     _censor_char = "*"
+    OFFLINE_MESSAGE = {"event": "transcript", "final": False, "record": "Transcription Engine is Offline"}
+    ONLINE_MESSAGE = {"event": "transcript", "final": False, "record": "Welcome to SpeakReader -- Listening"}
 
-    def __init__(self, queueManager):
+    def __init__(self, receiverQueue):
         if TranscribeEngine._INITIALIZED:
             logger.warn("Transcribe Engine already Initialized")
             return
         logger.info("Transcribe Engine Initializing")
-        self.queueManager = queueManager
+        self.receiverQueue = receiverQueue
         TranscribeEngine._INITIALIZED = True
 
     @property
-    def is_started(self):
+    def is_online(self):
         if self._transcribeThread is None or not self._transcribeThread.is_alive():
-            self._STARTED = False
-        return self._STARTED
+            self._ONLINE = False
+        return self._ONLINE
 
     def start(self):
         self._transcribeThread = threading.Thread(name='TranscribeEngine', target=self.run)
         self._transcribeThread.start()
-        self.queueManager.online()
 
     def stop(self):
-        if self._STARTED:
+        if self._ONLINE:
             self.microphoneStream.stop()
-            self.queueManager.offline()
+            self.receiverQueue.put_nowait(self.OFFLINE_MESSAGE)
             self._transcribeThread.join()
-            self._STARTED = False
+            self._ONLINE = False
 
     def run(self):
-        if self._STARTED:
+        if self._ONLINE:
             logger.warn("Transcribe Engine already Started")
             return
 
@@ -71,7 +71,8 @@ class TranscribeEngine:
 
         self.microphoneStream = MicrophoneStream(speakreader.CONFIG.INPUT_DEVICE, SAMPLE_RATE, CHUNK_SIZE, STREAMING_LIMIT)
 
-        self._STARTED = True
+        self._ONLINE = True
+        self.receiverQueue.put_nowait(self.ONLINE_MESSAGE)
 
         try:
             with self.microphoneStream as stream:
@@ -92,8 +93,8 @@ class TranscribeEngine:
         except Exception as e:
             logger.warn("b: %s" % e)
 
-        self.queueManager.offline()
-        self._STARTED = False
+        self.receiverQueue.put_nowait(self.OFFLINE_MESSAGE)
+        self._ONLINE = False
         logger.info("Transcribe Engine Terminated")
 
     def process_responses(self, responses):
@@ -138,10 +139,10 @@ class TranscribeEngine:
             transcription = {
                 'event': 'transcript',
                 'final': result.is_final,
-                'transcript': transcript,
+                'record': transcript,
             }
 
-            self.queueManager.put(transcription)
+            self.receiverQueue.put(transcription)
 
 
     def censor(self, input_text):

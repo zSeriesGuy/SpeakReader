@@ -28,23 +28,24 @@ function startTranscriptStream() {
     }
 
     // Create Transcript Stream.
-    transcriptStream = new EventSource('/streamTranscript?sessionID=' + sessionID);
+    transcriptStream = new EventSource('/addListener?type=transcript&sessionID=' + sessionID);
     transcriptStream.onmessage = function (e) {
         var data = JSON.parse(e.data);
 
         switch (data.event) {
             case 'close':
                 transcriptStream.close();
+                transcriptStream = "";
                 break;
 
             case 'transcript':
                 var offset = scrollDoc ? window.innerHeight - scrollTarget.prop("clientHeight") + 2 : 0;
                 atBottom = scrollTarget.prop("scrollTop") + scrollTarget.prop("clientHeight") + offset >= scrollTarget.prop("scrollHeight");
 
-                if ( data.final === "refresh" ) {
-                    $("#transcript").html(data.transcript);
+                if ( data.final === "reload" ) {
+                    $("#transcript").html(data.record);
                 } else {
-                    $("#transcript p:last-child").html(data.transcript);
+                    $("#transcript p:last-child").html(data.record);
                 }
 
                 if (data.final) {
@@ -64,9 +65,7 @@ function startTranscriptStream() {
 function stopTranscriptStream() {
     if ( transcriptStream !== "" && transcriptStream.readyState === 1 ) {
         noSleep.disable();
-        transcriptStream.close();
-        navigator.sendBeacon("removeListener", sessionID);
-        transcriptStream = "";
+        navigator.sendBeacon("removeListener", JSON.stringify({"type": "transcript", "sessionID": sessionID}));
     }
 };
 

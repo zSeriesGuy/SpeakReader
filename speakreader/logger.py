@@ -7,7 +7,6 @@ import json
 from queue import Queue
 import logging, logging.handlers
 from logging import handlers
-from logging.handlers import QueueHandler, QueueListener
 import multiprocessing
 import os
 #import re
@@ -86,36 +85,6 @@ def initLogger(console=False, log_dir=False, verbose=False):
 
     # Install exception hooks
     initHooks(thread_exceptions=False)
-
-
-def addLogListener(sessionID):
-    logger.debug("Adding Log Listener Queue: " + sessionID)
-
-    listenerQueue = Queue(maxsize=100)
-    queue_handler = logging.handlers.QueueHandler(listenerQueue)
-    queue_handler.setFormatter(log_format)
-    queue_handler.setLevel(log_level)
-    logger.addHandler(queue_handler)
-
-    listenerQueue.sessionID = sessionID
-    listenerQueue.queueHandler = queue_handler
-    listenerQueues.append(listenerQueue)
-
-    return listenerQueue
-
-
-def removeLogListener(sessionID=None, listenerQueue=None):
-    if listenerQueue is None and sessionID is not None:
-        for q in listenerQueues:
-            if q.sessionID == sessionID:
-                listenerQueue = q
-                break
-    if listenerQueue is not None:
-        logger.debug("Removing Log Listener Queue: " + listenerQueue.sessionID)
-        logger.removeHandler(listenerQueue.queueHandler)
-        listenerQueue.put({"event": "close"})
-        listenerQueue.put(None)
-        listenerQueues.remove(listenerQueue)
 
 
 def initHooks(global_exceptions=True, thread_exceptions=True, pass_original=True):

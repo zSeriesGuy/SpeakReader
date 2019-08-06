@@ -32,6 +32,12 @@ COMMITS_BEHIND = None
 LATEST_RELEASE = None
 UPDATE_AVAILABLE = False
 
+initial_hash = "4e91264061f008fa14787b325c178efdefd3b11c"
+current_hash = "56b3d03616c9e51240f1efc8735acfef04bc1319"
+
+GITHUB_BRANCH = "Master"
+VERSION_RELEASE = "V1.0.00"
+
 
 def version_init():
 
@@ -69,6 +75,8 @@ def version_init():
                     logger.error("Unable to write current version to file '%s': %s" %
                                  (version_lock_file, e))
 
+    INSTALLED_VERSION_HASH = prev_version_hash
+
     # Get the previous release from the file
     if os.path.isfile(release_lock_file):
         try:
@@ -86,13 +94,18 @@ def version_init():
 
     # Check for new versions
     if speakreader.CONFIG.CHECK_GITHUB_ON_STARTUP and speakreader.CONFIG.CHECK_GITHUB:
-        try:
-            LATEST_VERSION_HASH = check_update()
-        except Exception as e:
-            logger.exception("Unhandled exception: %s" % e)
-            LATEST_VERSION_HASH = INSTALLED_VERSION_HASH
+        check_update()
     else:
         LATEST_VERSION_HASH = INSTALLED_VERSION_HASH
+
+    install_type = INSTALL_TYPE
+    installed_version_hash = INSTALLED_VERSION_HASH
+    installed_release = INSTALLED_RELEASE
+    lastest_version_hash = LATEST_VERSION_HASH
+    commits_behind = COMMITS_BEHIND
+    installed_release = INSTALLED_RELEASE
+    latest_release = LATEST_RELEASE
+    update_available = UPDATE_AVAILABLE
 
     # Check if the release was updated
     if speakreader.RELEASE != INSTALLED_RELEASE:
@@ -263,7 +276,7 @@ def check_github(auto_update=False, notify=False):
                                                                   LATEST_VERSION_HASH,
                                                                   INSTALLED_VERSION_HASH)
     if speakreader.CONFIG.GIT_TOKEN: url = url + '?access_token=%s' % speakreader.CONFIG.GIT_TOKEN
-    response = requests.get(url, timeout=20, whitelist_status_code=404, validator=lambda x: type(x) == dict)
+    response = requests.get(url, timeout=20)
 
     if response.ok:
         commits = response.json()

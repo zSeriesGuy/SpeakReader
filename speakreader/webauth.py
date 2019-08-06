@@ -10,7 +10,6 @@ import jwt
 
 import speakreader
 from speakreader import logger
-from speakreader.config import DEFAULT_USERNAME, DEFAULT_PASSWORD
 
 
 JWT_ALGORITHM = 'HS256'
@@ -146,13 +145,9 @@ class AuthController(object):
     
     def get_loginform(self):
         from speakreader.webserve import serve_template
-        login_default = False
-        if speakreader.CONFIG.HTTP_USERNAME == DEFAULT_USERNAME \
-            and speakreader.CONFIG.HTTP_PASSWORD == DEFAULT_PASSWORD:
-            login_default = True
         return serve_template(templatename="login.html",
                               title="Login",
-                              login_default=int(login_default))
+                              )
     
     @cherrypy.expose
     def index(self, *args, **kwargs):

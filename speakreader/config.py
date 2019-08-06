@@ -17,8 +17,6 @@ def bool_int(value):
 
 
 FILENAME = "config.ini"
-DEFAULT_USERNAME = "admin"
-DEFAULT_PASSWORD = "admin"
 
 _CONFIG_DEFINITIONS = {
     'INPUT_DEVICE': (str, 'General', ''),
@@ -41,15 +39,14 @@ _CONFIG_DEFINITIONS = {
     'HTTP_ROOT': (str, 'HTTP', '/'),
     'HTTP_BASE_URL': (str, 'HTTP', ''),
 
-    'HTTP_BASIC_AUTH': (int, 'HTTP', 1),
-    'HTTP_USERNAME': (str, 'HTTP', DEFAULT_USERNAME),
-    'HTTP_PASSWORD': (str, 'HTTP', DEFAULT_PASSWORD),
+    'HTTP_BASIC_AUTH': (int, 'HTTP', 0),
+    'HTTP_USERNAME': (str, 'HTTP', ''),
+    'HTTP_PASSWORD': (str, 'HTTP', ''),
     'HTTP_HASH_PASSWORD': (int, 'HTTP', 0),
     'JWT_SECRET': (str, 'HTTP', ''),
 
     'CHECK_GITHUB': (int, 'Update', 1),
     'CHECK_GITHUB_INTERVAL': (int, 'Update', 360),
-    'CHECK_GITHUB_ON_STARTUP': (int, 'Update', 1),
     'GIT_BRANCH': (str, 'Update', 'master'),
     'GIT_PATH': (str, 'Update', ''),
     'GIT_REMOTE': (str, 'Update', 'origin'),

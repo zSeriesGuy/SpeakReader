@@ -11,7 +11,7 @@ if (typeof platform !== 'undefined') {
 
 if (['IE', 'Microsoft Edge', 'IE Mobile'].indexOf(p.name) > -1) {
     $('body').prepend('<div id="browser-warning"><i class="fa fa-exclamation-circle"></i>&nbsp;' +
-        'Tautulli does not support Internet Explorer or Microsoft Edge! ' +
+        'SpeakReader does not support Internet Explorer or Microsoft Edge! ' +
         'Please use a different browser such as Chrome or Firefox.</div>');
     var offset = $('#browser-warning').height();
     var navbar = $('.navbar-fixed-top');
