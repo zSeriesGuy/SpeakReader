@@ -208,6 +208,7 @@ class WebInterface(object):
     @requireAuth(is_admin())
     def update(self, **kwargs):
         self.SR.versionInfo.update()
+        self.restart()
         return {'result': 'success'}
 
     @cherrypy.expose
