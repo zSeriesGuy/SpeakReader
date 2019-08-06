@@ -25,7 +25,7 @@ INIT_LOCK = threading.Lock()
 
 # Identify Our Application
 PRODUCT = 'SpeakReader'
-VERSION_RELEASE = "V1.0.00-beta"
+VERSION_RELEASE = "V1.1.01"
 GITHUB_BRANCH = "Master"
 
 # TODO: Update checks and auto update from GITHUB
@@ -101,7 +101,6 @@ class SpeakReader(object):
             for k, v in d.items():
                 print(str(k) + ": " + str(v))
             self.get_input_device()
-
 
             ###################################################################################################
             #  Initialize the Queue Manager

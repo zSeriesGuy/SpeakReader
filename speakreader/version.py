@@ -12,10 +12,6 @@ from speakreader import logger
 import requests
 
 
-initial_hash = "4e91264061f008fa14787b325c178efdefd3b11c"
-current_hash = "56b3d03616c9e51240f1efc8735acfef04bc1319"
-
-
 class Version(object):
     INSTALL_TYPE = None
     INSTALLED_VERSION_HASH = None
@@ -29,7 +25,6 @@ class Version(object):
 
     def __init__(self):
         self.INSTALLED_RELEASE = speakreader.VERSION_RELEASE
-        self.LATEST_RELEASE = speakreader.VERSION_RELEASE
 
         if os.path.isdir(os.path.join(speakreader.PROG_DIR, '.git')):
             self.INSTALL_TYPE = 'git'
@@ -71,22 +66,21 @@ class Version(object):
             self.INSTALL_TYPE = 'source'
             self.REMOTE_NAME = 'origin'
             self.BRANCH_NAME = speakreader.GITHUB_BRANCH
+            self.INSTALLED_VERSION_HASH = None
 
             version_file = os.path.join(speakreader.PROG_DIR, 'version.txt')
             if os.path.isfile(version_file):
                 with open(version_file, 'r') as f:
                     self.INSTALLED_VERSION_HASH = f.read().strip(' \n\r')
 
-
         # Check for new versions
         if speakreader.CONFIG.CHECK_GITHUB:
-            #self.INSTALLED_VERSION_HASH = initial_hash
             self.check_github()
         else:
             self.LATEST_VERSION_HASH = self.INSTALLED_VERSION_HASH
 
         if not self.INSTALLED_VERSION_HASH:
-            self.UPDATE_AVAILABLE = None
+            self.UPDATE_AVAILABLE = True
         elif self.COMMITS_BEHIND > 0 and speakreader.GITHUB_BRANCH in ('master', 'beta') and \
                 speakreader.VERSION_RELEASE != self.LATEST_RELEASE:
             self.UPDATE_AVAILABLE = 'release'
@@ -120,6 +114,7 @@ class Version(object):
         # See how many commits behind we are
         if not self.INSTALLED_VERSION_HASH:
             logger.info('You are running an unknown version of SpeakReader. Run the updater to identify your version')
+            self.LATEST_RELEASE = "Unknown"
             return
 
         if self.LATEST_VERSION_HASH == self.INSTALLED_VERSION_HASH:
@@ -178,7 +173,7 @@ class Version(object):
 
     def update(self):
         if self.INSTALL_TYPE == 'xgit':
-            output, err = runGit('pull ' + speakreader.CONFIG.GIT_REMOTE + ' ' + speakreader.CONFIG.GIT_BRANCH)
+            output, err = runGit('xpull ' + speakreader.CONFIG.GIT_REMOTE + ' ' + speakreader.CONFIG.GIT_BRANCH)
 
             if not output:
                 logger.error('Unable to download latest version')
@@ -239,9 +234,7 @@ class Version(object):
 
                     if os.path.isfile(new_path):
                         os.remove(new_path)
-                        #logger.debug("os.remove: " + new_path)
                     os.renames(old_path, new_path)
-                    #logger.debug("os.renames: " + "oldPath: " + old_path + " newPath: " + new_path )
 
             # Update version.txt
             try:
