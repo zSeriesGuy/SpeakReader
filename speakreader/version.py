@@ -123,6 +123,30 @@ class Version(object):
             self.LATEST_RELEASE = "Unknown"
             return
 
+        # Get latest release tag
+        logger.info('Retrieving latest release information from GitHub')
+        url = 'https://api.github.com/repos/%s/%s/releases' % (speakreader.CONFIG.GIT_USER, speakreader.CONFIG.GIT_REPO)
+        if speakreader.CONFIG.GIT_TOKEN: url = url + '?access_token=%s' % speakreader.CONFIG.GIT_TOKEN
+        response = requests.get(url, timeout=20)
+
+        if response.ok:
+            releases = response.json()
+        else:
+            logger.warn('Could not get releases from GitHub.')
+            return
+
+        if speakreader.CONFIG.GIT_BRANCH == 'master':
+            release = next((r for r in releases if not r['prerelease']), releases[0])
+        elif speakreader.CONFIG.GIT_BRANCH == 'beta':
+            release = next((r for r in releases if not r['tag_name'].endswith('-nightly')), releases[0])
+        elif speakreader.CONFIG.GIT_BRANCH == 'nightly':
+            release = next((r for r in releases), releases[0])
+        else:
+            release = releases[0]
+
+        self.LATEST_RELEASE = release['tag_name']
+        logger.debug("Latest release is %s", self.LATEST_RELEASE)
+
         if self.LATEST_VERSION_HASH == self.INSTALLED_VERSION_HASH:
             logger.info('SpeakReader is up to date')
             return
@@ -150,28 +174,6 @@ class Version(object):
 
         if self.COMMITS_BEHIND > 0:
             logger.info('New version is available. You are %s commits behind' % self.COMMITS_BEHIND)
-
-            url = 'https://api.github.com/repos/%s/%s/releases' % (speakreader.CONFIG.GIT_USER, speakreader.CONFIG.GIT_REPO)
-            if speakreader.CONFIG.GIT_TOKEN: url = url + '?access_token=%s' % speakreader.CONFIG.GIT_TOKEN
-            response = requests.get(url, timeout=20)
-
-            if response.ok:
-                releases = response.json()
-            else:
-                logger.warn('Could not get releases from GitHub.')
-                return
-
-            if speakreader.CONFIG.GIT_BRANCH == 'master':
-                release = next((r for r in releases if not r['prerelease']), releases[0])
-            elif speakreader.CONFIG.GIT_BRANCH == 'beta':
-                release = next((r for r in releases if not r['tag_name'].endswith('-nightly')), releases[0])
-            elif speakreader.CONFIG.GIT_BRANCH == 'nightly':
-                release = next((r for r in releases), releases[0])
-            else:
-                release = releases[0]
-
-            self.LATEST_RELEASE = release['tag_name']
-
         elif self.COMMITS_BEHIND == 0:
             logger.info('SpeakReader is up to date')
 
