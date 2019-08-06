@@ -816,9 +816,32 @@ $(document).ready(function() {
     $('#update-now-button').click(function() {
         $.ajax({
             url: 'update',
-            complete: function () { $('#update-available').hide(); },
+            complete: function () { $('#check-for-update').show(); },
         });
     });
+
+    $('#check-for-update-button').click(function() {
+        $.ajax({
+            url: 'check_for_update',
+            type: 'GET',
+            success: function (data, textStatus) {
+                if ( data.update_available ) {
+                    $('#check-for-update').hide();
+                    $('#update-available').show();
+                } else {
+                    $('#check-for-update').show();
+                    $('#update-available').hide();
+                }
+            },
+        });
+    });
+
+    var update_available = ${productInfo['update_available']}
+    if ( update_available ) {
+        $('#update-available').show();
+    } else {
+        $('#update-available').hide();
+    }
 
     $('#http_port').change(function() {
         var port = $('#http_port').val();
@@ -865,13 +888,6 @@ $(document).ready(function() {
         $('#configForm').attr('validated', 'true');
 
     });
-
-    var update_available = ${productInfo['update_available']}
-    if ( update_available ) {
-        $('#update-available').show();
-    } else {
-        $('#update-available').hide();
-    }
 
     $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
         $('#view-log-container').hide();

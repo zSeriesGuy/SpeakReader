@@ -13,18 +13,20 @@ import requests
 
 
 class Version(object):
-    INSTALL_TYPE = None
-    INSTALLED_VERSION_HASH = None
-    INSTALLED_RELEASE = None
-    LATEST_VERSION_HASH = None
-    LATEST_RELEASE = None
-    COMMITS_BEHIND = None
-    UPDATE_AVAILABLE = False
-    REMOTE_NAME = None
-    BRANCH_NAME = None
 
     def __init__(self):
+        self.updateVersionInfo()
+
+    def updateVersionInfo(self):
+        self.INSTALL_TYPE = None
+        self.INSTALLED_VERSION_HASH = None
         self.INSTALLED_RELEASE = speakreader.VERSION_RELEASE
+        self.LATEST_VERSION_HASH = None
+        self.LATEST_RELEASE = None
+        self.COMMITS_BEHIND = 0
+        self.UPDATE_AVAILABLE = False
+        self.REMOTE_NAME = None
+        self.BRANCH_NAME = None
 
         if os.path.isdir(os.path.join(speakreader.PROG_DIR, '.git')):
             self.INSTALL_TYPE = 'git'
@@ -88,6 +90,10 @@ class Version(object):
             self.UPDATE_AVAILABLE = 'commit'
         else:
             self.UPDATE_AVAILABLE = False
+
+        d = self.__dict__
+        for k, v in d.items():
+            print(str(k) + ": " + str(v))
 
 
     def check_github(self):

@@ -206,6 +206,18 @@ class WebInterface(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     @requireAuth(is_admin())
+    def check_for_update(self, **kwargs):
+        logger.info("Checking for Updates")
+        self.SR.versionInfo.updateVersionInfo()
+        versionInfo = {
+            "latest_version": self.SR.versionInfo.LATEST_RELEASE,
+            "update_available": int(bool(self.SR.versionInfo.UPDATE_AVAILABLE)),
+        }
+        return versionInfo
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    @requireAuth(is_admin())
     def update(self, **kwargs):
         self.SR.versionInfo.update()
         self.restart()
