@@ -78,7 +78,7 @@ class WebInterface(object):
         productInfo = {
             "product": speakreader.PRODUCT,
             "current_version": self.SR.versionInfo.INSTALLED_RELEASE,
-            "latest_version": self.SR.versionInfo.LATEST_RELEASE,
+            "latest_release": self.SR.versionInfo.LATEST_RELEASE,
             "update_available": int(bool(self.SR.versionInfo.UPDATE_AVAILABLE)),
         }
 
@@ -210,7 +210,7 @@ class WebInterface(object):
         logger.info("Checking for Updates")
         self.SR.versionInfo.updateVersionInfo()
         versionInfo = {
-            "latest_version": self.SR.versionInfo.LATEST_RELEASE,
+            "latest_release": self.SR.versionInfo.LATEST_RELEASE,
             "update_available": int(bool(self.SR.versionInfo.UPDATE_AVAILABLE)),
         }
         return versionInfo
