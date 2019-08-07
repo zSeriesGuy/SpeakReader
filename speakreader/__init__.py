@@ -183,9 +183,9 @@ class SpeakReader(object):
         if update:
             logger.info("SpeakReader is updating...")
             try:
-                #self.versionInfo.update()
-                logger.debug("calling updater")
-                time.sleep(10)
+                self.versionInfo.update()
+                #logger.debug("calling updater")
+                #time.sleep(10)
             except Exception as e:
                 logger.warn("SpeakReader failed to update: %s. Restarting." % e)
 
