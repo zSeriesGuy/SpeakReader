@@ -127,8 +127,8 @@
                                 <span class="d-block font-weight-bold">Product Information</span>
                                 <span class="d-block ml-2">${productInfo['product']} ${productInfo['current_version']}</span>
                             </div>
-                            <div class="col" id="check-for-update">
-                                    <button id="check-for-update-button" class="btn btn-primary text-nowrap float-right mr-3 check-for-update-button">Check for Update</button>
+                            <div class="col mt-auto mb-auto" id="check-for-update">
+                                    <button id="check-for-update-button" class="btn btn-primary text-nowrap float-right mr-3 check-for-update-button">Check for Updates</button>
                             </div>
                             <div class="col" id="update-available">
                                     <span id="latest-release" class="d-block text-right font-weight-bold">Update Available: ${productInfo['latest_release']}</span>
@@ -820,13 +820,13 @@ $(document).ready(function() {
         });
     });
 
-    $('#check-for-update-button').click(function() {
+    function checkForUpdate() {
         $.ajax({
             url: 'check_for_update',
             type: 'GET',
             success: function (data, textStatus) {
                 if ( data.update_available ) {
-                    $('#latest-release').text(data.latest_release);
+                    $('#latest-release').text("Update Available: " + data.latest_release);
                     $('#check-for-update').hide();
                     $('#update-available').show();
                 } else {
@@ -835,14 +835,13 @@ $(document).ready(function() {
                 }
             },
         });
-    });
+    };
 
-    var update_available = ${productInfo['update_available']}
-    if ( update_available ) {
-        $('#update-available').show();
-    } else {
-        $('#update-available').hide();
-    }
+    $('#check-for-update-button').click(function() {
+        checkForUpdate();
+    });
+    checkForUpdate();
+
 
     $('#http_port').change(function() {
         var port = $('#http_port').val();

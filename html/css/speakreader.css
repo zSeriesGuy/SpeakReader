@@ -145,6 +145,11 @@ body,
     color: white;
 }
 
+.check-for-update-button {
+    background-color: green;
+    color: white;
+}
+
 #view-transcript-container,
 #view-log-container {
     display: none;
