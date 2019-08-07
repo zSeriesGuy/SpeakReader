@@ -93,7 +93,7 @@ class Version(object):
 
         d = self.__dict__
         for k, v in d.items():
-            print(str(k) + ": " + str(v))
+            logger.debug(str(k) + ": " + str(v))
 
 
     def check_github(self):
@@ -180,8 +180,8 @@ class Version(object):
 
 
     def update(self):
-        if self.INSTALL_TYPE == 'xgit':
-            output, err = runGit('xpull ' + speakreader.CONFIG.GIT_REMOTE + ' ' + speakreader.CONFIG.GIT_BRANCH)
+        if self.INSTALL_TYPE == 'git':
+            output, err = runGit('pull ' + speakreader.CONFIG.GIT_REMOTE + ' ' + speakreader.CONFIG.GIT_BRANCH)
 
             if not output:
                 logger.error('Unable to download latest version')
