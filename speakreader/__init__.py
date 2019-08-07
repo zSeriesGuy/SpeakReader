@@ -167,14 +167,35 @@ class SpeakReader(object):
     ###################################################################################################
     #  Shutdown SpeakReader
     ###################################################################################################
-    def shutdown(self):
-        if SpeakReader._INITIALIZED:
+    def shutdown(self, restart=False, update=False, checkout=False):
+        import time
+        SpeakReader._INITIALIZED = False
+        self.stopTranscribeEngine()
+        self.queueManager.shutdown()
+        logger.info('WebServer Terminating')
+        cherrypy.engine.exit()
+
+        CONFIG.write()
+
+        if not restart and not update and not checkout:
             logger.info("Shutting Down SpeakReader")
-            SpeakReader._INITIALIZED = False
-            self.stopTranscribeEngine()
-            self.queueManager.shutdown()
-            logger.info('WebServer Terminating')
-            cherrypy.engine.exit()
+
+        if update:
+            logger.info("SpeakReader is updating...")
+            try:
+                #self.versionInfo.update()
+                logger.debug("calling updater")
+                time.sleep(10)
+            except Exception as e:
+                logger.warn("SpeakReader failed to update: %s. Restarting." % e)
+
+        if checkout:
+            logger.info("SpeakReader is switching the git branch...")
+            try:
+                self.versionInfo.checkout_git_branch()
+            except Exception as e:
+                logger.warn("SpeakReader failed to switch git branch: %s. Restarting." % e)
+
 
     ###################################################################################################
     #  Get Input Device

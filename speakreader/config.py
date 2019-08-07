@@ -28,6 +28,8 @@ _CONFIG_DEFINITIONS = {
     'ENABLE_CENSORSHIP': (int, 'General', 1),
     'CENSORED_WORDS': (list, 'General', ''),
     'LOG_DIR': (str, 'General', ''),
+    'ANON_REDIRECT': (str, 'General', 'http://www.nullrefer.com/?'),
+    'SERVER_ENVIRONMENT': (str, 'Advanced', 'production'),
 
     'HTTP_PORT': (int, 'HTTP', 8880),
     'ENABLE_HTTPS': (int, 'HTTP', 0),
@@ -55,8 +57,6 @@ _CONFIG_DEFINITIONS = {
     'GIT_REPO': (str, 'Update', 'SpeakReader'),
     'DO_NOT_OVERRIDE_GIT_BRANCH': (int, 'Update', 0),
 
-    'HTTP_ENVIRONMENT': (str, 'General', 'production'),
-    'ANON_REDIRECT': (str, 'General', 'http://www.nullrefer.com/?'),
 }
 
 

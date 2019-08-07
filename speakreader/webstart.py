@@ -19,7 +19,7 @@ def initialize(options):
     options_dict = {
         'server.socket_port': options['http_port'],
         'server.socket_host': CONFIG.HTTP_HOST,
-        'environment': CONFIG.HTTP_ENVIRONMENT,
+        'environment': 'production',
         'server.thread_pool': 10,
         'tools.encode.on': True,
         'tools.encode.encoding': 'utf-8',

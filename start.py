@@ -258,10 +258,14 @@ def main():
                 restart = True
                 update = True
                 break
+            elif SR.SIGNAL == 'checkout':
+                restart = True
+                checkout = True
+                break
             else:
                 SR.SIGNAL = None
 
-    SR.shutdown()
+    SR.shutdown(restart=restart, update=update, checkout=checkout)
 
     if CREATEPID:
         logger.info("Removing pidfile %s", PIDFILE)

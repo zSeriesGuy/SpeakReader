@@ -216,20 +216,15 @@ class WebInterface(object):
         return versionInfo
 
     @cherrypy.expose
-    @cherrypy.tools.json_out()
     @requireAuth(is_admin())
     def update(self, **kwargs):
-        self.SR.versionInfo.update()
-        self.restart()
-        return {'result': 'success'}
+        return self.do_state_change('update', 'Updating', 60)
 
     @cherrypy.expose
     @requireAuth(is_admin())
     def shutdown(self, **kwargs):
         self.SR.queueManager.closeAllListeners()
         return self.do_state_change('shutdown', 'Shutting Down', 15)
-        # self.SR.shutdown()
-        # return {'result': 'success'}
 
     @cherrypy.expose
     @requireAuth(is_admin())

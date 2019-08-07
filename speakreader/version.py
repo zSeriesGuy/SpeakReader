@@ -106,7 +106,11 @@ class Version(object):
                                                                  speakreader.CONFIG.GIT_REPO,
                                                                  speakreader.CONFIG.GIT_BRANCH)
         if speakreader.CONFIG.GIT_TOKEN: url = url + '?access_token=%s' % speakreader.CONFIG.GIT_TOKEN
-        response = requests.get(url, timeout=20)
+        try:
+            response = requests.get(url, timeout=10)
+        except Exception as e:
+            logger.warn('Failed to establish a connection to GitHub')
+            return
 
         if response.ok:
             version = response.json()
@@ -127,7 +131,11 @@ class Version(object):
         logger.info('Retrieving latest release information from GitHub')
         url = 'https://api.github.com/repos/%s/%s/releases' % (speakreader.CONFIG.GIT_USER, speakreader.CONFIG.GIT_REPO)
         if speakreader.CONFIG.GIT_TOKEN: url = url + '?access_token=%s' % speakreader.CONFIG.GIT_TOKEN
-        response = requests.get(url, timeout=20)
+        try:
+            response = requests.get(url, timeout=10)
+        except Exception as e:
+            logger.warn('Failed to establish a connection to GitHub')
+            return
 
         if response.ok:
             releases = response.json()
@@ -157,7 +165,11 @@ class Version(object):
                                                                       self.LATEST_VERSION_HASH,
                                                                       self.INSTALLED_VERSION_HASH)
         if speakreader.CONFIG.GIT_TOKEN: url = url + '?access_token=%s' % speakreader.CONFIG.GIT_TOKEN
-        response = requests.get(url, timeout=20)
+        try:
+            response = requests.get(url, timeout=10)
+        except Exception as e:
+            logger.warn('Failed to establish a connection to GitHub')
+            return
 
         if response.ok:
             commits = response.json()
@@ -180,21 +192,26 @@ class Version(object):
 
 
     def update(self):
+        if speakreader.CONFIG.SERVER_ENVIRONMENT != 'production':
+            logger.info("Updating bypassed because this is not a production environment")
+            return False
+
         if self.INSTALL_TYPE == 'git':
             output, err = runGit('pull ' + speakreader.CONFIG.GIT_REMOTE + ' ' + speakreader.CONFIG.GIT_BRANCH)
 
             if not output:
                 logger.error('Unable to download latest version')
-                return
+                return False
 
             for line in output.split('\n'):
-
                 if 'Already up-to-date.' in line:
                     logger.info('No update available, not updating')
                     logger.info('Output: ' + str(output))
+                    return False
                 elif line.endswith(('Aborting', 'Aborting.')):
                     logger.error('Unable to update from git: ' + line)
                     logger.info('Output: ' + str(output))
+                    return False
 
         else:
             tar_download_url = 'https://api.github.com/repos/{}/{}/tarball/{}'.format(speakreader.CONFIG.GIT_USER, speakreader.CONFIG.GIT_REPO, speakreader.CONFIG.GIT_BRANCH)
@@ -203,11 +220,15 @@ class Version(object):
             version_path = os.path.join(speakreader.PROG_DIR, 'version.txt')
 
             logger.info('Downloading update from: ' + tar_download_url)
-            data = requests.get(tar_download_url, timeout=5)
+            try:
+                data = requests.get(tar_download_url, timeout=10)
+            except Exception as e:
+                logger.warn('Failed to establish a connection to GitHub')
+                return False
 
             if not data:
                 logger.error("Unable to retrieve new version from '%s', can't update", tar_download_url)
-                return
+                return False
 
             download_name = speakreader.CONFIG.GIT_BRANCH + '-github'
             tar_download_path = os.path.join(speakreader.PROG_DIR, download_name)
@@ -230,7 +251,7 @@ class Version(object):
             update_dir_contents = [x for x in os.listdir(update_dir) if os.path.isdir(os.path.join(update_dir, x))]
             if len(update_dir_contents) != 1:
                 logger.error("Invalid update data, update failed: " + str(update_dir_contents))
-                return
+                return False
             content_dir = os.path.join(update_dir, update_dir_contents[0])
 
             # walk temp folder and move files to main folder
@@ -253,10 +274,13 @@ class Version(object):
                     "Unable to write current version to version.txt, update not complete: %s",
                     e
                 )
-                return
+                return False
 
-            logger.info("Update Complete")
+        logger.info("Update Completed Successfully")
+        return True
 
+    def checkout_git_branch(self):
+        pass
 
 def runGit(args):
     if speakreader.CONFIG.GIT_PATH:

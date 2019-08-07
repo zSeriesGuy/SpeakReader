@@ -132,7 +132,10 @@
                             </div>
                             <div class="col" id="update-available">
                                     <span id="latest-release" class="d-block text-right font-weight-bold">Update Available: ${productInfo['latest_release']}</span>
-                                    <button id="update-now-button" class="btn btn-primary text-nowrap float-right mr-3 update-now-button">Update Now</button>
+                                    <button id="update-now-button" class="btn btn-primary text-nowrap float-right mr-3 update-now-button">
+                                        <span id="update-now-spinner" class="fas fa-sync"></span>
+                                        <span id="update-now-button-text"> Update Now</span>
+                                    </button>
                             </div>
                         </div>
                     </div>
@@ -366,6 +369,41 @@
             </div>
         </div>
 
+    </div>
+</div>
+
+<div id="confirm-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirm-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-remove"></i></button>
+                <h4 class="modal-title">Confirm</h4>
+            </div>
+            <div class="modal-body">
+                <div id="confirm-message" style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger btn-ok" data-dismiss="modal" id="confirm-button">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="updating-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="updating-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-remove"></i></button>
+                <h4 class="modal-title">Update</h4>
+            </div>
+            <div class="modal-body">
+                <div id="updating-message" style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
+                    <span><i class="fas fa-circle-notch fa-spin"></i> Updating </span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -609,15 +647,21 @@ $(document).ready(function() {
     });
 
     $('#shutdown-button').click(function() {
-        $.ajax({url: "shutdown"});
-        tesHandler.close();
-        setTimeout(function(){ window.close(); }, 5000);
+        $("#confirm-message").text("Are you sure you want to shutdown SpeakReader?");
+        $('#confirm-modal').modal();
+        $('#confirm-modal').one('click', '#confirm-button', function () {
+            tesHandler.close();
+            window.location.href = "shutdown";
+        });
     });
 
     $('#restart-button').click(function() {
-        $.ajax({url: "restart"});
-        tesHandler.close();
-        setTimeout(function(){ location.reload(); }, 10000);
+        $("#confirm-message").text("Are you sure you want to restart Tautulli?");
+        $('#confirm-modal').modal();
+        $('#confirm-modal').one('click', '#confirm-button', function () {
+            tesHandler.close();
+            window.location.href = "restart";
+        });
     });
 
     $('#tes-button').click(function() {
@@ -814,9 +858,10 @@ $(document).ready(function() {
     });
 
     $('#update-now-button').click(function() {
-        $.ajax({
-            url: 'update',
-            complete: function () { $('#check-for-update').show(); },
+        $("#confirm-message").text("Are you sure you want to update SpeakReader?");
+        $('#confirm-modal').modal();
+        $('#confirm-modal').one('click', '#confirm-button', function () {
+            window.location.href = "update";
         });
     });
 
@@ -840,8 +885,15 @@ $(document).ready(function() {
     $('#check-for-update-button').click(function() {
         checkForUpdate();
     });
-    checkForUpdate();
 
+    var update_available = ${productInfo['update_available']};
+    if ( update_available ) {
+        $('#check-for-update').hide();
+        $('#update-available').show();
+    } else {
+        $('#check-for-update').show();
+        $('#update-available').show();
+    }
 
     $('#http_port').change(function() {
         var port = $('#http_port').val();

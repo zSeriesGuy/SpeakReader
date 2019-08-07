@@ -1,18 +1,26 @@
-<%inherit file="base.html"/>
+<!doctype html>
 
-<%def name="headIncludes()">
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>SpeakReader - ${title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+    <link rel="stylesheet" href="${http_root}css/speakreader.css${cache_param}">
+</head>
 
-</%def>
-
-<%def name="body()">
+<body class="manage-content">
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
         </div>
     </div>
-</%def>
 
-<%def name="modalIncludes()">
 <div id="state-change-modal" class="modal fade">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -22,27 +30,23 @@
             <div class="modal-body" id="modal-text">
                 <div align="center">
                     % if message == "Shutting Down":
-                    <h3><i class="fa fa-refresh fa-spin"></i> Tautulli is ${message}.</h3>
+                    <h3><i class="fa fa-refresh fa-spin"></i> SpeakReader is ${message}.</h3>
                     <br />
                     % else:
-                    <h3><i class="fa fa-refresh fa-spin"></i> Tautulli is ${message}.</h3>
+                    <h3><i class="fa fa-refresh fa-spin"></i> SpeakReader is ${message}.</h3>
                     <br />
-                    <h4>Restart in <span class="countdown"></span></h4>
+                    <h4>Restarting in <span class="countdown"></span> seconds</h4>
                     % endif
                 </div>
-            </div>
-            <div class="modal-footer">
-                <div style="float: right;"><span class="text-muted" id="rquote">footer</span></div>
             </div>
         </div>
     </div>
 </div>
-</%def>
 
-<%def name="javascriptIncludes()">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<script src="${http_root}js/speakreader.js${cache_param}"></script>
 <script>
-    // Remove the update bar
-    $('#updatebar').remove();
 
     // Use p.countdown as container, pass redirect, duration, and optional message
     $(".countdown").countdown(reloadPage, ${timer}, "");
@@ -54,7 +58,7 @@
 
     // Redirect to home page after countdown.
     function reloadPage() {
-        window.location.href = "${new_http_root}index";
+        window.location.href = "${new_http_root}manage";
     }
 
     var online = true;
@@ -62,7 +66,7 @@
     (function poll() {
         setTimeout(function () {
             $.ajax({
-                url: 'index',
+                url: 'manage',
                 type: 'HEAD',
                 success: function () {
                     if (!(online)){
@@ -83,5 +87,5 @@
         }, 1000);
     })();
 </script>
-
-</%def>
+</body>
+</html>
