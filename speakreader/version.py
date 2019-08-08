@@ -196,6 +196,10 @@ class Version(object):
             logger.info("Updating bypassed because this is not a production environment")
             return False
 
+        if not self.UPDATE_AVAILABLE:
+            logger.info("No Updates Available")
+            return False
+
         if self.INSTALL_TYPE == 'git':
             output, err = runGit('pull ' + speakreader.CONFIG.GIT_REMOTE + ' ' + speakreader.CONFIG.GIT_BRANCH)
 
@@ -280,7 +284,86 @@ class Version(object):
         return True
 
     def checkout_git_branch(self):
-        pass
+        if self.INSTALL_TYPE == 'git':
+            output, err = runGit('fetch %s' % speakreader.CONFIG.GIT_REMOTE)
+            output, err = runGit('checkout %s' % speakreader.CONFIG.GIT_BRANCH)
+
+            if not output:
+                logger.error('Unable to change git branch.')
+                return
+
+            for line in output.split('\n'):
+                if line.endswith(('Aborting', 'Aborting.')):
+                    logger.error('Unable to checkout from git: ' + line)
+                    logger.info('Output: ' + str(output))
+
+            output, err = runGit('pull %s %s' % (speakreader.CONFIG.GIT_REMOTE, speakreader.CONFIG.GIT_BRANCH))
+
+
+def read_changelog(latest_only=False, since_INSTALLED_RELEASE=False):
+    changelog_file = os.path.join(speakreader.PROG_DIR, 'CHANGELOG.md')
+
+    if not os.path.isfile(changelog_file):
+        return '<h4>Missing changelog file</h4>'
+
+    try:
+        output = ['']
+        prev_level = 0
+
+        latest_version_found = False
+
+        header_pattern = re.compile(r'(^#+)\s(.+)')
+        list_pattern = re.compile(r'(^[ \t]*\*\s)(.+)')
+
+        with open(changelog_file, "r") as logfile:
+            for line in logfile:
+                line_header_match = re.search(header_pattern, line)
+                line_list_match = re.search(list_pattern, line)
+
+                if line_header_match:
+                    header_level = str(len(line_header_match.group(1)))
+                    header_text = line_header_match.group(2)
+
+                    if header_text.lower() == 'changelog':
+                        continue
+
+                    if latest_version_found:
+                        break
+                    elif latest_only:
+                        latest_version_found = True
+                    # Add a space to the end of the release to match tags
+                    elif since_INSTALLED_RELEASE and str(self.INSTALLED_RELEASE) + ' ' in header_text:
+                        break
+
+                    output[-1] += '<h' + header_level + '>' + header_text + '</h' + header_level + '>'
+
+                elif line_list_match:
+                    line_level = len(line_list_match.group(1)) / 2
+                    line_text = line_list_match.group(2)
+
+                    if line_level > prev_level:
+                        output[-1] += '<ul>' * int(line_level - prev_level) + '<li>' + line_text + '</li>'
+                    elif line_level < prev_level:
+                        output[-1] += '</ul>' * int(prev_level - line_level) + '<li>' + line_text + '</li>'
+                    else:
+                        output[-1] += '<li>' + line_text + '</li>'
+
+                    prev_level = line_level
+
+                elif line.strip() == '' and prev_level:
+                    output[-1] += '</ul>' * (prev_level)
+                    output.append('')
+                    prev_level = 0
+
+        if since_INSTALLED_RELEASE:
+            output.reverse()
+
+        return ''.join(output)
+
+    except IOError as e:
+        logger.error('Unable to open changelog file. %s' % e)
+        return '<h4>Unable to open changelog file</h4>'
+
 
 def runGit(args):
     if speakreader.CONFIG.GIT_PATH:

@@ -218,7 +218,11 @@ class WebInterface(object):
     @cherrypy.expose
     @requireAuth(is_admin())
     def update(self, **kwargs):
-        return self.do_state_change('update', 'Updating', 60)
+        if self.SR.versionInfo.UPDATE_AVAILABLE:
+            return self.do_state_change('update', 'Updating', 60)
+        else:
+            logger.info("No Updates Available")
+            return self.manage()
 
     @cherrypy.expose
     @requireAuth(is_admin())

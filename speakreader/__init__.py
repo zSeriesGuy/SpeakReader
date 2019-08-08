@@ -25,7 +25,7 @@ INIT_LOCK = threading.Lock()
 
 # Identify Our Application
 PRODUCT = 'SpeakReader'
-VERSION_RELEASE = "V1.1.03"
+VERSION_RELEASE = "V1.1.4"
 GITHUB_BRANCH = "Master"
 
 # TODO: Update checks and auto update from GITHUB
@@ -184,8 +184,6 @@ class SpeakReader(object):
             logger.info("SpeakReader is updating...")
             try:
                 self.versionInfo.update()
-                #logger.debug("calling updater")
-                #time.sleep(10)
             except Exception as e:
                 logger.warn("SpeakReader failed to update: %s. Restarting." % e)
 
