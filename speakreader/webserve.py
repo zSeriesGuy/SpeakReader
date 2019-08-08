@@ -16,7 +16,7 @@ from mako import exceptions
 from passlib.hash import pbkdf2_sha256
 
 import speakreader
-from speakreader import logger, versioncheck
+from speakreader import logger
 from speakreader.session import get_session_info, get_session_user_id
 from speakreader.webauth import AuthController, requireAuth, is_admin
 
