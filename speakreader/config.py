@@ -48,11 +48,10 @@ _CONFIG_DEFINITIONS = {
     'JWT_SECRET': (str, 'HTTP', ''),
 
     'CHECK_GITHUB': (int, 'Update', 1),
-    'CHECK_GITHUB_INTERVAL': (int, 'Update', 360),
+    'GIT_TOKEN': (str, 'Update', ''),
+    'GIT_REMOTE': (str, 'Update', 'origin'),
     'GIT_BRANCH': (str, 'Update', 'master'),
     'GIT_PATH': (str, 'Update', ''),
-    'GIT_REMOTE': (str, 'Update', 'origin'),
-    'GIT_TOKEN': (str, 'Update', ''),
     'GIT_USER': (str, 'Update', 'zSeriesGuy'),
     'GIT_REPO': (str, 'Update', 'SpeakReader'),
     'DO_NOT_OVERRIDE_GIT_BRANCH': (int, 'Update', 0),

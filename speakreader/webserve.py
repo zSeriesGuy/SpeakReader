@@ -78,16 +78,14 @@ class WebInterface(object):
         productInfo = {
             "product": speakreader.PRODUCT,
             "current_version": self.SR.versionInfo.INSTALLED_RELEASE,
-            "latest_release": self.SR.versionInfo.LATEST_RELEASE,
-            "update_available": int(bool(self.SR.versionInfo.UPDATE_AVAILABLE)),
         }
-
-        return serve_template(templatename="manage.html", title="Management Console", productInfo=productInfo)
+        settings = self.getSettings()
+        return serve_template(templatename="manage.html", title="Management Console", productInfo=productInfo, config=settings['config'])
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
     @requireAuth(is_admin())
-    def get_settings(self, **kwargs):
+    def getSettings(self, **kwargs):
 
         config = {
             "start_transcribe_on_startup": speakreader.CONFIG.START_TRANSCRIBE_ON_STARTUP,
@@ -107,6 +105,12 @@ class WebInterface(object):
             "http_username": speakreader.CONFIG.HTTP_USERNAME,
             "http_hash_password": speakreader.CONFIG.HTTP_HASH_PASSWORD,
             "hashed_password": speakreader.CONFIG.HTTP_HASH_PASSWORD,
+            "check_github": speakreader.CONFIG.CHECK_GITHUB,
+            "git_token": speakreader.CONFIG.GIT_TOKEN,
+            "git_remote": speakreader.CONFIG.GIT_REMOTE,
+            "git_branch": speakreader.CONFIG.GIT_BRANCH,
+            "git_path": speakreader.CONFIG.GIT_PATH,
+            "install_type": self.SR.versionInfo.INSTALL_TYPE,
         }
 
         return {"result": "success", "config": config}
@@ -129,6 +133,7 @@ class WebInterface(object):
             "enable_censorship",
             "http_hash_password",
             "http_basic_auth",
+            "check_github",
         ]
         for checked_config in checked_configs:
             if checked_config not in kwargs:
@@ -206,11 +211,12 @@ class WebInterface(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     @requireAuth(is_admin())
-    def check_for_update(self, **kwargs):
+    def checkForUpdate(self, **kwargs):
         logger.info("Checking for Updates")
-        self.SR.versionInfo.updateVersionInfo()
+        self.SR.versionInfo.checkForUpdate()
         versionInfo = {
             "latest_release": self.SR.versionInfo.LATEST_RELEASE,
+            "latest_release_url": self.SR.versionInfo.LATEST_RELEASE_URL,
             "update_available": int(bool(self.SR.versionInfo.UPDATE_AVAILABLE)),
         }
         return versionInfo
@@ -236,6 +242,19 @@ class WebInterface(object):
         self.SR.queueManager.closeAllListeners()
         return self.do_state_change('restart', 'Restarting', 30)
 
+    @cherrypy.expose
+    @requireAuth(is_admin())
+    def checkout_git_branch(self, git_remote=None, git_branch=None, **kwargs):
+        if git_branch == speakreader.CONFIG.GIT_BRANCH:
+            logger.error(u"Already on the %s branch" % git_branch)
+            raise cherrypy.HTTPRedirect(speakreader.CONFIG.HTTP_ROOT + "manage")
+
+        # Set the new git remote and branch
+        speakreader.CONFIG.__setattr__('GIT_REMOTE', git_remote)
+        speakreader.CONFIG.__setattr__('GIT_BRANCH', git_branch)
+        speakreader.CONFIG.write()
+        return self.do_state_change('checkout', 'Switching Git Branches', 120)
+
     def do_state_change(self, signal, title, timer, **kwargs):
         message = title
         self.SR.SIGNAL = signal
@@ -245,9 +264,8 @@ class WebInterface(object):
         else:
             new_http_root = '/'
 
-        return serve_template(templatename="shutdown.html", signal=signal, title=title,
+        return serve_template(templatename="confirm.html", signal=signal, title=title,
                               new_http_root=new_http_root, message=message, timer=timer)
-
 
     ###################################################################################################
     #  Event Sources

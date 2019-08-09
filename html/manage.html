@@ -125,13 +125,13 @@
                         <div class="row">
                             <div class="col">
                                 <span class="d-block font-weight-bold">Product Information</span>
-                                <span class="d-block ml-2">${productInfo['product']} ${productInfo['current_version']}</span>
+                                <span class="d-block ml-2 release-url">${productInfo['product']} ${productInfo['current_version']}</span>
                             </div>
-                            <div class="col mt-auto mb-auto" id="check-for-update">
+                            <div class="col mt-auto mb-auto" id="check-for-update" style="display: none;">
                                     <button id="check-for-update-button" class="btn btn-primary text-nowrap float-right mr-3 check-for-update-button">Check for Updates</button>
                             </div>
-                            <div class="col" id="update-available">
-                                    <span id="latest-release" class="d-block text-right font-weight-bold">Update Available: ${productInfo['latest_release']}</span>
+                            <div class="col" id="update-available" style="display: none;">
+                                    <span id="latest-release" class="d-block text-right font-weight-bold"></span>
                                     <button id="update-now-button" class="btn btn-primary text-nowrap float-right mr-3 update-now-button">
                                         <span id="update-now-spinner" class="fas fa-sync"></span>
                                         <span id="update-now-button-text"> Update Now</span>
@@ -157,26 +157,26 @@
                                     </div>
 
                                     <div class="form-group form-check">
-                                        <input id="show_interim_results" type="checkbox" class="form-check-input" name="show_interim_results" value="1">
+                                        <input id="show_interim_results" type="checkbox" class="form-check-input" name="show_interim_results" value="1" checked="${config['show_interim_results']}"/>
                                         <label for="show_interim_results" class="font-weight-bold form-check-label">Show Interim Results</label>
                                         <small class="form-text">Show interim result text during transcription. Unchecking this will only show the final result text.</small>
                                     </div>
 
                                     <div class="form-group form-check">
-                                        <input id="start_transcribe_on_startup" type="checkbox" class="form-check-input" name="start_transcribe_on_startup" value="1"/>
+                                        <input id="start_transcribe_on_startup" type="checkbox" class="form-check-input" name="start_transcribe_on_startup" value="1" checked="${config['start_transcribe_on_startup']}"/>
                                         <label for="start_transcribe_on_startup" class="font-weight-bold form-check-label">Start Transcribe Engine on Startup</label>
                                         <small class="form-text">Automatically start the Transcribe Engine when SpeakReader starts.</small>
                                     </div>
 
                                     <div class="form-group form-check">
-                                        <input id="launch_browser" type="checkbox" class="form-check-input" name="launch_browser" value="1">
+                                        <input id="launch_browser" type="checkbox" class="form-check-input" name="launch_browser" value="1" checked="${config['launch_browser']}"/>
                                         <label for="launch_browser" class="font-weight-bold form-check-label">Launch Management Console on Startup</label>
                                         <small class="form-text">Launch a web browser with the SpeakReader Management Console on startup.</small>
                                     </div>
 
                                     <div class="form-group form-check">
                                         <div>
-                                            <input id="enable_censorship" type="checkbox" class="form-check-input" name="enable_censorship" value="1"/>
+                                            <input id="enable_censorship" type="checkbox" class="form-check-input" name="enable_censorship" value="1" checked="${config['enable_censorship']}"/>
                                             <label for="enable_censorship" class="font-weight-bold form-check-label">Enable Censorship</label>
                                             <small class="form-text">Enable profanity filters and censorship.</small>
                                         </div>
@@ -190,7 +190,7 @@
                                     <div class="form-group">
                                         <label for="credentials_file" class="font-weight-bold">GoogleAPI Credentials JSON File</label>
                                         <div class="input-group">
-                                            <input id="credentials_file" class="form-control col-md-11" type="text" name="credentials_file" value="">
+                                            <input id="credentials_file" class="form-control col-md-11" type="text" name="credentials_file" value="${config['credentials_file']}">
                                             <div class="input-group-append">
                                                 <button id="upload_credentials_button" class="btn btn-secondary">Upload</button>
                                             </div>
@@ -201,13 +201,13 @@
 
                                     <div class="form-group">
                                         <label for="transcripts_folder" class="font-weight-bold">Transcripts Folder</label>
-                                        <input id="transcripts_folder" type="text" class="form-control" name="transcripts_folder" value="" size="30">
+                                        <input id="transcripts_folder" type="text" class="form-control" name="transcripts_folder" value="${config['transcripts_folder']}" size="30">
                                         <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the transcripts.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="log_dir" class="font-weight-bold">Logs Folder</label>
-                                        <input id="log_dir" type="text" class="form-control" name="log_dir" value="" size="30">
+                                        <input id="log_dir" type="text" class="form-control" name="log_dir" value="${config['log_dir']}" size="30">
                                         <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the SpeakReader console logs.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
                                     </div>
                                 </div>
@@ -223,7 +223,7 @@
                                         <label for="http_port" class="font-weight-bold">HTTP Port</label>
                                         <div class="row">
                                             <div class="col-md-2">
-                                                <input id="http_port" type="text" class="form-control" name="http_port" value="" required>
+                                                <input id="http_port" type="text" class="form-control" name="http_port" value="${config['http_port']}" required>
                                             </div>
                                             <div id="http_port_error" class="alert alert-danger" role="alert"></div>
                                         </div>
@@ -232,26 +232,26 @@
 
                                     <div class="form-group form-check">
                                         <div>
-                                            <input id="enable_https" type="checkbox" class="form-check-input" name="enable_https" value="1" />
+                                            <input id="enable_https" type="checkbox" class="form-check-input" name="enable_https" value="1" checked="${config['enable_https']}"/>
                                             <label for="enable_https" class="font-weight-bold form-check-label">Enable HTTPS</label>
                                             <small class="form-text">Enable HTTPS for the web server to use encrypted communication.<br><strong>Changing protocols will require restarting SpeakReader.</strong></small>
                                         </div>
                                         <div class="form-sub-group">
                                             <div class="form-sub-group">
                                                 <label for="https_cert" class="font-weight-bold">HTTPS Certificate</label>
-                                                <input type="text" class="form-control http-settings" id="https_cert" name="https_cert" value="" />
+                                                <input type="text" class="form-control http-settings" id="https_cert" name="https_cert" value="${config['https_cert']}" />
                                                 <small class="form-text">The location of the SSL certificate.</small>
                                             </div>
 
                                             <div class="form-sub-group">
                                                 <label for="https_key" class="font-weight-bold">HTTPS Key</label>
-                                                <input type="text" class="form-control http-settings" id="https_key" name="https_key" value="" />
+                                                <input type="text" class="form-control http-settings" id="https_key" name="https_key" value="${config['https_key']}" />
                                                 <small class="form-text">The location of the SSL key.</small>
                                             </div>
 
                                             <div class="form-sub-group">
                                                 <label for="https_cert_chain" class="font-weight-bold">HTTPS Certificate Chain</label>
-                                                <input type="text" class="form-control http-settings" id="https_cert_chain" name="https_cert_chain" value="" />
+                                                <input type="text" class="form-control http-settings" id="https_cert_chain" name="https_cert_chain" value="${config['https_cert_chain']}" />
                                                 <small class="form-text">The location of the SSL certificate chain. Optional if the certificate file does not contain the full chain.</small>
                                             </div>
 
@@ -270,7 +270,7 @@
                                         <label for="http_username" class="font-weight-bold">HTTP Username</label>
                                         <div class="row">
                                             <div class="col-md-2">
-                                                <input id="http_username" type="text" class="form-control" name="http_username" value="" />
+                                                <input id="http_username" type="text" class="form-control" name="http_username" value="${config['http_username']}" />
                                             </div>
                                             <div id="http_username_error" class="alert alert-danger" role="alert"></div>
                                         </div>
@@ -292,7 +292,7 @@
                                     <div class="form-group form-check">
                                         <div class="row">
                                             <div class="col">
-                                                <input id="http_hash_password" type="checkbox" class="form-check-input" name="http_hash_password" value="1" />
+                                                <input id="http_hash_password" type="checkbox" class="form-check-input" name="http_hash_password" value="1" checked="${config['http_hash_password']}"/>
                                                 <label for="http_hash_password" class="font-weight-bold form-check-label">Hash Password in the Config File</label>
                                             </div>
                                             <div id="http_hash_password_error" class="alert alert-danger" role="alert"></div>
@@ -301,10 +301,71 @@
                                     </div>
 
                                     <div class="form-group form-check">
-                                        <input id="http_basic_auth" type="checkbox" class="form-check-input" name="http_basic_auth" value="1" />
+                                        <input id="http_basic_auth" type="checkbox" class="form-check-input" name="http_basic_auth" value="1" checked="${config['http_basic_auth']}"/>
                                         <label for="http_basic_auth" class="font-weight-bold form-check-label">Use Basic Authentication</label>
                                         <small class="form-text">Use basic HTTP authentication instead of the HTML login form.!</small>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <div class="col">
+                                    <div class="padded-header">
+                                        <h4>Updates</h4>
+                                    </div>
+
+                                    <div class="form-group form-check">
+                                        <div>
+                                            <input id="check_github" type="checkbox" class="form-check-input" name="check_github" value="1" checked="${config['check_github']}" />
+                                            <label for="check_github" class="font-weight-bold form-check-label">Enable Updates</label>
+                                            <div id="check_github_error" class="alert alert-danger" role="alert"></div>
+                                            <small class="form-text">Enable support for updating SpeakReader.</small>
+                                        </div>
+
+                                        <div class="form-sub-group">
+                                            <div class="form-sub-group">
+                                                <label for="git_token" class="font-weight-bold">GitHub API Token</label>
+                                                <input id="git_token" type="text" class="form-control" name="git_token" value="${config['git_token']}" />
+                                                <div id="git_token_error" class="alert alert-danger" role="alert"></div>
+                                                <small class="form-text">Optional: Use your own GitHub API token when checking for updates.</small>
+                                            </div>
+
+                                            % if config['install_type'] == 'git':
+                                            <div class="form-sub-group">
+                                                <label for="git_branch" class="font-weight-bold">Git Remote / Branch</label>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="input-group git-group">
+                                                            <input type="text" class="form-control" id="git_remote" name="git_remote" value="${config['git_remote']}">
+                                                            <select class="form-control" id="git_branch" name="git_branch">
+                                                                <% branches = ('master', 'beta', 'nightly') %>
+                                                                % for branch in branches:
+                                                                <option value="${branch}" ${'selected' if config['git_branch'] == branch else ''}>${branch}</option>
+                                                                % endfor
+                                                                % if config['git_branch'] not in branches:
+                                                                <option value="${config['git_branch']}" selected>${config['git_branch']}</option>
+                                                                % endif
+                                                            </select>
+                                                            <span class="input-group-btn">
+                                                                <button class="btn btn-form" type="button" id="switch_git_branch">Checkout Branch</button>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <small class="form-text">The git tracking remote and branch (default "origin/master"). Select to switch the git branch (requires restart).</small>
+                                            </div>
+
+                                            <div class="form-sub-group">
+                                                <label for="git_path" class="font-weight-bold">Git Path</label>
+                                                <input type="text" class="form-control" id="git_path" name="git_path" value="${config['git_path']}" size="30">
+                                                <small class="form-text">Optional: The path to your git environment variable. Leave blank for default.</small>
+                                                <div id="git_path_error" class="alert alert-danger" role="alert"></div>
+                                            </div>
+                                            % endif
+
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
 
@@ -420,6 +481,7 @@
 var logStream = "";
 var prev_username = "";
 var prev_hashed_password = "";
+var update_available = false;
 
 function startLogStream() {
 
@@ -508,6 +570,23 @@ function resizeContainers() {
     $('#view-transcript').height(viewContainerHeight - 20);
 }
 
+function checkForUpdate() {
+    $('#check-for-update-button').html('<span><i class="fas fa-sync fa-spin"/> Checking</span>');
+    $.getJSON('checkForUpdate', function (data, textStatus) {
+        $('#latest-release').html('<a class="release-url" target="_blank" href="' + data.latest_release_url + '">Update Available: ' + data.latest_release + '</a>');
+        $('#check-for-update-button').html('<span>Check for Updates</span>');
+        if ( data.update_available ) {
+            update_available = true;
+            $('#check-for-update').hide();
+            $('#update-available').show();
+        } else {
+            update_available = false;
+            $('#check-for-update').show();
+            $('#update-available').hide();
+        }
+    });
+};
+
 function postSaveChecks(jqXHR) {
     var response = JSON.parse(jqXHR.responseText);
     if ( response.portchanged ) {
@@ -521,7 +600,6 @@ function postSaveChecks(jqXHR) {
         var url = protocol + "//" + hostname + ":" + port + "/manage";
         setTimeout(function () { window.location = url; }, 10000);
     }
-    var x = $('#set_http_password').val();
     $('#listeningOn').text($('#inputDeviceSelection').val());
     $('#upload_credentials_file').val("");
     $('#http_password').val("");
@@ -530,47 +608,75 @@ function postSaveChecks(jqXHR) {
     if ( response.logout ) {
         window.location.href = "auth/logout";
     }
+    if ( $('#check_github').prop('checked') ) {
+        if ( update_available ) {
+            $('#check-for-update').hide();
+            $('#update-available').show();
+        } else {
+            $('#check-for-update').show();
+            $('#update-available').hide();
+        }
+    } else {
+        $('#check-for-update').hide();
+        $('#update-available').hide();
+    }
+    window.scrollTo(0,0);
 };
 
 function getSettings() {
-    $.ajax({
-        url: 'get_settings',
-        type: 'GET',
-        success: function (data, textStatus) {
-            var config = data.config;
+    $.getJSON('getSettings', function (data, textStatus) {
+        var config = data.config;
 
-            // Check boxes
-            $('#show_interim_results').prop('checked', config.show_interim_results);
-            $('#start_transcribe_on_startup').prop('checked', config.start_transcribe_on_startup);
-            $('#launch_browser').prop('checked', config.launch_browser);
-            $('#enable_censorship').prop('checked', config.enable_censorship);
-            $('#http_basic_auth').prop('checked', config.http_basic_auth);
-            $('#http_hash_password').prop('checked', config.http_hash_password);
-            $('#enable_https').prop('checked', config.enable_https);
+        // Check boxes
+        $('#show_interim_results').prop('checked', config.show_interim_results);
+        $('#start_transcribe_on_startup').prop('checked', config.start_transcribe_on_startup);
+        $('#launch_browser').prop('checked', config.launch_browser);
+        $('#enable_censorship').prop('checked', config.enable_censorship);
+        $('#http_basic_auth').prop('checked', config.http_basic_auth);
+        $('#http_hash_password').prop('checked', config.http_hash_password);
+        $('#enable_https').prop('checked', config.enable_https);
+        $('#check_github').prop('checked', config.check_github);
 
-            // Text Values
-            $('#credentials_file').val(config.credentials_file);
-            $('#transcripts_folder').val(config.transcripts_folder);
-            $('#log_dir').val(config.log_dir);
-            $('#http_port').val(config.http_port);
-            $('#https_cert').val(config.https_cert);
-            $('#https_cert_chain').val(config.https_cert_chain);
-            $('#https_key').val(config.https_key);
-            $('#http_username').val(config.http_username);
-            $('#hashed_password').val(config.hashed_password);
-            $('#censored_words').val(config.censored_words);
+        // Text Values
+        $('#credentials_file').val(config.credentials_file);
+        $('#transcripts_folder').val(config.transcripts_folder);
+        $('#log_dir').val(config.log_dir);
+        $('#http_port').val(config.http_port);
+        $('#https_cert').val(config.https_cert);
+        $('#https_cert_chain').val(config.https_cert_chain);
+        $('#https_key').val(config.https_key);
+        $('#http_username').val(config.http_username);
+        $('#hashed_password').val(config.hashed_password);
+        $('#censored_words').val(config.censored_words);
+        $('#git_token').val(config.git_token);
+        $('#git_remote').val(config.git_remote);
+        $('#git_path').val(config.git_path);
 
-            prev_username = config.http_username;
-            prev_hashed_password = config.hashed_password;
-            if ( prev_username !== "" ) {
-                $('#signout-button').show();
-            } else {
-                $('#signout-button').hide();
-            }
+        $('#git_branch').val(config.git_branch);
 
-            initConfigCheckbox('#enable_https');
-            initConfigCheckbox('#enable_censorship');
+        prev_username = config.http_username;
+        prev_hashed_password = config.hashed_password;
+        if ( prev_username !== "" ) {
+            $('#signout-button').show();
+        } else {
+            $('#signout-button').hide();
         }
+        if ( config.check_github ) {
+            if ( update_available ) {
+                $('#check-for-update').hide();
+                $('#update-available').show();
+            } else {
+                $('#check-for-update').show();
+                $('#update-available').hide();
+            }
+        } else {
+            $('#check-for-update').hide();
+            $('#update-available').hide();
+        }
+
+        initConfigCheckbox('#enable_https');
+        initConfigCheckbox('#enable_censorship');
+        initConfigCheckbox('#check_github');
     });
 };
 
@@ -612,7 +718,9 @@ function verifyAuthentication() {
 
 $(document).ready(function() {
 
-    getSettings();
+    if ( $('#check_github').prop('checked') ) {
+        checkForUpdate();
+    }
 
     $('#upload_credentials_button').on('click', function(e) {
         e.preventDefault();
@@ -865,35 +973,9 @@ $(document).ready(function() {
         });
     });
 
-    function checkForUpdate() {
-        $.ajax({
-            url: 'check_for_update',
-            type: 'GET',
-            success: function (data, textStatus) {
-                if ( data.update_available ) {
-                    $('#latest-release').text("Update Available: " + data.latest_release);
-                    $('#check-for-update').hide();
-                    $('#update-available').show();
-                } else {
-                    $('#check-for-update').show();
-                    $('#update-available').hide();
-                }
-            },
-        });
-    };
-
     $('#check-for-update-button').click(function() {
         checkForUpdate();
     });
-
-    var update_available = ${productInfo['update_available']};
-    if ( update_available ) {
-        $('#check-for-update').hide();
-        $('#update-available').show();
-    } else {
-        $('#check-for-update').show();
-        $('#update-available').show();
-    }
 
     $('#http_port').change(function() {
         var port = $('#http_port').val();
@@ -950,6 +1032,25 @@ $(document).ready(function() {
         var target = $(e.target).attr("href");
         if ((target === '#tabs-settings')) {
             getSettings();
+        }
+    });
+
+    $("#switch_git_branch").click(function () {
+        var current_remote = "${config['git_remote']}";
+        var current_branch = "${config['git_branch']}";
+        var new_remote = $("#git_remote").val();
+        var new_branch = $("#git_branch option:selected").val();
+
+        if (new_remote === current_remote && new_branch === current_branch) {
+            //showMsg('<i class="fa fa-exclamation-circle"></i> Already on the ' + current_remote + ' ' + current_branch + ' branch.', false, true, 5000, true)
+        } else {
+            var msg = 'Are you sure you want to switch to the <strong>' + new_remote + '/' + new_branch + '</strong> branch?' +
+                '<br />Switching branches may cause SpeakReader to become unstable.<br /><br />SpeakReaderi will restart.';
+            $('#confirm-message').html(msg);
+            $('#confirm-modal').modal();
+            $('#confirm-modal').one('click', '#confirm-button', function () {
+                window.location.href = 'checkout_git_branch?git_remote=' + new_remote + '&git_branch=' + new_branch;
+            });
         }
     });
 

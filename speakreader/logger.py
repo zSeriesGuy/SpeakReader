@@ -25,6 +25,7 @@ MAX_SIZE = 5000000  # 5 MB
 MAX_FILES = 5
 
 # SpeakReader logger
+VERBOSE = False
 logger = logging.getLogger("SpeakReader")
 log_level = logging.DEBUG
 log_format = logging.Formatter('%(asctime)s - %(levelname)s :: %(threadName)s : %(message)s', '%Y-%m-%d %H:%M:%S')
@@ -49,8 +50,9 @@ def initLogger(console=False, log_dir=False, verbose=False):
 
     # Close and remove old handlers. This is required to reinit the loggers
     # at runtime
-    global log_level
+    global log_level, VERBOSE
     log_level = logging.DEBUG if verbose else logging.INFO
+    VERBOSE = verbose
 
     for handler in logger.handlers[:]:
         # Just make sure it is cleaned up.

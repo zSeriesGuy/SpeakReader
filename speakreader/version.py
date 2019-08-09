@@ -15,9 +15,7 @@ import requests
 class Version(object):
 
     def __init__(self):
-        self.updateVersionInfo()
 
-    def updateVersionInfo(self):
         self.INSTALL_TYPE = None
         self.INSTALLED_VERSION_HASH = None
         self.INSTALLED_RELEASE = speakreader.VERSION_RELEASE
@@ -27,6 +25,12 @@ class Version(object):
         self.UPDATE_AVAILABLE = False
         self.REMOTE_NAME = None
         self.BRANCH_NAME = None
+        self.version_lock_file = os.path.join(speakreader.DATA_DIR, "version.lock")
+        self.release_lock_file = os.path.join(speakreader.DATA_DIR, "release.lock")
+
+        installed_release = self.getReleaseLock()
+        if self.INSTALLED_RELEASE != installed_release:
+            self.setReleaseLock(self.INSTALLED_RELEASE)
 
         if os.path.isdir(os.path.join(speakreader.PROG_DIR, '.git')):
             self.INSTALL_TYPE = 'git'
@@ -35,6 +39,9 @@ class Version(object):
             if output:
                 if re.match('^[a-z0-9]+$', output):
                     self.INSTALLED_VERSION_HASH = output
+                    installed_version_hash = self.getVersionLock()
+                    if self.INSTALLED_VERSION_HASH != installed_version_hash:
+                        self.setVersionLock(self.INSTALLED_VERSION_HASH)
                 else:
                     logger.error('Output does not look like a hash, not using it.')
             else:
@@ -68,16 +75,59 @@ class Version(object):
             self.INSTALL_TYPE = 'source'
             self.REMOTE_NAME = 'origin'
             self.BRANCH_NAME = speakreader.GITHUB_BRANCH
-            self.INSTALLED_VERSION_HASH = None
+            self.INSTALLED_VERSION_HASH = self.getVersionLock()
 
-            version_file = os.path.join(speakreader.PROG_DIR, 'version.txt')
-            if os.path.isfile(version_file):
-                with open(version_file, 'r') as f:
-                    self.INSTALLED_VERSION_HASH = f.read().strip(' \n\r')
 
+    def getVersionLock(self):
+        # Get the previous version from the file
+        version_hash = "unknown"
+        if os.path.isfile(self.version_lock_file):
+            try:
+                with open(self.version_lock_file, "r") as fp:
+                    version_hash = fp.read()
+            except IOError as e:
+                logger.error("Unable to read previous version from file '%s': %s" %
+                             (self.version_lock_file, e))
+        return version_hash
+
+
+    def setVersionLock(self, version_hash):
+        # Set the previous version in the lock file
+        try:
+            with open(self.version_lock_file, "w") as fp:
+                fp.write(version_hash)
+        except IOError as e:
+            logger.error(u"Unable to write current version to file '%s': %s" %
+                         (self.version_lock_file, e))
+
+
+    def getReleaseLock(self):
+        # Get the previous release from the lock file
+        release = False
+        if os.path.isfile(self.release_lock_file):
+            try:
+                with open(self.release_lock_file, "r") as fp:
+                    release = fp.read()
+            except IOError as e:
+                logger.error("Unable to read previous release from file '%s': %s" %
+                             (self.release_lock_file, e))
+        return release
+
+
+    def setReleaseLock(self, release):
+        # Set the previous release in the lock file
+        try:
+            with open(self.release_lock_file, "w") as fp:
+                fp.write(release)
+        except IOError as e:
+            logger.error(u"Unable to write current version to file '%s': %s" %
+                         (self.release_lock_file, e))
+
+
+    def checkForUpdate(self):
         # Check for new versions
         if speakreader.CONFIG.CHECK_GITHUB:
-            self.check_github()
+            self._check_github()
         else:
             self.LATEST_VERSION_HASH = self.INSTALLED_VERSION_HASH
 
@@ -91,17 +141,18 @@ class Version(object):
         else:
             self.UPDATE_AVAILABLE = False
 
-        d = self.__dict__
-        for k, v in d.items():
-            logger.debug(str(k) + ": " + str(v))
+        if logger.VERBOSE:
+            d = self.__dict__
+            for k, v in d.items():
+                logger.debug(str(k) + ": " + str(v))
 
 
-    def check_github(self):
+    def _check_github(self):
 
         self.COMMITS_BEHIND = 0
 
         # Get the latest version available from github
-        logger.info('Retrieving latest version information from GitHub')
+        logger.debug('Retrieving latest version information from GitHub')
         url = 'https://api.github.com/repos/%s/%s/commits/%s' % (speakreader.CONFIG.GIT_USER,
                                                                  speakreader.CONFIG.GIT_REPO,
                                                                  speakreader.CONFIG.GIT_BRANCH)
@@ -119,7 +170,6 @@ class Version(object):
             return
 
         self.LATEST_VERSION_HASH = version['sha']
-        logger.debug("Latest version is %s", self.LATEST_VERSION_HASH)
 
         # See how many commits behind we are
         if not self.INSTALLED_VERSION_HASH:
@@ -128,7 +178,7 @@ class Version(object):
             return
 
         # Get latest release tag
-        logger.info('Retrieving latest release information from GitHub')
+        logger.debug('Retrieving latest release information from GitHub')
         url = 'https://api.github.com/repos/%s/%s/releases' % (speakreader.CONFIG.GIT_USER, speakreader.CONFIG.GIT_REPO)
         if speakreader.CONFIG.GIT_TOKEN: url = url + '?access_token=%s' % speakreader.CONFIG.GIT_TOKEN
         try:
@@ -153,13 +203,19 @@ class Version(object):
             release = releases[0]
 
         self.LATEST_RELEASE = release['tag_name']
-        logger.debug("Latest release is %s", self.LATEST_RELEASE)
+        url = 'https://github.com/%s/%s/releases/tag/%s' \
+              % (speakreader.CONFIG.GIT_USER, speakreader.CONFIG.GIT_REPO, self.LATEST_RELEASE)
+        if speakreader.CONFIG.GIT_TOKEN: url = url + '?access_token=%s' % speakreader.CONFIG.GIT_TOKEN
+        self.LATEST_RELEASE_URL = url
+
+        logger.info("Installed release is %s - %s" % (self.INSTALLED_RELEASE, self.INSTALLED_VERSION_HASH))
+        logger.info("Latest release is %s - %s" % (self.LATEST_RELEASE, self.LATEST_VERSION_HASH))
 
         if self.LATEST_VERSION_HASH == self.INSTALLED_VERSION_HASH:
             logger.info('SpeakReader is up to date')
             return
 
-        logger.info('Comparing currently installed version with latest GitHub version')
+        logger.debug('Comparing currently installed version with latest GitHub version')
         url = 'https://api.github.com/repos/%s/%s/compare/%s...%s' % (speakreader.CONFIG.GIT_USER,
                                                                       speakreader.CONFIG.GIT_REPO,
                                                                       self.LATEST_VERSION_HASH,
@@ -188,7 +244,6 @@ class Version(object):
             logger.info('New version is available. You are %s commits behind' % self.COMMITS_BEHIND)
         elif self.COMMITS_BEHIND == 0:
             logger.info('SpeakReader is up to date')
-
 
 
     def update(self):
