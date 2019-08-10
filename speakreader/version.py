@@ -20,7 +20,8 @@ class Version(object):
         self.INSTALLED_VERSION_HASH = None
         self.INSTALLED_RELEASE = speakreader.VERSION_RELEASE
         self.LATEST_VERSION_HASH = None
-        self.LATEST_RELEASE = None
+        self.LATEST_RELEASE = "Unknown"
+        self.LATEST_RELEASE_URL = ""
         self.COMMITS_BEHIND = 0
         self.UPDATE_AVAILABLE = False
         self.REMOTE_NAME = None
@@ -166,7 +167,7 @@ class Version(object):
         if response.ok:
             version = response.json()
         else:
-            logger.warn('Could not get the latest version from GitHub. Are you running a local development version?')
+            logger.warn('Could not get the latest version information from GitHub for ' + speakreader.CONFIG.GIT_REMOTE + '/' + speakreader.CONFIG.GIT_BRANCH + '. Are you running a local development version?')
             return
 
         self.LATEST_VERSION_HASH = version['sha']
@@ -355,69 +356,69 @@ class Version(object):
             output, err = runGit('pull %s %s' % (speakreader.CONFIG.GIT_REMOTE, speakreader.CONFIG.GIT_BRANCH))
 
 
-def read_changelog(latest_only=False, since_INSTALLED_RELEASE=False):
-    changelog_file = os.path.join(speakreader.PROG_DIR, 'CHANGELOG.md')
+    def read_changelog(self, latest_only=False, since_prev_release=False):
+        changelog_file = os.path.join(speakreader.PROG_DIR, 'CHANGELOG.md')
 
-    if not os.path.isfile(changelog_file):
-        return '<h4>Missing changelog file</h4>'
+        if not os.path.isfile(changelog_file):
+            return '<h4>Missing changelog file</h4>'
 
-    try:
-        output = ['']
-        prev_level = 0
+        try:
+            output = ['']
+            prev_level = 0
 
-        latest_version_found = False
+            latest_version_found = False
 
-        header_pattern = re.compile(r'(^#+)\s(.+)')
-        list_pattern = re.compile(r'(^[ \t]*\*\s)(.+)')
+            header_pattern = re.compile(r'(^#+)\s(.+)')
+            list_pattern = re.compile(r'(^[ \t]*\*\s)(.+)')
 
-        with open(changelog_file, "r") as logfile:
-            for line in logfile:
-                line_header_match = re.search(header_pattern, line)
-                line_list_match = re.search(list_pattern, line)
+            with open(changelog_file, "r") as logfile:
+                for line in logfile:
+                    line_header_match = re.search(header_pattern, line)
+                    line_list_match = re.search(list_pattern, line)
 
-                if line_header_match:
-                    header_level = str(len(line_header_match.group(1)))
-                    header_text = line_header_match.group(2)
+                    if line_header_match:
+                        header_level = str(len(line_header_match.group(1)))
+                        header_text = line_header_match.group(2)
 
-                    if header_text.lower() == 'changelog':
-                        continue
+                        if header_text.lower() == 'changelog':
+                            continue
 
-                    if latest_version_found:
-                        break
-                    elif latest_only:
-                        latest_version_found = True
-                    # Add a space to the end of the release to match tags
-                    elif since_INSTALLED_RELEASE and str(self.INSTALLED_RELEASE) + ' ' in header_text:
-                        break
+                        if latest_version_found:
+                            break
+                        elif latest_only:
+                            latest_version_found = True
+                        # Add a space to the end of the release to match tags
+                        elif since_prev_release and str(self.INSTALLED_RELEASE) + ' ' in header_text:
+                            break
 
-                    output[-1] += '<h' + header_level + '>' + header_text + '</h' + header_level + '>'
+                        output[-1] += '<h' + header_level + '>' + header_text + '</h' + header_level + '>'
 
-                elif line_list_match:
-                    line_level = len(line_list_match.group(1)) / 2
-                    line_text = line_list_match.group(2)
+                    elif line_list_match:
+                        line_level = len(line_list_match.group(1)) / 2
+                        line_text = line_list_match.group(2)
 
-                    if line_level > prev_level:
-                        output[-1] += '<ul>' * int(line_level - prev_level) + '<li>' + line_text + '</li>'
-                    elif line_level < prev_level:
-                        output[-1] += '</ul>' * int(prev_level - line_level) + '<li>' + line_text + '</li>'
-                    else:
-                        output[-1] += '<li>' + line_text + '</li>'
+                        if line_level > prev_level:
+                            output[-1] += '<ul>' * int(line_level - prev_level) + '<li>' + line_text + '</li>'
+                        elif line_level < prev_level:
+                            output[-1] += '</ul>' * int(prev_level - line_level) + '<li>' + line_text + '</li>'
+                        else:
+                            output[-1] += '<li>' + line_text + '</li>'
 
-                    prev_level = line_level
+                        prev_level = line_level
 
-                elif line.strip() == '' and prev_level:
-                    output[-1] += '</ul>' * (prev_level)
-                    output.append('')
-                    prev_level = 0
+                    elif line.strip() == '' and prev_level:
+                        output[-1] += '</ul>' * int(prev_level)
+                        output.append('')
+                        prev_level = 0
 
-        if since_INSTALLED_RELEASE:
-            output.reverse()
+            if since_prev_release:
+                output.reverse()
 
-        return ''.join(output)
+            return ''.join(output)
 
-    except IOError as e:
-        logger.error('Unable to open changelog file. %s' % e)
-        return '<h4>Unable to open changelog file</h4>'
+        except IOError as e:
+            logger.error('Unable to open changelog file. %s' % e)
+            return '<h4>Unable to open changelog file</h4>'
 
 
 def runGit(args):

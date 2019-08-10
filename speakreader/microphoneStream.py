@@ -60,6 +60,7 @@ class MicrophoneStream:
                 stream_callback=self._fill_buffer,
             )
         except OSError:
+            print("microphone __enter__.OSError")
             self.closed = True
             raise Exception("Microphone Not Functioning")
 

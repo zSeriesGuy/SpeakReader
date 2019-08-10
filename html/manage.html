@@ -66,7 +66,7 @@
                             <div class="status-view-container">
                                 <p class="status-view-title font-weight-bold">Monitor</p>
                                 <div class="d-flex justify-content-around align-items-center mb-1" role="radiogroup">
-                                    <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="off">Off</label>
+                                    <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="status">Status</label>
                                     <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="transcript" checked>Transcript</label>
                                     <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="console">Console</label>
                                 </div>
@@ -88,6 +88,33 @@
 
             <div class="row mt-3">
                 <div class="col">
+
+                    <div id="status-container" class="row status-container">
+                        <div class="col pr-2">
+                            <div class="status-card">
+                                <div class="status-card-title">Transcript Listeners</div>
+                                <div class="status-card-count">
+                                    <span>Count: </span><span id="transcript-listener-count"></span>
+                                </div>
+                                <div  class="status-card-table-container">
+                                    <div id="transcript-listener-table" class="status-card-table"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col pl-2">
+                            <div class="status-card">
+                                <div class="status-card-title">Log Listeners</div>
+                                <div class="status-card-count">
+                                    <span>Count: </span><span id="log-listener-count"></span>
+                                </div>
+                                <div  class="status-card-table-container">
+                                    <div id="log-listener-table" class="status-card-table"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
 
                     <div id="transcript-container" class="transcript-container">
                         <div id="transcript" class="transcript">
@@ -125,7 +152,7 @@
                         <div class="row">
                             <div class="col">
                                 <span class="d-block font-weight-bold">Product Information</span>
-                                <span class="d-block ml-2 release-url">${productInfo['product']} ${productInfo['current_version']}</span>
+                                <a id="changelog-modal-link" class="d-block ml-2 release-url" href="#">${productInfo['product']} ${productInfo['current_version']}</a>
                             </div>
                             <div class="col mt-auto mb-auto" id="check-for-update" style="display: none;">
                                     <button id="check-for-update-button" class="btn btn-primary text-nowrap float-right mr-3 check-for-update-button">Check for Updates</button>
@@ -395,7 +422,9 @@
         <div class="tab-pane fade show mt-3" id="tabs-transcripts" role="tabpanel" aria-labelledby="tabs-transcripts-tab">
             <div class="row">
                 <div class="col">
-                    <table id="transcripts-list" class="display hover row-border stripe nowrap" style="width: 100%;"></table>
+                    <div id="transcripts-list-container">
+                        <table id="transcripts-list" class="display hover row-border stripe nowrap" style="width: 100%;"></table>
+                    </div>
                     <div id="view-transcript-container">
                         <div class="row mb-2">
                             <div class="col-md-10">
@@ -433,11 +462,25 @@
     </div>
 </div>
 
+<div id="changelog-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="changelog-modal">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Changelog</h4>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-primary" data-dismiss="modal" value="Close">
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="confirm-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirm-modal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-remove"></i></button>
                 <h4 class="modal-title">Confirm</h4>
             </div>
             <div class="modal-body">
@@ -526,15 +569,17 @@ function setStatusView(s) {
     setCookie("statusView", statusView, 365);
     $('#transcript-settings').slideUp();
     switch (  statusView ) {
-        case 'off':
+        case 'status':
             stopTranscriptStream();
             stopLogStream();
+            $('#status-container').show();
             $('#transcript-container').hide();
             $('#log-container').hide();
             break;
 
         case 'transcript':
             stopLogStream();
+            $('#status-container').hide();
             $('#log-container').hide();
             $('#transcript-container').show();
             startTranscriptStream();
@@ -542,6 +587,7 @@ function setStatusView(s) {
 
         case 'console':
             stopTranscriptStream();
+            $('#status-container').hide();
             $('#transcript-container').hide();
             $('#log-container').show();
             startLogStream();
@@ -559,7 +605,7 @@ function resizeContainers() {
     var width = $('#transcript-container').prop('scrollWidth');
     $('#transcript-settings').css({'bottom': bottom + 'px', 'width': width + 'px'});
 
-    var viewContainerHeight = window.innerHeight - $('#view-log-container').offsetParent().prop('offsetTop') - 15;
+    var viewContainerHeight = window.innerHeight - $('#view-log-container').offsetParent().prop('offsetTop')  - 15;
     $('#view-log-container').height(viewContainerHeight);
     var viewContainerHeight = viewContainerHeight - $('#view-log').prop('offsetTop');
     $('#view-log').height(viewContainerHeight - 20);
@@ -568,6 +614,9 @@ function resizeContainers() {
     $('#view-transcript-container').height(viewContainerHeight);
     var viewContainerHeight = viewContainerHeight - $('#view-transcript').prop('offsetTop');
     $('#view-transcript').height(viewContainerHeight - 20);
+
+    var containerHeight = window.innerHeight - $('.status-container').offsetParent().prop('offsetTop') - $('.status-card-table-container').prop('offsetTop') - 35;
+    $('.status-card-table-container').height(containerHeight);
 }
 
 function checkForUpdate() {
@@ -787,24 +836,51 @@ $(document).ready(function() {
     // SSE handler for transcribeEngineStatus
     var tesHandler = new EventSource('transcribeEngineStatus');
     tesHandler.onmessage = function (e) {
-        var tesStatus = e.data;
+        var data = JSON.parse(e.data);
+        var tesStatus = data.status
         switch (tesStatus) {
             case "Close":
                 tesHandler.close();
                 break;
 
-            case "True":
+            case true:
                 $('#tes-button').css("background-color", "green").text("Stop").val("stop");
                 $('#tes-status').text("Online");
                 $('.listeningOn-div').show();
                 break;
 
-            case "False":
+            case false:
                 $('#tes-button').css("background-color", "red").text("Start").val("start");
                 $('#tes-status').text("Offline");
                 $('.listeningOn-div').hide();
                 break;
         }
+
+        $('#transcript-listener-count').text(data.usage.transcript.count);
+        var table = "";
+        if ( data.usage.transcript.count > 0 ) {
+            table = '<table class="status-card-table"><tbody>'
+            for ( i = 0; i < data.usage.transcript.list.length; i++ ) {
+                var item = data.usage.transcript.list[i];
+                table += '<tr><td>' + item.remoteIP + '</td></tr>';
+            }
+            table += '</tbody></table>'
+        }
+        $('#transcript-listener-table').html(table);
+
+        $('#log-listener-count').text(data.usage.log.count);
+        var table = "";
+        if ( data.usage.log.count > 0 ) {
+            table = '<table class="status-card-table"><tbody>'
+            for ( i = 0; i < data.usage.log.list.length; i++ ) {
+                var item = data.usage.log.list[i];
+                table += '<tr><td>' + item.remoteIP + '</td></tr>';
+            }
+            table += '</tbody></table>'
+        }
+        $('#log-listener-table').html(table);
+
+
     };
 
 
@@ -1052,6 +1128,19 @@ $(document).ready(function() {
                 window.location.href = 'checkout_git_branch?git_remote=' + new_remote + '&git_branch=' + new_branch;
             });
         }
+    });
+
+    $('#changelog-modal-link').on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: 'get_changelog',
+            cache: false,
+            async: true,
+            complete: function(xhr, status) {
+                $("#changelog-modal .modal-body").html(xhr.responseText);
+                $('#changelog-modal').modal();
+            }
+        });
     });
 
     $('input[type=radio][name=status_view]').change(function() {

@@ -25,10 +25,9 @@ INIT_LOCK = threading.Lock()
 
 # Identify Our Application
 PRODUCT = 'SpeakReader'
-VERSION_RELEASE = "V1.1.6"
+VERSION_RELEASE = "V1.1.7"
 GITHUB_BRANCH = "Master"
 
-# TODO: Update checks and auto update from GITHUB
 # TODO: Do something about certgen. Do you need it?
 
 class SpeakReader(object):

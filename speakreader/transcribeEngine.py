@@ -69,10 +69,14 @@ class TranscribeEngine:
             config=config,
             interim_results=True)
 
-        self.microphoneStream = MicrophoneStream(speakreader.CONFIG.INPUT_DEVICE, SAMPLE_RATE, CHUNK_SIZE, STREAMING_LIMIT)
-
-        self._ONLINE = True
-        self.receiverQueue.put_nowait(self.ONLINE_MESSAGE)
+        try:
+            self.microphoneStream = MicrophoneStream(speakreader.CONFIG.INPUT_DEVICE, SAMPLE_RATE, CHUNK_SIZE, STREAMING_LIMIT)
+            self._ONLINE = True
+            self.receiverQueue.put_nowait(self.ONLINE_MESSAGE)
+        except Exception as e:
+            logger.debug("MicrophoneStream Exception: %s" % e)
+            self.receiverQueue.put_nowait(self.OFFLINE_MESSAGE)
+            return
 
         try:
             with self.microphoneStream as stream:
@@ -88,10 +92,11 @@ class TranscribeEngine:
                     try:
                         self.process_responses(responses)
                     except Exception as e:
-                        logger.warn("a: %s" % e)
+                        logger.debug("a: %s" % e)
+                logger.debug("Microphone Stream Closed")
 
         except Exception as e:
-            logger.warn("b: %s" % e)
+            logger.error("b: %s" % e)
 
         self.receiverQueue.put_nowait(self.OFFLINE_MESSAGE)
         self._ONLINE = False

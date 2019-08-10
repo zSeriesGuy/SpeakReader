@@ -56,17 +56,22 @@ class QueueManager(object):
         elif type == "transcript":
             self.transcriptHandler.removeListener(sessionID=sessionID)
 
+    def getUsage(self):
+        usage = {}
+        usage['transcript'] = self.transcriptHandler.getUsage()
+        usage['log'] = self.logHandler.getUsage()
+        return usage
 
 class QueueHandler(object):
-    _STARTED = False
-    fileLock = threading.Lock()
-    _receiverQueue = None
-    _listenerQueues = []
-    _queueHandlerThread = None
-    logFileName = None
-    transcriptFile = None
 
     def __init__(self, name):
+        self._STARTED = False
+        self.fileLock = threading.Lock()
+        self._receiverQueue = None
+        self._listenerQueues = []
+        self._queueHandlerThread = None
+        self.logFileName = None
+        self.transcriptFile = None
         self.threadName = name
 
         # Initialize the Handler queue manager
@@ -145,6 +150,12 @@ class QueueHandler(object):
         self._listenerQueues = []
         self._STARTED = False
 
+    def getUsage(self):
+        count = len(self._listenerQueues)
+        list = []
+        for q in self._listenerQueues:
+            list.append({'remoteIP': q.remoteIP, 'sessionID': q.sessionID})
+        return {'count': count, 'list': list}
 
 class TranscriptHandler(QueueHandler):
     def __init__(self, name):

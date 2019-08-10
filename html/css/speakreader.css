@@ -7,7 +7,6 @@ body,
     background-color: #f2f2f2;
 }
 
-.xmodal-backdrop,
 .manage-content {
     background-color: #ffffb3;
 }
@@ -25,15 +24,16 @@ body,
     position: relative;
     width: 100%;
     min-height: 100px;
-    display: none;
 }
 
 #transcript-container {
     overflow-y: auto;
+    display: none;
 }
 
 #log-container {
     overflow: auto;
+    display: none;
 }
 
 .config-container .form-group {
@@ -157,6 +157,7 @@ body,
     display: none;
 }
 
+#transcripts-list-container,
 #view-transcript,
 #view-log {
     overflow: auto;
@@ -281,4 +282,101 @@ body,
 .release-url {
     color: black;
     text-decoration: underline;
+}
+
+.modal-content {
+    color: #eee;
+}
+
+.modal-header {
+    padding: 15px 20px;
+    background-color: #222222;
+    border-radius: 3px 3px 0 0;
+    border-bottom: 1px solid #1C1C1C;
+}
+.modal-body {
+    position: relative;
+    overflow-y: auto;
+    max-height: 600px;
+    padding: 15px;
+    background-color: #323232;
+    color: #fff;
+}
+.modal-body table {
+    color: #fff;
+}
+.modal-body li {
+    margin-top: 7px;
+    margin-left: 4px;
+    color: #aaa;
+}
+.modal-body li strong {
+    color: #eee;
+}
+.modal-body i {
+    color: #F9AA03;
+}
+.modal-body i.fa {
+    color: #fff;
+}
+.modal-body td:hover a .fa,
+.modal-body a:focus i.fa {
+    color: #f9aa03;
+}
+.modal-body strong,
+.modal-body strong i.fa {
+    color: #F9AA03;
+}
+.modal-footer {
+    padding: 15px 20px;
+    margin-top: 0;
+    background-color: #222222;
+    border-radius: 0 0 3px 3px;
+    border-top: 1px solid #1C1C1C;
+}
+#changelog-modal .modal-body > h2 {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #444;
+    font-size: 18px;
+}
+#changelog-modal .modal-body > ul {
+    padding-left: 25px;
+    margin-bottom: 30px;
+}
+#changelog-modal ul {
+    padding-left: 20px;
+}
+
+.status-card {
+    background-color: #339933;
+    border: 9px inset;
+    border-color: #bfbfbf;
+}
+
+.status-card-title {
+    background-color: #4d4d4d;
+    color: #fff;
+    border-bottom: 1px solid black;
+    font-size: 18px;
+    text-align: center;
+    margin: 0px;
+}
+
+.status-card-count {
+    font-size: 16px;
+    margin: 5px 2px 0px 10px;
+    color: #fff;
+}
+
+.status-card-table-container {
+    margin: 8px;
+    overflow-y: auto;
+}
+
+#transcript-listener-table,
+#log-listener-table {
+    background-color: #f2f2f2;
+    width: 100%;
+    height: 100%;
 }

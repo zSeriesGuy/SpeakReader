@@ -43,6 +43,7 @@
 <script>
 $(document).ready(function() {
     startTranscriptStream();
+    $('#transcript-container').show();
     window.addEventListener('beforeunload', stopTranscriptStream, false);
 });
 </script>

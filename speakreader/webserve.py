@@ -219,6 +219,7 @@ class WebInterface(object):
             "latest_release_url": self.SR.versionInfo.LATEST_RELEASE_URL,
             "update_available": int(bool(self.SR.versionInfo.UPDATE_AVAILABLE)),
         }
+        # versionInfo['update_available'] = True
         return versionInfo
 
     @cherrypy.expose
@@ -254,6 +255,26 @@ class WebInterface(object):
         speakreader.CONFIG.__setattr__('GIT_BRANCH', git_branch)
         speakreader.CONFIG.write()
         return self.do_state_change('checkout', 'Switching Git Branches', 120)
+
+    @cherrypy.expose
+    @requireAuth(is_admin())
+    def get_changelog(self, latest_only=False, since_prev_release=False, update_shown=False, **kwargs):
+        latest_only = (latest_only == 'true')
+        since_prev_release = (since_prev_release == 'true')
+
+        #if since_prev_release and speakreader.PREV_RELEASE == speakreader.VERSION_RELEASE:
+        #    latest_only = True
+        #    since_prev_release = False
+
+        # Set update changelog shown status
+        #if update_shown == 'true':
+        #    speakreader.CONFIG.__setattr__('UPDATE_SHOW_CHANGELOG', 0)
+        #    speakreader.CONFIG.write()
+
+        latest_only = False
+        since_prev_release = False
+
+        return self.SR.versionInfo.read_changelog(latest_only=latest_only, since_prev_release=since_prev_release)
 
     def do_state_change(self, signal, title, timer, **kwargs):
         message = title
@@ -314,8 +335,11 @@ class WebInterface(object):
 
         def eventSource():
             while self.SR.is_initialized:
-                yield 'data: {}\n\n'.format(self.SR.transcribeEngine.is_online)
-                time.sleep(1.0)
+                status = {}
+                status['status'] = self.SR.transcribeEngine.is_online
+                status['usage'] = self.SR.queueManager.getUsage()
+                yield 'data: {}\n\n'.format(json.dumps(status))
+                time.sleep(1.5)
             yield 'data: {}\n\n'.format('Close')
 
         return eventSource()
