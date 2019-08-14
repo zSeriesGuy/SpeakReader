@@ -147,6 +147,7 @@ class QueueHandler(object):
 
         if queueElement is not None:
             logger.info("Removing " + queueElement.type.capitalize() + " Listener Queue for IP: " + queueElement.remoteIP + " with SessionID: " + sessionID)
+            queueElement.clear()
             queueElement.put_nowait(None)
             self._listenerQueues.pop(sessionID)
 
@@ -289,3 +290,6 @@ class QueueElement(object):
 
     def put(self, data):
         self.listenerQueue.put(data)
+
+    def clear(self, data):
+        self.listenerQueue.queue.clear()
