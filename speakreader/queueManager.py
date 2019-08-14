@@ -1,7 +1,6 @@
 import threading
 import queue
 from queue import Queue
-import json
 import os
 import datetime
 
@@ -105,7 +104,7 @@ class QueueHandler(object):
         data = {"event": "open",
                 "sessionID": sessionID,
                 }
-        queueElement.put_nowait(json.dumps(data))
+        queueElement.put_nowait(data)
 
         data = None
         if type == "log":
@@ -129,7 +128,7 @@ class QueueHandler(object):
                         }
 
         if data:
-            queueElement.put_nowait(json.dumps(data))
+            queueElement.put_nowait(data)
 
         return queueElement.listenerQueue
 
@@ -183,11 +182,11 @@ class TranscriptHandler(QueueHandler):
         self.filename = os.path.join(speakreader.CONFIG.TRANSCRIPTS_FOLDER, FILENAME)
         self.transcriptFile = open(self.filename, "a+")
 
-        while True:
+        while self._STARTED:
             try:
                 transcript = self._receiverQueue.get(timeout=2)
 
-                if transcript is None or not self._STARTED:
+                if transcript is None:
                     break
 
                 if transcript['event'] == 'transcript' and transcript['final']:
@@ -234,10 +233,10 @@ class LogHandler(QueueHandler):
                 self.logFileName = handler.baseFilename
                 break
 
-        while True:
+        while self._STARTED:
             try:
                 logRecord = self._receiverQueue.get(timeout=2)
-                if logRecord is None or not self._STARTED:
+                if logRecord is None:
                     break
                 # Python 3.6.8 doesn't seem to return a formatted message while 3.7.3 does.
                 logMessage = logRecord.getMessage()

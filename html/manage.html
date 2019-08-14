@@ -520,6 +520,9 @@ function startLogStream() {
         atBottom = $('#console-log').parent().prop("scrollTop") + $('#console-log').parent().prop("clientHeight") + offset >= $('#console-log').parent().prop("scrollHeight");
 
         switch (data.event) {
+            case 'ping':
+                break;
+
             case 'open':
                 sessionID = data.sessionID;
                 break;

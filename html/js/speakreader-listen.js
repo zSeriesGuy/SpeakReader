@@ -33,6 +33,9 @@ function startTranscriptStream() {
         var data = JSON.parse(e.data);
 
         switch (data.event) {
+            case 'ping':
+                break;
+
             case 'open':
                 sessionID = data.sessionID;
                 break;

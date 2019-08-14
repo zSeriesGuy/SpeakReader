@@ -311,12 +311,11 @@ class WebInterface(object):
         def eventSource(type, listenerQueue, remoteIP, sessionID):
             while self.SR.queueManager.is_initialized:
                 try:
-                    data = listenerQueue.get(timeout=5)
-                    if data == None:
-                        yield 'data: {}\n\n'.format(json.dumps({"event": "close"}))
+                    data = listenerQueue.get(timeout=2)
+                    if data is None:
+                        close_event = json.dumps({"event": "close"})
+                        yield 'data: {}\n\n'.format(close_event)
                         break
-                    if data['event'] == 'ping':
-                        continue
                     yield 'data: {}\n\n'.format(json.dumps(data))
                 except queue.Empty:
                     continue
@@ -326,9 +325,9 @@ class WebInterface(object):
 
         if type == 'transcript':
             if self.SR.transcribeEngine.is_online:
-                listenerQueue.put_nowait(json.dumps(self.SR.transcribeEngine.ONLINE_MESSAGE))
+                listenerQueue.put_nowait(self.SR.transcribeEngine.ONLINE_MESSAGE)
             else:
-                listenerQueue.put_nowait(json.dumps(self.SR.transcribeEngine.OFFLINE_MESSAGE))
+                listenerQueue.put_nowait(self.SR.transcribeEngine.OFFLINE_MESSAGE)
 
         return eventSource(type, listenerQueue, remoteIP, sessionID)
     addListener._cp_config = {'response.stream': True}
