@@ -5,35 +5,23 @@ body,
     margin-left: auto;
     margin-right: auto;
     background-color: #f2f2f2;
+    overflow: hidden;
 }
 
 .manage-content {
     background-color: #ffffb3;
+    height: 100%;
 }
 
 .container {
-    max-width: 900px;
+    max-width: 800px;
     min-width: 400px;
     padding: 0px 15px 15px 15px;
     background-color: #80ff80;
-}
-
-.transcript-container,
-.log-container {
-    background-color: #f2f2f2;
-    position: relative;
-    width: 100%;
-    min-height: 100px;
-}
-
-#transcript-container {
-    overflow-y: auto;
-    display: none;
-}
-
-#log-container {
-    overflow: auto;
-    display: none;
+    height: 100%;
+    height: -moz-available;          /* WebKit-based browsers will ignore this. */
+    height: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+    height: fill-available;
 }
 
 .config-container .form-group {
@@ -88,7 +76,7 @@ body,
     margin: 5px 0px 15px 0px;
 }
 
-#transcript-settings {
+.transcript-settings {
     background-color: #99bbff;
     border-top: 2px solid black;
     position: fixed;
@@ -102,6 +90,7 @@ body,
     margin: 5px 0px 10px 0px;
     color: black;
     padding: 0px 10px 0px 10px;
+    background-color: #f2f2f2;
 }
 
 .console-log {
@@ -111,8 +100,22 @@ body,
     padding: 0px 10px 0px 10px;
 }
 
-#bottom-button,
-#log-bottom-button {
+.console-log>p {
+    margin: 0px;
+    white-space: nowrap;
+}
+
+.settings-container {
+    overflow: auto;
+}
+
+.transcript-container,
+.log-container {
+    overflow: auto;
+    background-color: #f2f2f2;
+}
+
+.bottom-button {
     z-index: 999;
     font-size: 22px;
     line-height: 1.0;
@@ -150,30 +153,6 @@ body,
 .check-for-update-button {
     background-color: green;
     color: white;
-}
-
-#view-transcript-container,
-#view-log-container {
-    display: none;
-}
-
-#transcripts-list-container,
-#view-transcript,
-#view-log {
-    overflow: auto;
-    padding: 10px 10px 10px 10px;
-    min-height: 100px;
-    height: 100%;
-    width: 100%;
-}
-
-#log {
-}
-
-#console-log>p,
-#view-log>p {
-    margin: 0px;
-    white-space: nowrap;
 }
 
 .fontsize-button {
@@ -372,11 +351,8 @@ body,
 .status-card-table-container {
     margin: 8px;
     overflow-y: auto;
+    background-color: #f2f2f2;
 }
 
-#transcript-listener-table,
-#log-listener-table {
-    background-color: #f2f2f2;
-    width: 100%;
-    height: 100%;
+.stretch {
 }

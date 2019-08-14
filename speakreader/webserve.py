@@ -78,6 +78,9 @@ class WebInterface(object):
         productInfo = {
             "product": speakreader.PRODUCT,
             "current_version": self.SR.versionInfo.INSTALLED_RELEASE,
+            "latest_release": self.SR.versionInfo.LATEST_RELEASE,
+            "latest_release_url": self.SR.versionInfo.LATEST_RELEASE_URL,
+            "update_available": "true" if self.SR.versionInfo.UPDATE_AVAILABLE else "false",
         }
         settings = self.getSettings()
         return serve_template(templatename="manage.html", title="Management Console", productInfo=productInfo, config=settings['config'])

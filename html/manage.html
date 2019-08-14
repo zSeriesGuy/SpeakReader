@@ -46,84 +46,80 @@
         </nav>
     </div>
 
-    <div class="tab-content">
+        <div class="tab-content">
 
-        <div class="tab-pane fade show active mt-1" id="tabs-status" role="tabpanel" aria-labelledby="tabs-status-tab">
+            <div id="tabs-status" class="tab-pane fade show active mt-1" role="tabpanel" aria-labelledby="tabs-status-tab">
 
-            <div class="row">
-                <div class="col">
-                    <div class="d-md-flex flex-row justify-content-between">
-                        <div class="col-md-3 btn-group order-0" role="group" aria-label="btn1">
-                            <button type="button" id="tes-button" class="btn btn-primary" value="start">Start</button>
-                        </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="d-md-flex flex-row justify-content-between">
+                            <div class="col-md-3 btn-group order-0" role="group" aria-label="btn1">
+                                <button type="button" id="tes-button" class="btn btn-primary" value="start">Start</button>
+                            </div>
 
-                        <div class="col-md-3 btn-group order-2" role="group" aria-label="btn2">
-                            <button type="button" id="restart-button" class="btn btn-primary" value="restart" >Restart</button>
-                            <button type="button" id="shutdown-button" class="btn btn-primary" value="shutdown">Shutdown</button>
-                        </div>
+                            <div class="col-md-3 btn-group order-2" role="group" aria-label="btn2">
+                                <button type="button" id="restart-button" class="btn btn-primary" value="restart" >Restart</button>
+                                <button type="button" id="shutdown-button" class="btn btn-primary" value="shutdown">Shutdown</button>
+                            </div>
 
-                        <div class="col-md-5 text-center align-middle order-1">
-                            <div class="status-view-container">
-                                <p class="status-view-title font-weight-bold">Monitor</p>
-                                <div class="d-flex justify-content-around align-items-center mb-1" role="radiogroup">
-                                    <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="status">Status</label>
-                                    <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="transcript" checked>Transcript</label>
-                                    <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="console">Console</label>
+                            <div class="col-md-5 text-center align-middle order-1">
+                                <div class="status-view-container">
+                                    <p class="status-view-title font-weight-bold">Monitor</p>
+                                    <div class="d-flex justify-content-around align-items-center mb-1" role="radiogroup">
+                                        <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="status">Status</label>
+                                        <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="transcript" checked>Transcript</label>
+                                        <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="console">Console</label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row mt-2">
-                <div class="col-md-5">
-                    <span class="font-weight-bold">Transcribe Engine Status: </span><span id="tes-status"></span>
-                </div>
-                <div class="col-md text-md-right">
-                    <span class="font-weight-bold listeningOn-div">Listening On: </span><span id="listeningOn"></span>
-                </div>
-            </div>
-
-            <div class="row mt-3">
-                <div class="col">
-
-                    <div id="status-container" class="row status-container">
-                        <div class="col pr-2">
-                            <div class="status-card">
-                                <div class="status-card-title">Transcript Listeners</div>
-                                <div class="status-card-count">
-                                    <span>Count: </span><span id="transcript-listener-count"></span>
-                                </div>
-                                <div  class="status-card-table-container">
-                                    <div id="transcript-listener-table" class="status-card-table"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col pl-2">
-                            <div class="status-card">
-                                <div class="status-card-title">Log Listeners</div>
-                                <div class="status-card-count">
-                                    <span>Count: </span><span id="log-listener-count"></span>
-                                </div>
-                                <div  class="status-card-table-container">
-                                    <div id="log-listener-table" class="status-card-table"></div>
-                                </div>
-                            </div>
-                        </div>
-
+                <div class="row mt-2 mb-2">
+                    <div class="col-5 text-nowrap">
+                        <span class="font-weight-bold text-nowrap">Transcribe Engine Status: </span><span id="tes-status" class="text-nowrap"></span>
                     </div>
+                    <div class="col text-md-right text-sm-left text-nowrap listeningOn-div">
+                        <span class="font-weight-bold text-nowrap">Listening On: </span><span id="listeningOn" class="text-nowrap"></span>
+                    </div>
+                </div>
 
-                    <div id="transcript-container" class="transcript-container">
-                        <div id="transcript" class="transcript">
-                            <p></p>
+                <div id="status-container" class="row">
+                    <div class="col pr-2">
+                        <div class="status-card">
+                            <div class="status-card-title row">Transcript Listeners</div>
+                            <div class="status-card-count row">
+                                <span>Count: </span><span id="transcript-listener-count"></span>
+                            </div>
+                            <div class="status-card-table-container row">
+                                <div id="transcript-listener-table" class="status-card-table stretch"></div>
+                            </div>
                         </div>
-                        <button id="bottom-button" class="bottom-button"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="col pl-2">
+                        <div class="status-card">
+                            <div class="status-card-title row">Log Listeners</div>
+                            <div class="status-card-count row">
+                                <span>Count: </span><span id="log-listener-count"></span>
+                            </div>
+                            <div class="status-card-table-container row">
+                                <div id="log-listener-table" class="status-card-table stretch"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                        <div id="transcript-settings" class="transcript-settings">
-                            <div class="row">
+                <div id="transcript-container" class="row">
+                    <div class="col">
+                        <div class="transcript-container stretch">
+                            <div id="transcript" class="transcript">
+                                <p></p>
+                            </div>
+                            <button id="bottom-button" class="bottom-button"><i class="fas fa-chevron-down"></i></button>
+
+                            <div id="transcript-settings" class="transcript-settings">
                                 <div class="col text-center">
                                     <button id="fontsize-button-down" class="fontsize-button-down fontsize-button">A-</button>
                                     <button id="fontsize-button-up" class="fontsize-button-up fontsize-button">A+</button>
@@ -131,335 +127,344 @@
                             </div>
                         </div>
                     </div>
-
-                    <div id="log-container" class="log-container">
-                        <div id="console-log" class="console-log">
-                            <p></p>
-                        </div>
-                        <button id="log-bottom-button" class="bottom-button"><i class="fas fa-chevron-down"></i></button>
-                    </div>
-
                 </div>
-            </div>
 
-        </div>
-
-        <div class="tab-pane fade" id="tabs-settings" role="tabpanel" aria-labelledby="tabs-settings-tab">
-
-            <div class="row">
-                <div class="col">
-                    <div class="product-info-container">
-                        <div class="row">
-                            <div class="col">
-                                <span class="d-block font-weight-bold">Product Information</span>
-                                <a id="changelog-modal-link" class="d-block ml-2 release-url" href="#">${productInfo['product']} ${productInfo['current_version']}</a>
+                <div id="log-container" class="row">
+                    <div class="col">
+                        <div class="log-container stretch">
+                            <div id="console-log" class="console-log">
+                                <p></p>
                             </div>
-                            <div class="col mt-auto mb-auto" id="check-for-update" style="display: none;">
-                                    <button id="check-for-update-button" class="btn btn-primary text-nowrap float-right mr-3 check-for-update-button">Check for Updates</button>
-                            </div>
-                            <div class="col" id="update-available" style="display: none;">
-                                    <span id="latest-release" class="d-block text-right font-weight-bold"></span>
-                                    <button id="update-now-button" class="btn btn-primary text-nowrap float-right mr-3 update-now-button">
-                                        <span id="update-now-spinner" class="fas fa-sync"></span>
-                                        <span id="update-now-button-text"> Update Now</span>
-                                    </button>
-                            </div>
+                            <button id="log-bottom-button" class="bottom-button"><i class="fas fa-chevron-down"></i></button>
                         </div>
                     </div>
                 </div>
+
             </div>
-            <div class="row">
-                <div class="col-sm">
-                    <form action="configUpdate" method="post" class="form" id="configForm" validated="true">
-                        <div id="config-container" class="config-container">
-                            <div class="form-section">
-                                <div class="col">
-                                    <div class="padded-header">
-                                        <h4>General</h4>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="inputDeviceSelection" class="font-weight-bold">Input Device Selection</label>
-                                        <select id="inputDeviceSelection" class="form-control col-md-6" name="input_device"></select>
-                                        <small class="form-text">Select the microphone or line-in input device that SpeakReader will listen on.</small>
-                                    </div>
 
-                                    <div class="form-group form-check">
-                                        <input id="show_interim_results" type="checkbox" class="form-check-input" name="show_interim_results" value="1" checked="${config['show_interim_results']}"/>
-                                        <label for="show_interim_results" class="font-weight-bold form-check-label">Show Interim Results</label>
-                                        <small class="form-text">Show interim result text during transcription. Unchecking this will only show the final result text.</small>
-                                    </div>
+            <div id="tabs-settings" class="tab-pane fade" role="tabpanel" aria-labelledby="tabs-settings-tab">
 
-                                    <div class="form-group form-check">
-                                        <input id="start_transcribe_on_startup" type="checkbox" class="form-check-input" name="start_transcribe_on_startup" value="1" checked="${config['start_transcribe_on_startup']}"/>
-                                        <label for="start_transcribe_on_startup" class="font-weight-bold form-check-label">Start Transcribe Engine on Startup</label>
-                                        <small class="form-text">Automatically start the Transcribe Engine when SpeakReader starts.</small>
-                                    </div>
-
-                                    <div class="form-group form-check">
-                                        <input id="launch_browser" type="checkbox" class="form-check-input" name="launch_browser" value="1" checked="${config['launch_browser']}"/>
-                                        <label for="launch_browser" class="font-weight-bold form-check-label">Launch Management Console on Startup</label>
-                                        <small class="form-text">Launch a web browser with the SpeakReader Management Console on startup.</small>
-                                    </div>
-
-                                    <div class="form-group form-check">
-                                        <div>
-                                            <input id="enable_censorship" type="checkbox" class="form-check-input" name="enable_censorship" value="1" checked="${config['enable_censorship']}"/>
-                                            <label for="enable_censorship" class="font-weight-bold form-check-label">Enable Censorship</label>
-                                            <small class="form-text">Enable profanity filters and censorship.</small>
-                                        </div>
-                                        <div class="form-sub-group">
-                                            <button id="censored-words-button" class="btn btn-primary censored-words-button">Edit</button>
-                                            <label for="censored-words-button" class="font-weight-bold">Edit Censored Words List</label>
-                                            <small class="form-text">Optional: Define additional words you never want to see in the transcript.</small>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="credentials_file" class="font-weight-bold">GoogleAPI Credentials JSON File</label>
-                                        <div class="input-group">
-                                            <input id="credentials_file" class="form-control col-md-11" type="text" name="credentials_file" value="${config['credentials_file']}">
-                                            <div class="input-group-append">
-                                                <button id="upload_credentials_button" class="btn btn-secondary">Upload</button>
-                                            </div>
-                                        </div>
-                                        <small class="form-text">Required: Select and Upload your GoogleAPI JSON credentials file.</small>
-                                        <input id="upload_credentials_file" type="file" name="upload_credentials_file" style="display: none;" />
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="transcripts_folder" class="font-weight-bold">Transcripts Folder</label>
-                                        <input id="transcripts_folder" type="text" class="form-control" name="transcripts_folder" value="${config['transcripts_folder']}" size="30">
-                                        <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the transcripts.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="log_dir" class="font-weight-bold">Logs Folder</label>
-                                        <input id="log_dir" type="text" class="form-control" name="log_dir" value="${config['log_dir']}" size="30">
-                                        <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the SpeakReader console logs.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-section">
-                                <div class="col">
-                                    <div class="padded-header">
-                                        <h4>Web Interface</h4>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="http_port" class="font-weight-bold">HTTP Port</label>
-                                        <div class="row">
-                                            <div class="col-md-2">
-                                                <input id="http_port" type="text" class="form-control" name="http_port" value="${config['http_port']}" required>
-                                            </div>
-                                            <div id="http_port_error" class="alert alert-danger" role="alert"></div>
-                                        </div>
-                                        <small class="form-text">Port to bind the web server to. Note that ports below 1024 may require root authority.<br><strong>Changing this value will restart SpeakReader.</strong></small>
-                                    </div>
-
-                                    <div class="form-group form-check">
-                                        <div>
-                                            <input id="enable_https" type="checkbox" class="form-check-input" name="enable_https" value="1" checked="${config['enable_https']}"/>
-                                            <label for="enable_https" class="font-weight-bold form-check-label">Enable HTTPS</label>
-                                            <small class="form-text">Enable HTTPS for the web server to use encrypted communication.<br><strong>Changing protocols will require restarting SpeakReader.</strong></small>
-                                        </div>
-                                        <div class="form-sub-group">
-                                            <div class="form-sub-group">
-                                                <label for="https_cert" class="font-weight-bold">HTTPS Certificate</label>
-                                                <input type="text" class="form-control http-settings" id="https_cert" name="https_cert" value="${config['https_cert']}" />
-                                                <small class="form-text">The location of the SSL certificate.</small>
-                                            </div>
-
-                                            <div class="form-sub-group">
-                                                <label for="https_key" class="font-weight-bold">HTTPS Key</label>
-                                                <input type="text" class="form-control http-settings" id="https_key" name="https_key" value="${config['https_key']}" />
-                                                <small class="form-text">The location of the SSL key.</small>
-                                            </div>
-
-                                            <div class="form-sub-group">
-                                                <label for="https_cert_chain" class="font-weight-bold">HTTPS Certificate Chain</label>
-                                                <input type="text" class="form-control http-settings" id="https_cert_chain" name="https_cert_chain" value="${config['https_cert_chain']}" />
-                                                <small class="form-text">The location of the SSL certificate chain. Optional if the certificate file does not contain the full chain.</small>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-section">
-                                <div class="col">
-                                    <div class="padded-header">
-                                        <h4>Authentication</h4>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="http_username" class="font-weight-bold">HTTP Username</label>
-                                        <div class="row">
-                                            <div class="col-md-2">
-                                                <input id="http_username" type="text" class="form-control" name="http_username" value="${config['http_username']}" />
-                                            </div>
-                                            <div id="http_username_error" class="alert alert-danger" role="alert"></div>
-                                        </div>
-                                        <small class="form-text">Username for SpeakReader Management Console authentication. Leave empty to disable.</small>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="http_password" class="font-weight-bold">HTTP Password</label>
-                                        <div class="row">
-                                            <div class="col-md-2">
-                                                <input id="http_password" type="password" class="form-control" name="http_password" value="">
-                                                <input id="set_http_password" type="hidden" name="set_http_password" value="0">
-                                            </div>
-                                            <div id="http_password_error" class="alert alert-danger" role="alert"></div>
-                                        </div>
-                                        <small class="form-text">Password for SpeakReader Management Console authentication. Leave empty to disable.</small>
-                                    </div>
-
-                                    <div class="form-group form-check">
-                                        <div class="row">
-                                            <div class="col">
-                                                <input id="http_hash_password" type="checkbox" class="form-check-input" name="http_hash_password" value="1" checked="${config['http_hash_password']}"/>
-                                                <label for="http_hash_password" class="font-weight-bold form-check-label">Hash Password in the Config File</label>
-                                            </div>
-                                            <div id="http_hash_password_error" class="alert alert-danger" role="alert"></div>
-                                        </div>
-                                        <small class="form-text">Store a hashed password in the config file.<br />Warning: Your password cannot be recovered if forgotten!</small>
-                                    </div>
-
-                                    <div class="form-group form-check">
-                                        <input id="http_basic_auth" type="checkbox" class="form-check-input" name="http_basic_auth" value="1" checked="${config['http_basic_auth']}"/>
-                                        <label for="http_basic_auth" class="font-weight-bold form-check-label">Use Basic Authentication</label>
-                                        <small class="form-text">Use basic HTTP authentication instead of the HTML login form.!</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-section">
-                                <div class="col">
-                                    <div class="padded-header">
-                                        <h4>Updates</h4>
-                                    </div>
-
-                                    <div class="form-group form-check">
-                                        <div>
-                                            <input id="check_github" type="checkbox" class="form-check-input" name="check_github" value="1" checked="${config['check_github']}" />
-                                            <label for="check_github" class="font-weight-bold form-check-label">Enable Updates</label>
-                                            <div id="check_github_error" class="alert alert-danger" role="alert"></div>
-                                            <small class="form-text">Enable support for updating SpeakReader.</small>
-                                        </div>
-
-                                        <div class="form-sub-group">
-                                            <div class="form-sub-group">
-                                                <label for="git_token" class="font-weight-bold">GitHub API Token</label>
-                                                <input id="git_token" type="text" class="form-control" name="git_token" value="${config['git_token']}" />
-                                                <div id="git_token_error" class="alert alert-danger" role="alert"></div>
-                                                <small class="form-text">Optional: Use your own GitHub API token when checking for updates.</small>
-                                            </div>
-
-                                            % if config['install_type'] == 'git':
-                                            <div class="form-sub-group">
-                                                <label for="git_branch" class="font-weight-bold">Git Remote / Branch</label>
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="input-group git-group">
-                                                            <input type="text" class="form-control" id="git_remote" name="git_remote" value="${config['git_remote']}">
-                                                            <select class="form-control" id="git_branch" name="git_branch">
-                                                                <% branches = ('master', 'beta', 'nightly') %>
-                                                                % for branch in branches:
-                                                                <option value="${branch}" ${'selected' if config['git_branch'] == branch else ''}>${branch}</option>
-                                                                % endfor
-                                                                % if config['git_branch'] not in branches:
-                                                                <option value="${config['git_branch']}" selected>${config['git_branch']}</option>
-                                                                % endif
-                                                            </select>
-                                                            <span class="input-group-btn">
-                                                                <button class="btn btn-form" type="button" id="switch_git_branch">Checkout Branch</button>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <small class="form-text">The git tracking remote and branch (default "origin/master"). Select to switch the git branch (requires restart).</small>
-                                            </div>
-
-                                            <div class="form-sub-group">
-                                                <label for="git_path" class="font-weight-bold">Git Path</label>
-                                                <input type="text" class="form-control" id="git_path" name="git_path" value="${config['git_path']}" size="30">
-                                                <small class="form-text">Optional: The path to your git environment variable. Leave blank for default.</small>
-                                                <div id="git_path_error" class="alert alert-danger" role="alert"></div>
-                                            </div>
-                                            % endif
-
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            <div class="col" role="group">
-                                <button id="save-button" class="btn btn-primary save-button">Save</button>
-                                <label for="save-button" class="font-weight-bold">Save your configuration changes.</label>
-                            </div>
-
-                        </div>
-
-                        <div id="censored-words-container" class="censored-words-container" style="display: none; z-index: 999;">
+                <div class="row">
+                    <div class="col">
+                        <div class="product-info-container">
                             <div class="row">
                                 <div class="col">
-                                    <h4 class="text-center">Censored Words</h4>
-                                    <p>If the Enable Censorship configuration option is checked, words or phrases on this list will be censored from the transcript in addition to the words censored by the speech-to-text API profanity filter.<br>Place each word or series of words on separate lines.</p>
-                                    <textarea id="censored_words" rows="20" cols="1" name="censored_words" style="width: 100%;"></textarea>
+                                    <span class="d-block font-weight-bold">Product Information</span>
+                                    <a id="changelog-modal-link" class="d-block ml-2 release-url" href="#">${productInfo['product']} ${productInfo['current_version']}</a>
                                 </div>
-                                <button id="close-censored-words" class="close-button"><i class="fas fa-times"></i></button>
+                                <div class="col mt-auto mb-auto" id="check-for-update" style="display: none;">
+                                        <button id="check-for-update-button" class="btn btn-primary text-nowrap float-right mr-3 check-for-update-button">Check for Updates</button>
+                                </div>
+                                <div class="col" id="update-available" style="display: none;">
+                                        <span id="latest-release" class="d-block text-right font-weight-bold"><a class="release-url" target="_blank" href="${productInfo['latest_release_url']}">Update Available: ${productInfo['latest_release']}</a></span>
+                                        <button id="update-now-button" class="btn btn-primary text-nowrap float-right mr-3 update-now-button">
+                                            <span id="update-now-spinner" class="fas fa-sync"></span>
+                                            <span id="update-now-button-text"> Update Now</span>
+                                        </button>
+                                </div>
                             </div>
                         </div>
-
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="tab-pane fade show mt-3" id="tabs-transcripts" role="tabpanel" aria-labelledby="tabs-transcripts-tab">
-            <div class="row">
-                <div class="col">
-                    <div id="transcripts-list-container">
-                        <table id="transcripts-list" class="display hover row-border stripe nowrap" style="width: 100%;"></table>
                     </div>
-                    <div id="view-transcript-container">
-                        <div class="row mb-2">
-                            <div class="col-md-10">
-                                <h5 id="view-transcript-filename" class="view-transcript-filename mt-2 ml-3"></h5>
+                </div>
+
+                <div id="settings-container" class="row stretch settings-container">
+                    <div class="col-sm">
+                        <form action="configUpdate" method="post" class="form" id="configForm" validated="true">
+                            <div id="config-container" class="config-container">
+                                <div class="form-section">
+                                    <div class="col">
+                                        <div class="padded-header">
+                                            <h4>General</h4>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="inputDeviceSelection" class="font-weight-bold">Input Device Selection</label>
+                                            <select id="inputDeviceSelection" class="form-control col-md-6" name="input_device"></select>
+                                            <small class="form-text">Select the microphone or line-in input device that SpeakReader will listen on.</small>
+                                        </div>
+
+                                        <div class="form-group form-check">
+                                            <input id="show_interim_results" type="checkbox" class="form-check-input" name="show_interim_results" value="1" checked="${config['show_interim_results']}"/>
+                                            <label for="show_interim_results" class="font-weight-bold form-check-label">Show Interim Results</label>
+                                            <small class="form-text">Show interim result text during transcription. Unchecking this will only show the final result text.</small>
+                                        </div>
+
+                                        <div class="form-group form-check">
+                                            <input id="start_transcribe_on_startup" type="checkbox" class="form-check-input" name="start_transcribe_on_startup" value="1" checked="${config['start_transcribe_on_startup']}"/>
+                                            <label for="start_transcribe_on_startup" class="font-weight-bold form-check-label">Start Transcribe Engine on Startup</label>
+                                            <small class="form-text">Automatically start the Transcribe Engine when SpeakReader starts.</small>
+                                        </div>
+
+                                        <div class="form-group form-check">
+                                            <input id="launch_browser" type="checkbox" class="form-check-input" name="launch_browser" value="1" checked="${config['launch_browser']}"/>
+                                            <label for="launch_browser" class="font-weight-bold form-check-label">Launch Management Console on Startup</label>
+                                            <small class="form-text">Launch a web browser with the SpeakReader Management Console on startup.</small>
+                                        </div>
+
+                                        <div class="form-group form-check">
+                                            <div>
+                                                <input id="enable_censorship" type="checkbox" class="form-check-input" name="enable_censorship" value="1" checked="${config['enable_censorship']}"/>
+                                                <label for="enable_censorship" class="font-weight-bold form-check-label">Enable Censorship</label>
+                                                <small class="form-text">Enable profanity filters and censorship.</small>
+                                            </div>
+                                            <div class="form-sub-group">
+                                                <button id="censored-words-button" class="btn btn-primary censored-words-button">Edit</button>
+                                                <label for="censored-words-button" class="font-weight-bold">Edit Censored Words List</label>
+                                                <small class="form-text">Optional: Define additional words you never want to see in the transcript.</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="credentials_file" class="font-weight-bold">GoogleAPI Credentials JSON File</label>
+                                            <div class="input-group">
+                                                <input id="credentials_file" class="form-control col-md-11" type="text" name="credentials_file" value="${config['credentials_file']}">
+                                                <div class="input-group-append">
+                                                    <button id="upload_credentials_button" class="btn btn-secondary">Upload</button>
+                                                </div>
+                                            </div>
+                                            <small class="form-text">Required: Select and Upload your GoogleAPI JSON credentials file.</small>
+                                            <input id="upload_credentials_file" type="file" name="upload_credentials_file" style="display: none;" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="transcripts_folder" class="font-weight-bold">Transcripts Folder</label>
+                                            <input id="transcripts_folder" type="text" class="form-control" name="transcripts_folder" value="${config['transcripts_folder']}" size="30">
+                                            <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the transcripts.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="log_dir" class="font-weight-bold">Logs Folder</label>
+                                            <input id="log_dir" type="text" class="form-control" name="log_dir" value="${config['log_dir']}" size="30">
+                                            <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the SpeakReader console logs.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-section">
+                                    <div class="col">
+                                        <div class="padded-header">
+                                            <h4>Web Interface</h4>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="http_port" class="font-weight-bold">HTTP Port</label>
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <input id="http_port" type="text" class="form-control" name="http_port" value="${config['http_port']}" required>
+                                                </div>
+                                                <div id="http_port_error" class="alert alert-danger" role="alert"></div>
+                                            </div>
+                                            <small class="form-text">Port to bind the web server to. Note that ports below 1024 may require root authority.<br><strong>Changing this value will restart SpeakReader.</strong></small>
+                                        </div>
+
+                                        <div class="form-group form-check">
+                                            <div>
+                                                <input id="enable_https" type="checkbox" class="form-check-input" name="enable_https" value="1" checked="${config['enable_https']}"/>
+                                                <label for="enable_https" class="font-weight-bold form-check-label">Enable HTTPS</label>
+                                                <small class="form-text">Enable HTTPS for the web server to use encrypted communication.<br><strong>Changing protocols will require restarting SpeakReader.</strong></small>
+                                            </div>
+                                            <div class="form-sub-group">
+                                                <div class="form-sub-group">
+                                                    <label for="https_cert" class="font-weight-bold">HTTPS Certificate</label>
+                                                    <input type="text" class="form-control http-settings" id="https_cert" name="https_cert" value="${config['https_cert']}" />
+                                                    <small class="form-text">The location of the SSL certificate.</small>
+                                                </div>
+
+                                                <div class="form-sub-group">
+                                                    <label for="https_key" class="font-weight-bold">HTTPS Key</label>
+                                                    <input type="text" class="form-control http-settings" id="https_key" name="https_key" value="${config['https_key']}" />
+                                                    <small class="form-text">The location of the SSL key.</small>
+                                                </div>
+
+                                                <div class="form-sub-group">
+                                                    <label for="https_cert_chain" class="font-weight-bold">HTTPS Certificate Chain</label>
+                                                    <input type="text" class="form-control http-settings" id="https_cert_chain" name="https_cert_chain" value="${config['https_cert_chain']}" />
+                                                    <small class="form-text">The location of the SSL certificate chain. Optional if the certificate file does not contain the full chain.</small>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-section">
+                                    <div class="col">
+                                        <div class="padded-header">
+                                            <h4>Authentication</h4>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="http_username" class="font-weight-bold">HTTP Username</label>
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <input id="http_username" type="text" class="form-control" name="http_username" value="${config['http_username']}" />
+                                                </div>
+                                                <div id="http_username_error" class="alert alert-danger" role="alert"></div>
+                                            </div>
+                                            <small class="form-text">Username for SpeakReader Management Console authentication. Leave empty to disable.</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="http_password" class="font-weight-bold">HTTP Password</label>
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <input id="http_password" type="password" class="form-control" name="http_password" value="">
+                                                    <input id="set_http_password" type="hidden" name="set_http_password" value="0">
+                                                </div>
+                                                <div id="http_password_error" class="alert alert-danger" role="alert"></div>
+                                            </div>
+                                            <small class="form-text">Password for SpeakReader Management Console authentication. Leave empty to disable.</small>
+                                        </div>
+
+                                        <div class="form-group form-check">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <input id="http_hash_password" type="checkbox" class="form-check-input" name="http_hash_password" value="1" checked="${config['http_hash_password']}"/>
+                                                    <label for="http_hash_password" class="font-weight-bold form-check-label">Hash Password in the Config File</label>
+                                                </div>
+                                                <div id="http_hash_password_error" class="alert alert-danger" role="alert"></div>
+                                            </div>
+                                            <small class="form-text">Store a hashed password in the config file.<br />Warning: Your password cannot be recovered if forgotten!</small>
+                                        </div>
+
+                                        <div class="form-group form-check">
+                                            <input id="http_basic_auth" type="checkbox" class="form-check-input" name="http_basic_auth" value="1" checked="${config['http_basic_auth']}"/>
+                                            <label for="http_basic_auth" class="font-weight-bold form-check-label">Use Basic Authentication</label>
+                                            <small class="form-text">Use basic HTTP authentication instead of the HTML login form.!</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-section">
+                                    <div class="col">
+                                        <div class="padded-header">
+                                            <h4>Updates</h4>
+                                        </div>
+
+                                        <div class="form-group form-check">
+                                            <div>
+                                                <input id="check_github" type="checkbox" class="form-check-input" name="check_github" value="1" checked="${config['check_github']}" />
+                                                <label for="check_github" class="font-weight-bold form-check-label">Enable Updates</label>
+                                                <div id="check_github_error" class="alert alert-danger" role="alert"></div>
+                                                <small class="form-text">Enable support for updating SpeakReader.</small>
+                                            </div>
+
+                                            <div class="form-sub-group">
+                                                <div class="form-sub-group">
+                                                    <label for="git_token" class="font-weight-bold">GitHub API Token</label>
+                                                    <input id="git_token" type="text" class="form-control col-md-6" name="git_token" value="${config['git_token']}" />
+                                                    <div id="git_token_error" class="alert alert-danger" role="alert"></div>
+                                                    <small class="form-text">Optional: Use your own GitHub API token when checking for updates.</small>
+                                                </div>
+
+                                                % if config['install_type'] == 'git':
+                                                <div class="form-sub-group">
+                                                    <label for="git_branch" class="font-weight-bold">Git Remote / Branch</label>
+                                                    <div class="row">
+                                                        <div class="col-7">
+                                                            <div class="input-group git-group">
+                                                                <input type="text" class="form-control" id="git_remote" name="git_remote" value="${config['git_remote']}">
+                                                                <select class="form-control" id="git_branch" name="git_branch">
+                                                                    <% branches = ('master', 'beta', 'nightly') %>
+                                                                    % for branch in branches:
+                                                                    <option value="${branch}" ${'selected' if config['git_branch'] == branch else ''}>${branch}</option>
+                                                                    % endfor
+                                                                    % if config['git_branch'] not in branches:
+                                                                    <option value="${config['git_branch']}" selected>${config['git_branch']}</option>
+                                                                    % endif
+                                                                </select>
+                                                                <span class="input-group-btn">
+                                                                    <button class="btn btn-primary" type="button" id="switch_git_branch">Checkout Branch</button>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <small class="form-text">The git tracking remote and branch (default "origin/master"). Select to switch the git branch (requires restart).</small>
+                                                </div>
+
+                                                <div class="form-sub-group">
+                                                    <label for="git_path" class="font-weight-bold">Git Path</label>
+                                                    <input type="text" class="form-control col-5" id="git_path" name="git_path" value="${config['git_path']}" size="30">
+                                                    <small class="form-text">Optional: The path to your git environment variable. Leave blank for default.</small>
+                                                    <div id="git_path_error" class="alert alert-danger" role="alert"></div>
+                                                </div>
+                                                % endif
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col" role="group">
+                                    <button id="save-button" class="btn btn-primary save-button">Save</button>
+                                    <label for="save-button" class="font-weight-bold">Save your configuration changes.</label>
+                                </div>
+
                             </div>
-                            <div class="col text-center">
-                                <button id="close-transcript" class="btn btn-secondary close-button">Close</button>
+
+                            <div id="censored-words-container" class="censored-words-container" style="display: none; z-index: 999;">
+                                <div class="row">
+                                    <div class="col">
+                                        <h4 class="text-center">Censored Words</h4>
+                                        <p>If the Enable Censorship configuration option is checked, words or phrases on this list will be censored from the transcript in addition to the words censored by the speech-to-text API profanity filter.<br>Place each word or series of words on separate lines.</p>
+                                        <textarea id="censored_words" rows="20" cols="1" name="censored_words" style="width: 100%;"></textarea>
+                                    </div>
+                                    <button id="close-censored-words" class="close-button"><i class="fas fa-times"></i></button>
+                                </div>
                             </div>
+
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="tabs-transcripts" class="tab-pane fade mt-3" role="tabpanel" aria-labelledby="tabs-transcripts-tab">
+                <div id="transcripts-list-container" class="row stretch">
+                    <div class="col">
+                        <table id="transcripts-list" class="display hover row-border stripe nowrap pr-0" style="width: 100%;"></table>
+                    </div>
+                </div>
+
+                <div id="view-transcript-container">
+                    <div class="row mb-2">
+                        <div class="col-10">
+                            <h5 id="view-transcript-filename" class="view-filename mt-2 ml-3"></h5>
                         </div>
-                        <div id="view-transcript" class="view-transcript transcript-container"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="tab-pane fade show mt-3" id="tabs-logs" role="tabpanel" aria-labelledby="tabs-logs-tab">
-            <div class="row">
-                <div class="col">
-                    <table id="logs-list" class="display hover row-border stripe nowrap" style="width: 100%;"></table>
-                    <div id="view-log-container">
-                        <div class="row mb-2">
-                            <div class="col-md-10">
-                                <h5 id="view-log-filename" class="view-log-filename mt-2 ml-3"></h5>
-                            </div>
-                            <div class="col text-center">
-                                <button id="close-log" class="btn btn-secondary close-button">Close</button>
-                            </div>
+                        <div class="col text-right">
+                            <button id="close-transcript" class="btn btn-secondary close-button">Close</button>
                         </div>
-                        <div id="view-log" class="view-log log-container"></div>
+                    </div>
+                    <div class="transcript-container stretch">
+                        <div id="view-transcript" class="transcript"></div>
                     </div>
                 </div>
             </div>
+
+            <div id="tabs-logs" class="tab-pane fade mt-3" role="tabpanel" aria-labelledby="tabs-logs-tab">
+                <div id="logs-list-container" class="row stretch">
+                    <div class="col">
+                        <table id="logs-list" class="display hover row-border stripe nowrap pr-0" style="width: 100%;"></table>
+                    </div>
+                </div>
+
+                <div id="view-log-container">
+                    <div class="row mb-2">
+                        <div class="col-10">
+                            <h5 id="view-log-filename" class="view-filename mt-2 ml-3"></h5>
+                        </div>
+                        <div class="col text-right">
+                            <button id="close-log" class="btn btn-secondary close-button">Close</button>
+                        </div>
+                    </div>
+                    <div class="log-container stretch">
+                        <div id="view-log" class="console-log"></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-    </div>
 </div>
 
 <div id="changelog-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="changelog-modal">
@@ -495,26 +500,11 @@
     </div>
 </div>
 
-<div id="updating-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="updating-modal">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-remove"></i></button>
-                <h4 class="modal-title">Update</h4>
-            </div>
-            <div class="modal-body">
-                <div id="updating-message" style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
-                    <span><i class="fas fa-circle-notch fa-spin"></i> Updating </span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/features/scrollResize/dataTables.scrollResize.min.js"></script>
 <script src="${http_root}js/eventsource.min.js"></script>
 <script src="${http_root}js/NoSleep.min.js"></script>
 <script src="${http_root}js/speakreader.js${cache_param}"></script>
@@ -524,7 +514,9 @@
 var logStream = "";
 var prev_username = "";
 var prev_hashed_password = "";
-var update_available = false;
+var update_available = ${productInfo['update_available']};
+var transcripts_table = false;
+var logs_table = false;
 
 function startLogStream() {
 
@@ -532,8 +524,8 @@ function startLogStream() {
     logStream = new EventSource('/addListener?type=log&sessionID=' + sessionID);
     logStream.onmessage = function (e) {
         var data = JSON.parse(e.data);
-        var offset = scrollDoc ? window.innerHeight - $('#log-container').prop("clientHeight") + 2 : 0;
-        atBottom = $('#log-container').prop("scrollTop") + $('#log-container').prop("clientHeight") + offset >= $('#log-container').prop("scrollHeight");
+        var offset = window.innerHeight - $('#log-container').prop("clientHeight") + 2;
+        atBottom = $('#console-log').parent().prop("scrollTop") + $('#console-log').parent().prop("clientHeight") + offset >= $('#console-log').parent().prop("scrollHeight");
 
         switch (data.event) {
             case 'close':
@@ -551,7 +543,7 @@ function startLogStream() {
         }
 
         if ( atBottom ) {
-            $('#log-container').scrollTop($('#log-container').prop("scrollHeight"));
+            $('#console-log').parent().scrollTop($('#console-log').prop("scrollHeight"));
         }
     };
 
@@ -564,7 +556,7 @@ function stopLogStream() {
     }
 };
 
-function setStatusView(s) {
+function setStatusView() {
     var statusView = $('input[type=radio][name=status_view]:checked').val();
     setCookie("statusView", statusView, 365);
     $('#transcript-settings').slideUp();
@@ -593,46 +585,72 @@ function setStatusView(s) {
             startLogStream();
             break;
     }
+    resizeContainers();
 };
 
 function resizeContainers() {
-    var listenHeight = window.innerHeight - $('#transcript-container').parent().prop('offsetTop') - 20;
-    $('#transcript-container').height(listenHeight);
-    var logHeight = window.innerHeight - $('#log-container').parent().prop('offsetTop') - 20;
-    $('#log-container').height(logHeight);
 
-    var bottom = window.innerHeight - $('#transcript-container').parent().prop('offsetTop') - $('#transcript-container').prop('clientHeight');
-    var width = $('#transcript-container').prop('scrollWidth');
+    // Set the size of the stretched containers
+    $('.stretch:visible').each( function() {
+        var e = $(this)[0];
+        var mt = parseInt($(this).parent().css("margin-top"));
+        var mb = parseInt($(this).parent().css("margin-bottom"));
+        var pt = parseInt($(this).parent().css("padding-top"));
+        var pb = parseInt($(this).parent().css("padding-bottom"));
+        var height = $('.container').height() - mt - mb - pt - pb;
+        do {
+            height -= e.offsetTop;
+            e = e.offsetParent;
+        }
+        while ( e !== null );
+        $(this).height(height);
+        $(this).width($(this).parent().width());
+    });
+
+    // Set the position of the bottom button
+    $('.bottom-button').each( function() {
+        var buttonShown = $( this ).is(":visible");
+        $(this).show();
+        var e = $(this)[0].parentElement;
+        var top = 5;
+        var left = $(this).parent().prop("clientWidth") - $(this).prop("offsetWidth") - 5;
+        do {
+            top += e.offsetTop;
+            left += e.offsetLeft;
+            e = e.offsetParent;
+        }
+        while ( e !== null );
+        $( this ).css({"top": top + "px", "left": left + "px"});
+        if ( !buttonShown ) {
+            $(this).hide();
+        }
+    });
+
+    // Set the location of the font settings slide
+    var bottom = window.innerHeight - $('#transcript-container').prop('offsetTop') - $('#transcript-container').prop('clientHeight');
+    var width = $('#transcript-container').parent().prop('clientWidth');
     $('#transcript-settings').css({'bottom': bottom + 'px', 'width': width + 'px'});
 
-    var viewContainerHeight = window.innerHeight - $('#view-log-container').offsetParent().prop('offsetTop')  - 15;
-    $('#view-log-container').height(viewContainerHeight);
-    var viewContainerHeight = viewContainerHeight - $('#view-log').prop('offsetTop');
-    $('#view-log').height(viewContainerHeight - 20);
+};
 
-    var viewContainerHeight = window.innerHeight - $('#view-transcript-container').offsetParent().prop('offsetTop') - 15;
-    $('#view-transcript-container').height(viewContainerHeight);
-    var viewContainerHeight = viewContainerHeight - $('#view-transcript').prop('offsetTop');
-    $('#view-transcript').height(viewContainerHeight - 20);
-
-    var containerHeight = window.innerHeight - $('.status-container').offsetParent().prop('offsetTop') - $('.status-card-table-container').prop('offsetTop') - 35;
-    $('.status-card-table-container').height(containerHeight);
+function setLatestRelease(data) {
+    $('#latest-release').html('<a class="release-url" target="_blank" href="' + data.latest_release_url + '">Update Available: ' + data.latest_release + '</a>');
+    $('#check-for-update-button').html('<span>Check for Updates</span>');
+    if ( data.update_available ) {
+        update_available = true;
+        $('#check-for-update').hide();
+        $('#update-available').show();
+    } else {
+        update_available = false;
+        $('#check-for-update').show();
+        $('#update-available').hide();
+    }
 }
 
 function checkForUpdate() {
     $('#check-for-update-button').html('<span><i class="fas fa-sync fa-spin"/> Checking</span>');
     $.getJSON('checkForUpdate', function (data, textStatus) {
-        $('#latest-release').html('<a class="release-url" target="_blank" href="' + data.latest_release_url + '">Update Available: ' + data.latest_release + '</a>');
-        $('#check-for-update-button').html('<span>Check for Updates</span>');
-        if ( data.update_available ) {
-            update_available = true;
-            $('#check-for-update').hide();
-            $('#update-available').show();
-        } else {
-            update_available = false;
-            $('#check-for-update').show();
-            $('#update-available').hide();
-        }
+        setLatestRelease(data)
     });
 };
 
@@ -669,7 +687,7 @@ function postSaveChecks(jqXHR) {
         $('#check-for-update').hide();
         $('#update-available').hide();
     }
-    window.scrollTo(0,0);
+    $('#settings-container').scrollTop(0);
 };
 
 function getSettings() {
@@ -767,14 +785,14 @@ function verifyAuthentication() {
 
 $(document).ready(function() {
 
-    if ( $('#check_github').prop('checked') ) {
-        checkForUpdate();
+    var statusView = getCookie("statusView");
+    if ( statusView !== "" ) {
+        $('input[type=radio][name=status_view][value="' +statusView+ '"]').prop('checked', true);
+        setCookie("statusView", statusView, 365);
     }
-
-    $('#upload_credentials_button').on('click', function(e) {
-        e.preventDefault();
-        $('#upload_credentials_file').trigger('click');
-    });
+    setStatusView();
+    resizeContainers();
+    window.addEventListener('resize', resizeContainers, true);
 
     window.addEventListener('beforeunload', function(event) {
         tesHandler.close();
@@ -784,14 +802,23 @@ $(document).ready(function() {
         return false;
     }, false);
 
-    $('.navbar-toggler').on('click', function(){
+    if ( $('#check_github').prop('checked') ) {
+        //checkForUpdate();
+    }
+
+    $('#upload_credentials_button').click(function(e) {
+        e.preventDefault();
+        $('#upload_credentials_file').trigger('click');
+    });
+
+    $('.navbar-toggler').click(function(){
         if ( $('#navbarToggler').hasClass('show') ) {
             $( '.navbar-collapse' ).collapse('hide');
             return false;
         }
     });
 
-    $('.navbar-nav>li>a').on('click', function(){
+    $('.navbar-nav>li>a').click(function(){
 	    $( '#navbar .navbar-nav' ).find( 'li.active' ).removeClass( 'active' );
 	    $( '#navbar .nav-item' ).find( 'a.active' ).removeClass( 'active' );
 	    $( this ).parent( 'li' ).addClass( 'active' );
@@ -828,10 +855,6 @@ $(document).ready(function() {
             $.ajax({url: "stopTranscribe"});
         }
     });
-
-    window.addEventListener('resize', function() {
-        resizeContainers();
-    }, true);
 
     // SSE handler for transcribeEngineStatus
     var tesHandler = new EventSource('transcribeEngineStatus');
@@ -879,8 +902,6 @@ $(document).ready(function() {
             table += '</tbody></table>'
         }
         $('#log-listener-table').html(table);
-
-
     };
 
 
@@ -900,8 +921,11 @@ $(document).ready(function() {
         $('#listeningOn').text($('#inputDeviceSelection').val());
     });
 
-    var transcripts_table = $('#transcripts-list').DataTable({
+    transcripts_table = $('#transcripts-list').DataTable({
         "paging": false,
+        "scrollResize": true,
+        "scrollY": "100%",
+        "scrollCollapse": true,
         "searching": false,
         "info": false,
         "ajax": { "url": "get_files_list",
@@ -920,7 +944,6 @@ $(document).ready(function() {
             $('[data-toggle="tooltip"]').tooltip();
         },
     });
-    transcripts_table.draw();
 
     $('#transcripts-list tbody').on( 'click', 'i', function () {
         var data = transcripts_table.row( $(this).parents('tr') ).data();
@@ -931,7 +954,7 @@ $(document).ready(function() {
                 data: { "transcript": data.name },
                 complete: function (jqXHR, status) {
                     $('#view-transcript').html(jqXHR.responseJSON.data);
-                    $('#transcripts-list').hide();
+                    $('#transcripts-list-container').hide();
                     $('#view-transcript-container').show();
                     $('#view-transcript-filename').text(data.name);
                     resizeContainers();
@@ -956,12 +979,16 @@ $(document).ready(function() {
 
     $('#close-transcript').click(function() {
         $('#view-transcript-container').hide();
-        $('#transcripts-list').show();
+        $('#transcripts-list-container').show();
+        resizeContainers();
         return false;
     });
 
-    var logs_table = $('#logs-list').DataTable({
+    logs_table = $('#logs-list').DataTable({
         "paging": false,
+        "scrollResize": true,
+        "scrollY": "100%",
+        "scrollCollapse": true,
         "searching": false,
         "info": false,
         "ajax": { "url": "get_files_list",
@@ -980,7 +1007,6 @@ $(document).ready(function() {
             $('[data-toggle="tooltip"]').tooltip();
         },
     });
-    logs_table.draw();
 
     $('#logs-list tbody').on( 'click', 'i', function () {
         var data = logs_table.row( $(this).parents('tr') ).data();
@@ -991,9 +1017,9 @@ $(document).ready(function() {
                 data: { "log": data.name },
                 complete: function (jqXHR, status) {
                     $('#view-log').html(jqXHR.responseJSON.data);
-                    $('#logs-list').hide();
-                    $('#view-log-container').show();
                     $('#view-log-filename').text(data.name);
+                    $('#logs-list-container').hide();
+                    $('#view-log-container').show();
                     resizeContainers();
                 },
             });
@@ -1016,7 +1042,8 @@ $(document).ready(function() {
 
     $('#close-log').click(function() {
         $('#view-log-container').hide();
-        $('#logs-list').show();
+        $('#logs-list-container').show();
+        resizeContainers();
         return false;
     });
 
@@ -1101,13 +1128,28 @@ $(document).ready(function() {
 
     $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
         $('#view-log-container').hide();
-        $('#logs-list').show();
         $('#view-transcript-container').hide();
-        $('#transcripts-list').show();
-        resizeContainers();
         var target = $(e.target).attr("href");
-        if ((target === '#tabs-settings')) {
-            getSettings();
+        switch ( target ) {
+            case '#tabs-status':
+                resizeContainers();
+                break;
+
+            case '#tabs-settings':
+                resizeContainers();
+                getSettings();
+                break;
+
+            case '#tabs-transcripts':
+                $('#transcripts-list-container').show();
+                resizeContainers();
+                $('#transcripts-list').DataTable().draw();
+                break;
+
+            case '#tabs-logs':
+                $('#logs-list-container').show();
+                resizeContainers();
+                break;
         }
     });
 
@@ -1130,7 +1172,7 @@ $(document).ready(function() {
         }
     });
 
-    $('#changelog-modal-link').on('click', function (e) {
+    $('#changelog-modal-link').click(function (e) {
         e.preventDefault();
         $.ajax({
             url: 'get_changelog',
@@ -1148,40 +1190,20 @@ $(document).ready(function() {
         resizeContainers();
     });
 
-    var statusView = getCookie("statusView");
-    if ( statusView !== "" ) {
-        $('input[type=radio][name=status_view][value="' +statusView+ '"]').prop('checked', true);
-        setCookie("statusView", statusView, 365);
-    }
-
     $('#log-bottom-button').click(function() {
-        $('#log-container').scrollTop($('#log-container').prop("scrollHeight"));
+        $('#console-log').parent().scrollTop($('#console-log').prop("scrollHeight"));
         return false;
     });
 
-    function showLogButton(e) {
-        var atBottom = $('#log-container').prop("scrollTop") + $('#log-container').prop("clientHeight") >= $('#log-container').prop("scrollHeight");
+    $('#console-log').parent().scroll(function () {
+        var atBottom = $('#console-log').parent().prop("scrollTop") + $('#console-log').parent().prop("clientHeight") >= $('#console-log').parent().prop("scrollHeight");
         if ( atBottom ) {
             $('#log-bottom-button').hide();
         } else {
             $('#log-bottom-button').show();
-            if ( !scrollDoc ) {
-                var top = $('#log-container').prop("offsetTop") + $('#log-container').parent().prop("offsetTop") + 5;
-                var left = $('#log-container').prop("offsetLeft") + $('#log-container').parent().prop("offsetLeft") + $('#log-container').prop("clientWidth") - $('#log-bottom-button').prop("offsetWidth") - 5;
-                $( "#log-bottom-button" ).css({"top": top + "px", "left": left + "px"});
-                if ( e.type === "resize") {
-                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                    window.scrollTo(window.scrollX, window.scrollY + 1);
-                }
-            }
         }
-    };
-    window.addEventListener('scroll', showLogButton, true);
-    window.addEventListener('resize', showLogButton, true);
+    });
 
-    setStatusView();
-    resizeContainers();
-    showLogButton();
 
 });
 

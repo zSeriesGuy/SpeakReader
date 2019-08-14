@@ -14,7 +14,7 @@ except ImportError:
     no_browser = True
 
 from speakreader import webstart, logger, config, version
-from speakreader.version import Version
+from speakreader.versionMgmt import Version
 from speakreader.transcribeEngine import TranscribeEngine
 from speakreader.queueManager import QueueManager
 
@@ -24,11 +24,14 @@ CONFIG = None
 INIT_LOCK = threading.Lock()
 
 # Identify Our Application
-PRODUCT = 'SpeakReader'
-VERSION_RELEASE = "V1.1.7"
-GITHUB_BRANCH = "Master"
+PRODUCT = version.PRODUCT
+VERSION_RELEASE = version.VERSION_RELEASE
+GITHUB_BRANCH = version.GITHUB_BRANCH
 
 # TODO: Do something about certgen. Do you need it?
+# TODO: Change queuemanger to use dictionaries instead of lists
+# TODO: Ensure unique sessionIDs
+# TODO: Recreate hang situation. Try to figure out what is hanging.
 
 class SpeakReader(object):
     _INITIALIZED = False

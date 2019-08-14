@@ -9,12 +9,12 @@ if ( $('#transcript-container').parent().prop('tagName') === 'BODY' ) {
     var scrollTarget = $('html');
 } else {
     var scrollDoc = false;
-    var scrollTarget = $("#transcript-container");
+    var scrollTarget = $("#transcript").parent();
 }
 
 function setFont() {
     var fontsize = getCookie("fontsize");
-    $( ".transcript" ).css({"font-size": fontsize + "px"});
+    $( "#transcript" ).css({"font-size": fontsize + "px"});
 };
 
 function startTranscriptStream() {
@@ -76,25 +76,15 @@ $('#bottom-button').click(function() {
     return false;
 });
 
-function showButton(e) {
+function showButton() {
     var atBottom = scrollTarget.prop("scrollTop") + scrollTarget.prop("clientHeight") >= scrollTarget.prop("scrollHeight");
     if ( atBottom ) {
         $('#bottom-button').hide();
     } else {
         $('#bottom-button').show();
-        if ( !scrollDoc ) {
-            var top = $('#transcript-container').prop("offsetTop") + $('#transcript-container').parent().prop("offsetTop") + 5;
-            var left = $('#transcript-container').prop("offsetLeft") + $('#transcript-container').parent().prop("offsetLeft") + $('#transcript-container').prop("scrollWidth") - $('#bottom-button').prop("offsetWidth") - 5;
-            $( "#bottom-button" ).css({"top": top + "px", "left": left + "px"});
-            if ( e.type === "resize") {
-                window.scrollTo(window.scrollX, window.scrollY - 1);
-                window.scrollTo(window.scrollX, window.scrollY + 1);
-            }
-        }
     }
 };
 window.addEventListener('scroll', showButton, true);
-window.addEventListener('resize', showButton, true);
 
 scrollTarget.click(function() {
     var container = $("#transcript-settings");
@@ -123,9 +113,8 @@ $('#fontsize-button-up').click(function() {
 
 var fontsize = getCookie("fontsize");
 if ( fontsize === "" ) {
-    fontsize = parseInt($(".transcript").css('font-size'));
+    fontsize = parseInt($("#transcript").css('font-size'));
     setCookie("fontsize", fontsize, 365);
 }
 
 setFont();
-showButton();
