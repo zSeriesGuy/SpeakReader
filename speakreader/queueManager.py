@@ -201,7 +201,7 @@ class TranscriptHandler(QueueHandler):
 
             transcript = json.dumps(transcript)
 
-            for q in self._listenerQueues.values():
+            for q in list(self._listenerQueues.values()):
                 try:
                     q.put_nowait(transcript)
                 except queue.Full:
@@ -262,7 +262,7 @@ class LogHandler(QueueHandler):
 
             data = json.dumps(data)
 
-            for q in self._listenerQueues.values():
+            for q in list(self._listenerQueues.values()):
                 try:
                     q.put_nowait(data)
                 except queue.Full:
