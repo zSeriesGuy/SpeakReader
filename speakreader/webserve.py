@@ -312,13 +312,14 @@ class WebInterface(object):
             while self.SR.queueManager.is_initialized:
                 try:
                     data = listenerQueue.get(timeout=5)
+                    if data == None:
+                        yield 'data: {}\n\n'.format(json.dumps({"event": "close"}))
+                        break
+                    if data['event'] == 'ping':
+                        continue
+                    yield 'data: {}\n\n'.format(json.dumps(data))
                 except queue.Empty:
                     continue
-                if data == None:
-                    close_event = json.dumps({"event": "close"})
-                    yield 'data: {}\n\n'.format(close_event)
-                    break
-                yield 'data: {}\n\n'.format(data)
             logger.debug("Exiting " + type.capitalize() + " Listener loop for IP: " + remoteIP + " with sessionID: " + sessionID)
 
         listenerQueue = self.SR.queueManager.addListener(type=type, remoteIP=remoteIP, sessionID=sessionID)

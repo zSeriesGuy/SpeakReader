@@ -186,21 +186,20 @@ class TranscriptHandler(QueueHandler):
         while True:
             try:
                 transcript = self._receiverQueue.get(timeout=2)
-            except queue.Empty:
-                if self._STARTED:
-                    continue
-                else:
+
+                if transcript is None or not self._STARTED:
                     break
 
-            if transcript is None or not self._STARTED:
-                break
+                if transcript['event'] == 'transcript' and transcript['final']:
+                    with self.fileLock:
+                        self.transcriptFile.write(transcript['record'].strip() + "\n\n")
+                        self.transcriptFile.flush()
 
-            if transcript['event'] == 'transcript' and transcript['final']:
-                with self.fileLock:
-                    self.transcriptFile.write(transcript['record'].strip() + "\n\n")
-                    self.transcriptFile.flush()
-
-            transcript = json.dumps(transcript)
+            except queue.Empty:
+                if self._STARTED:
+                    transcript = {"event": "ping"}
+                else:
+                    break
 
             for queueElement in list(self._listenerQueues.values()):
                 try:
@@ -210,6 +209,7 @@ class TranscriptHandler(QueueHandler):
 
         self.transcriptFile.close()
         self._STARTED = False
+        self.closeAllListeners()
         logger.info('Transcript Queue Handler terminated')
 
 
@@ -237,31 +237,26 @@ class LogHandler(QueueHandler):
         while True:
             try:
                 logRecord = self._receiverQueue.get(timeout=2)
+                if logRecord is None or not self._STARTED:
+                    break
+                # Python 3.6.8 doesn't seem to return a formatted message while 3.7.3 does.
+                logMessage = logRecord.getMessage()
+                formatted_logMessage = self.queueHandler.format(logRecord)
+                logRecord.msg = ""
+                formatted_header = self.queueHandler.format(logRecord)
+                if formatted_header not in logMessage:
+                    logMessage = formatted_logMessage
+
+                data = {"event": "logrecord",
+                        "final": True,
+                        "record": logMessage,
+                        }
+
             except queue.Empty:
                 if self._STARTED:
-                    continue
+                    data = {"event": "ping"}
                 else:
                     break
-
-            if logRecord is None or not self._STARTED:
-                break
-
-
-            # Python 3.6.8 doesn't seem to return a formatted message while 3.7.3 does.
-            logMessage = logRecord.getMessage()
-            formatted_logMessage = self.queueHandler.format(logRecord)
-            logRecord.msg = ""
-            formatted_header = self.queueHandler.format(logRecord)
-
-            if formatted_header not in logMessage:
-               logMessage = formatted_logMessage
-
-            data = {"event": "logrecord",
-                    "final": True,
-                    "record": logMessage,
-                    }
-
-            data = json.dumps(data)
 
             for queueElement in list(self._listenerQueues.values()):
                 try:
@@ -270,6 +265,7 @@ class LogHandler(QueueHandler):
                     self.removeListener(sessionID=queueElement.sessionID)
 
         self._STARTED = False
+        self.closeAllListeners()
         logger.info('Log Queue Handler terminated')
 
 
