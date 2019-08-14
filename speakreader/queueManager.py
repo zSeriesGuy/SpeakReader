@@ -201,11 +201,11 @@ class TranscriptHandler(QueueHandler):
 
             transcript = json.dumps(transcript)
 
-            for q in list(self._listenerQueues.values()):
+            for queueElement in list(self._listenerQueues.values()):
                 try:
-                    q.put_nowait(transcript)
+                    queueElement.put_nowait(transcript)
                 except queue.Full:
-                    self.removeListener(listenerQueue=q)
+                    self.removeListener(sessionID=queueElement.sessionID)
 
         self.transcriptFile.close()
         self._STARTED = False
@@ -262,11 +262,11 @@ class LogHandler(QueueHandler):
 
             data = json.dumps(data)
 
-            for q in list(self._listenerQueues.values()):
+            for queueElement in list(self._listenerQueues.values()):
                 try:
-                    q.put_nowait(data)
+                    queueElement.put_nowait(data)
                 except queue.Full:
-                    self.removeListener(listenerQueue=q)
+                    self.removeListener(sessionID=queueElement.sessionID)
 
         self._STARTED = False
         logger.info('Log Queue Handler terminated')
