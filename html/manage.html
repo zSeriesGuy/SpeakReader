@@ -16,7 +16,7 @@
 
 <body class="manage-content">
 
-<div class="container">
+<div id="container" class="container">
 
     <div class="row">
         <div class="col-md-12 title">
@@ -86,34 +86,32 @@
                     </div>
                 </div>
 
-                <div id="status-container" class="row">
-                    <div class="col-sm-6 pr-sm-2 pb-1">
+                <div id="status-container" class="row stretch">
+                    <div class="col-sm-6 pr-sm-2 pt-1">
                         <div class="status-card">
-                            <div class="status-card-title row">Transcript Listeners</div>
-                            <div class="status-card-count row">
+                            <div class="status-card-title">Transcript Listeners</div>
+                            <div class="status-card-count">
                                 <span>Count: </span><span id="transcript-listener-count"></span>
                             </div>
-                            <div class="status-card-table-container row">
-                                <div id="transcript-listener-table" class="status-card-table stretch"></div>
+                            <div class="status-card-table-container">
+                                <table id="transcript-listener-table" class="status-card-table"></table>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6 pl-sm-2 pb-1">
+                    <div class="col-sm-6 pl-sm-2 pt-1">
                         <div class="status-card">
-                            <div class="status-card-title row">Log Listeners</div>
-                            <div class="status-card-count row">
+                            <div class="status-card-title">Log Listeners</div>
+                            <div class="status-card-count">
                                 <span>Count: </span><span id="log-listener-count"></span>
                             </div>
-                            <div class="status-card-table-container row">
-                                <div id="log-listener-table" class="status-card-table stretch"></div>
+                            <div class="status-card-table-container">
+                                <div id="log-listener-table" class="status-card-table"></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div id="transcript-container" class="row">
-                    <div class="col">
-                        <div class="transcript-container stretch">
+                        <div id="transcript-container" class="transcript-container stretch">
                             <div id="transcript" class="transcript">
                                 <p></p>
                             </div>
@@ -126,19 +124,13 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div id="log-container" class="row">
-                    <div class="col">
-                        <div class="log-container stretch">
+                        <div id="log-container" class="log-container stretch">
                             <div id="console-log" class="console-log">
                                 <p></p>
                             </div>
                             <button id="log-bottom-button" class="bottom-button"><i class="fas fa-chevron-down"></i></button>
                         </div>
-                    </div>
-                </div>
 
             </div>
 
@@ -521,13 +513,17 @@ var logs_table = false;
 function startLogStream() {
 
     // Create Log Stream.
-    logStream = new EventSource('/addListener?type=log&sessionID=' + sessionID);
+    logStream = new EventSource('/addListener?type=log');
     logStream.onmessage = function (e) {
         var data = JSON.parse(e.data);
         var offset = window.innerHeight - $('#log-container').prop("clientHeight") + 2;
         atBottom = $('#console-log').parent().prop("scrollTop") + $('#console-log').parent().prop("clientHeight") + offset >= $('#console-log').parent().prop("scrollHeight");
 
         switch (data.event) {
+            case 'open':
+                sessionID = data.sessionID;
+                break;
+
             case 'close':
                 logStream.close();
                 logStream = "";
@@ -593,18 +589,13 @@ function resizeContainers() {
     // Set the size of the stretched containers
     $('.stretch:visible').each( function() {
         var e = $(this)[0];
-        var mt = parseInt($(this).parent().css("margin-top"));
-        var mb = parseInt($(this).parent().css("margin-bottom"));
-        var pt = parseInt($(this).parent().css("padding-top"));
-        var pb = parseInt($(this).parent().css("padding-bottom"));
-        var height = $('.container').height() - mt - mb - pt - pb;
+        var height = window.innerHeight;
         do {
-            height -= e.offsetTop;
+            height -= e.offsetTop + parseInt($(e).css("margin-bottom")) + parseInt($(e).css("padding-bottom"));
             e = e.offsetParent;
         }
         while ( e !== null );
         $(this).height(height);
-        $(this).width($(this).parent().width());
     });
 
     // Set the position of the bottom button
@@ -882,22 +873,22 @@ $(document).ready(function() {
         $('#transcript-listener-count').text(data.usage.transcript.count);
         var table = "";
         if ( data.usage.transcript.count > 0 ) {
-            table = '<table class="status-card-table"><tbody>'
+            table = '<tbody>'
             for ( i = 0; i < data.usage.transcript.list.length; i++ ) {
                 var item = data.usage.transcript.list[i];
-                table += '<tr><td>' + item.remoteIP + '</td></tr>';
+                table += '<tr><td class="text-nowrap">' + item.remoteIP + ' - ' + item.sessionID + '</td></tr>';
             }
-            table += '</tbody></table>'
+            table += '</tbody>'
         }
         $('#transcript-listener-table').html(table);
 
         $('#log-listener-count').text(data.usage.log.count);
         var table = "";
         if ( data.usage.log.count > 0 ) {
-            table = '<table class="status-card-table"><tbody>'
+            table = '<table class="status-card-table" style="height: 100%;"><tbody>'
             for ( i = 0; i < data.usage.log.list.length; i++ ) {
                 var item = data.usage.log.list[i];
-                table += '<tr><td>' + item.remoteIP + '</td></tr>';
+                table += '<tr><td class="text-nowrap">' + item.remoteIP + ' - ' + item.sessionID + '</td></tr>';
             }
             table += '</tbody></table>'
         }

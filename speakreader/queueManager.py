@@ -38,6 +38,7 @@ class QueueManager(object):
         self._INITIALIZED = False
         self.transcriptHandler.shutdown()
         self.logHandler.shutdown()
+        logger.info("Queue Manager terminated")
 
     def closeAllListeners(self):
         self.transcriptHandler.closeAllListeners()
@@ -68,7 +69,7 @@ class QueueHandler(object):
         self._STARTED = False
         self.fileLock = threading.Lock()
         self._receiverQueue = None
-        self._listenerQueues = []
+        self._listenerQueues = {}
         self._queueHandlerThread = None
         self.logFileName = None
         self.transcriptFile = None
@@ -99,6 +100,12 @@ class QueueHandler(object):
         logger.info("Adding " + type.capitalize() + " Listener Queue for IP: " + remoteIP + " with SessionID: " + sessionID)
 
         queueElement = QueueElement(type=type, remoteIP=remoteIP, sessionID=sessionID)
+        self._listenerQueues[sessionID] = queueElement
+
+        data = {"event": "open",
+                "sessionID": sessionID,
+                }
+        queueElement.put_nowait(json.dumps(data))
 
         data = None
         if type == "log":
@@ -123,37 +130,40 @@ class QueueHandler(object):
 
         if data:
             queueElement.put_nowait(json.dumps(data))
-            self._listenerQueues.append(queueElement)
-            return queueElement.listenerQueue
+
+        return queueElement.listenerQueue
 
 
     def removeListener(self, sessionID=None, listenerQueue=None):
-        if listenerQueue is None and sessionID is not None:
-            for q in self._listenerQueues:
-                if q.sessionID == sessionID:
-                    listenerQueue = q
+
+        queueElement = None
+        if sessionID is not None:
+            queueElement = self._listenerQueues[sessionID]
+
+        elif listenerQueue is not None:
+            for sessionID, queueElement in self._listenerQueues.items():
+                if queueElement.listenerQueue == listenerQueue:
                     break
-        if listenerQueue is not None:
-            logger.info("Removing " + listenerQueue.type.capitalize() + " Listener Queue for IP: " + listenerQueue.remoteIP + " with SessionID: " + listenerQueue.sessionID)
-            listenerQueue.put_nowait(None)
-            self._listenerQueues.remove(listenerQueue)
+
+        if queueElement is not None:
+            logger.info("Removing " + queueElement.type.capitalize() + " Listener Queue for IP: " + queueElement.remoteIP + " with SessionID: " + sessionID)
+            queueElement.put_nowait(None)
+            self._listenerQueues.pop(sessionID)
 
     def closeAllListeners(self):
-        for q in self._listenerQueues:
-            q.put_nowait(None)
-            self._listenerQueues.remove(q)
+        for sessionID in list(self._listenerQueues.keys()):
+            self.removeListener(sessionID=sessionID)
 
     def shutdown(self):
         self.closeAllListeners()
         self._receiverQueue.put(None)
         self._queueHandlerThread.join()
-        self._listenerQueues = []
         self._STARTED = False
 
     def getUsage(self):
         count = len(self._listenerQueues)
         list = []
-        for q in self._listenerQueues:
+        for q in self._listenerQueues.values():
             list.append({'remoteIP': q.remoteIP, 'sessionID': q.sessionID})
         return {'count': count, 'list': list}
 
@@ -191,7 +201,7 @@ class TranscriptHandler(QueueHandler):
 
             transcript = json.dumps(transcript)
 
-            for q in self._listenerQueues:
+            for q in self._listenerQueues.values():
                 try:
                     q.put_nowait(transcript)
                 except queue.Full:
@@ -252,7 +262,7 @@ class LogHandler(QueueHandler):
 
             data = json.dumps(data)
 
-            for q in self._listenerQueues:
+            for q in self._listenerQueues.values():
                 try:
                     q.put_nowait(data)
                 except queue.Full:

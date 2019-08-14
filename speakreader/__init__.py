@@ -28,9 +28,6 @@ PRODUCT = version.PRODUCT
 VERSION_RELEASE = version.VERSION_RELEASE
 GITHUB_BRANCH = version.GITHUB_BRANCH
 
-# TODO: Do something about certgen. Do you need it?
-# TODO: Change queuemanger to use dictionaries instead of lists
-# TODO: Ensure unique sessionIDs
 # TODO: Recreate hang situation. Try to figure out what is hanging.
 
 class SpeakReader(object):

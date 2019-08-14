@@ -5,23 +5,25 @@ body,
     margin-left: auto;
     margin-right: auto;
     background-color: #f2f2f2;
-    overflow: auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .manage-content {
     background-color: #ffffb3;
-    height: 100%;
 }
 
 .container {
     max-width: 1000px;
     min-width: 400px;
-    padding: 0px 15px 15px 15px;
     background-color: #80ff80;
     height: 100%;
     height: -moz-available;          /* WebKit-based browsers will ignore this. */
     height: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
     height: fill-available;
+    overflow: auto;
+    padding: 0px 15px 15px 15px;
+    position: relative;
 }
 
 .config-container .form-group {
@@ -95,9 +97,7 @@ body,
 
 .console-log {
     line-height: 1.4;
-    margin: 5px 0px 10px 0px;
     color: black;
-    padding: 0px 10px 0px 10px;
 }
 
 .console-log>p {
@@ -113,6 +113,7 @@ body,
 .log-container {
     overflow: auto;
     background-color: #f2f2f2;
+    padding: 0px 10px 0px 10px;
 }
 
 .bottom-button {
@@ -328,9 +329,13 @@ body,
 }
 
 .status-card {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
     background-color: #339933;
     border: 9px inset;
     border-color: #bfbfbf;
+    height: 100%;
 }
 
 .status-card-title {
@@ -349,10 +354,12 @@ body,
 }
 
 .status-card-table-container {
+    height: 100%;
     margin: 8px;
-    overflow-y: auto;
+    overflow: auto;
     background-color: #f2f2f2;
 }
 
-.stretch {
+.status-card-table {
+    margin: 5px;
 }

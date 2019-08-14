@@ -1,6 +1,6 @@
 // Global Variables
 var noSleep = new NoSleep();
-var sessionID = getCookie('session_id');
+var sessionID = "";
 var transcriptStream = "";
 
 // Determine where the scroll target is.
@@ -28,11 +28,15 @@ function startTranscriptStream() {
     }
 
     // Create Transcript Stream.
-    transcriptStream = new EventSource('/addListener?type=transcript&sessionID=' + sessionID);
+    transcriptStream = new EventSource('/addListener?type=transcript');
     transcriptStream.onmessage = function (e) {
         var data = JSON.parse(e.data);
 
         switch (data.event) {
+            case 'open':
+                sessionID = data.sessionID;
+                break;
+
             case 'close':
                 transcriptStream.close();
                 transcriptStream = "";

@@ -75,6 +75,7 @@ class WebInterface(object):
     @cherrypy.expose
     @requireAuth()
     def manage(self, **kwargs):
+
         productInfo = {
             "product": speakreader.PRODUCT,
             "current_version": self.SR.versionInfo.INSTALLED_RELEASE,
@@ -305,7 +306,7 @@ class WebInterface(object):
     def addListener(self, **kwargs):
         cherrypy.response.headers["Content-Type"] = "text/event-stream;charset=utf-8"
         type = kwargs.get('type', None)
-        sessionID = kwargs.get('sessionID', None)
+        sessionID = cherrypy.session.id
         remoteIP = cherrypy.request.remote.ip
         def eventSource(type, listenerQueue, remoteIP, sessionID):
             while self.SR.queueManager.is_initialized:
