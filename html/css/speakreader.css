@@ -5,6 +5,7 @@ body,
     margin-left: auto;
     margin-right: auto;
     background-color: #f2f2f2;
+    overflow: auto;
 }
 
 .manage-content {
@@ -13,7 +14,7 @@ body,
 }
 
 .container {
-    max-width: 800px;
+    max-width: 1000px;
     min-width: 400px;
     padding: 0px 15px 15px 15px;
     background-color: #80ff80;
