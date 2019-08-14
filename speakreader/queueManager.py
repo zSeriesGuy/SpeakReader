@@ -291,5 +291,5 @@ class QueueElement(object):
     def put(self, data):
         self.listenerQueue.put(data)
 
-    def clear(self, data):
+    def clear(self):
         self.listenerQueue.queue.clear()
