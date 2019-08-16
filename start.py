@@ -55,7 +55,7 @@ def main():
     PIDFILE = None
 
     QUIET = False
-    VERBOSE = False
+    VERBOSE = True
     NOLAUNCH = False
     HTTP_PORT = None
 
