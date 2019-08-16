@@ -14,7 +14,8 @@ Install the latest version of [Python 3](https://www.python.org/downloads/window
 * Type: `.\scripts\activate`
 * Type: `python -m pip install --upgrade pip setuptools`
 * Type: `python -m pip install wheel pip-tools`
-* Type: `pip3 install .\PyAudioWheels\PyAudio-0.2.11-cp37-cp37m-win_amd64.whl`
+* Install the appropriate PyAudio wheel package for your release of Windows and Python. Several are provided in the PyAudioWheels folder. For example, to install the 32-bit version for Python V3.7: 
+    * Type: `pip3 install .\PyAudioWheels\PyAudio-0.2.11-cp37-cp37m-win32.whl`
 * Type: `pip3 install -r requirements.txt`
 * Type: `.\scripts\python start.py` to start SpeakReader.
 * SpeakReader will be loaded in your browser or listening on http://localhost:8880
