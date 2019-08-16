@@ -75,9 +75,26 @@ To run SpeakReader in the background as a Daemon on startup:
 # Google API Services
 
 You won't be able to start the transcribe engine until you have provided a valid Google API credentials JSON file.
->NOTE: The [Google Speech-To-Text](https://cloud.google.com/speech-to-text/) API service is not free. But it is not very expensive, less than $1 US per hour. See the [pricing](https://cloud.google.com/speech-to-text/pricing).
+
+> NOTE: The [Google Speech-To-Text](https://cloud.google.com/speech-to-text/) API service is not free. But it is not very expensive, less than $1 US per hour. See the [pricing](https://cloud.google.com/speech-to-text/pricing).
 
 #### Setting Up API Access
-* Go to the [Google API Console](https://console.cloud.google.com)
 
-  
+* Go to the [Google API Console](https://console.cloud.google.com). Sign in with your Google Account if you have one or create one.
+* Create a billing account by clicking on Billing and set up your payment method.
+* Return to the Home page. 
+* At the top of the screen next to Google Cloud Platform, click the Select Project.
+* In the popped up window, click NEW PROJECT in the upper right.
+* Give the project a name or take the default and click CREATE.
+* Back on the Home page, if the selected project is not your newly created project, select it from the top of the screen next to Google Cloud Platform.
+* Select APIs & Services.
+* Click on the ENABLE APIS AND SERVICES at the top of the screen.
+* Search for Speech and click on Cloud Speech-to-Text API.
+* Click on ENABLE to enable this API for your project.
+* On the APIs & Services screen, click Credentials.
+* Click CREATE CREDENTIALS at the top of the screen and choose Service account key.
+* Create a Service Account with a Role of Service Usage Consumer. The Key Type should be JSON.
+* After you click the Create button, a json file will be downloaded to your computer. 
+* Go to the SpeakReader management console Settings page and upload this json file.
+* You should now be able to start the transcribe engine.
+> HINT: When you go to the Google API Console, there may be at the very top of the screen something about Free Trial. You can activate that to get $300 credit good for one year. This will allow you to test and use SpeakReader at no cost for one year or $300 worth, whichever comes first.
