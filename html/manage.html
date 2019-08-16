@@ -1,7 +1,7 @@
 <%inherit file="base.html"/>
 
 <%def name="body()">
-<div id="container" class="container">
+<div id="container" class="container stretch">
 
         <div class="row title-container">
                 <div class="col-1 logo-image">
@@ -42,21 +42,21 @@
 
                     <div class="row">
                         <div class="col">
-                            <div class="d-md-flex flex-row justify-content-between">
-                                <div class="col-md-3 btn-group order-0" role="group" aria-label="btn1">
+                            <div class="d-sm-flex flex-row justify-content-between">
+                                <div class="col-md-3 col-sm-2 btn-group order-0 pl-2 pr-2" role="group" aria-label="btn1">
                                     <button type="button" id="tes-button" class="btn btn-primary" value="start">Start</button>
                                 </div>
 
-                                <div class="col-md-3 btn-group order-2" role="group" aria-label="btn2">
+                                <div class="col-md-3 col-sm-3 btn-group order-2 pl-2 pr-2" role="group" aria-label="btn2">
                                     <button type="button" id="restart-button" class="btn btn-primary" value="restart" >Restart</button>
                                     <button type="button" id="shutdown-button" class="btn btn-primary" value="shutdown">Shutdown</button>
                                 </div>
 
-                                <div class="col-md-5 text-center align-middle order-1">
+                                <div class="col-md-6 col-sm-7 text-center align-middle order-1 pl-2 pr-2">
                                     <div class="status-view-container">
                                         <p class="status-view-title font-weight-bold">Monitor</p>
                                         <div class="d-flex justify-content-around align-items-center mb-1" role="radiogroup">
-                                            <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="status">Status</label>
+                                            <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="listeners">Listeners</label>
                                             <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="transcript" checked>Transcript</label>
                                             <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="console">Console</label>
                                         </div>
@@ -76,7 +76,7 @@
                         </div>
                     </div>
 
-                    <div id="status-container" class="row stretch">
+                    <div id="listeners-container" class="row stretch">
                         <div class="col-sm-6 pr-sm-2 pt-1">
                             <div class="status-card">
                                 <div class="status-card-title">Transcript Listeners</div>
@@ -101,16 +101,24 @@
                         </div>
                     </div>
 
-                            <div id="transcript-container" class="transcript-container stretch">
+                            <div id="transcript-container" class="transcript-container listen-content stretch">
                                 <div id="transcript" class="transcript">
                                     <p></p>
                                 </div>
                                 <button id="bottom-button" class="bottom-button"><i class="fas fa-chevron-down"></i></button>
 
                                 <div id="transcript-settings" class="transcript-settings">
-                                    <div class="col text-center">
-                                        <button id="fontsize-button-down" class="fontsize-button-down fontsize-button">A-</button>
-                                        <button id="fontsize-button-up" class="fontsize-button-up fontsize-button">A+</button>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <div class="d-inline-block h-100 pr-3">
+                                                <button id="fontsize-button-down" class="fontsize-button-down fontsize-button">A-</button>
+                                                <button id="fontsize-button-up" class="fontsize-button-up fontsize-button">A+</button>
+                                            </div>
+                                            <div class="d-inline-block h-100 pl-3">
+                                                <button id="light-theme" class="light color-theme-button" value="light"><i class="fas"></i></button>
+                                                <button id="dark-theme" class="dark color-theme-button" value="dark"><i class="fas"></i></button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -402,46 +410,46 @@
 
                 </div>
 
-                <div id="tabs-transcripts" class="tab-pane fade mt-3" role="tabpanel" aria-labelledby="tabs-transcripts-tab">
+                <div id="tabs-transcripts" class="tab-pane fade" role="tabpanel" aria-labelledby="tabs-transcripts-tab">
                     <div id="transcripts-list-container" class="row stretch">
                         <div class="col">
-                            <table id="transcripts-list" class="display hover row-border stripe nowrap pr-0" style="width: 100%;"></table>
+                            <table id="transcripts-list" class="display hover row-border stripe text-nowrap pr-0" style="width: 100%"></table>
                         </div>
                     </div>
 
                     <div id="view-transcript-container">
                         <div class="row mb-2">
                             <div class="col-10">
-                                <h5 id="view-transcript-filename" class="view-filename mt-2 ml-3"></h5>
-                            </div>
-                            <div class="col text-right">
-                                <button id="close-transcript" class="btn btn-secondary close-button">Close</button>
+                                <span id="view-transcript-filename" class="view-filename text-nowrap mt-2 ml-3"></span>
                             </div>
                         </div>
-                        <div class="transcript-container stretch">
-                            <div id="view-transcript" class="transcript"></div>
+                        <div style="position: relative;">
+                            <button id="close-transcript" class="btn btn-secondary close-button"><i class="fas fa-times"></i></button>
+                            <div class="transcript-container stretch">
+                                <div id="view-transcript" class="transcript"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div id="tabs-logs" class="tab-pane fade mt-3" role="tabpanel" aria-labelledby="tabs-logs-tab">
+                <div id="tabs-logs" class="tab-pane fade" role="tabpanel" aria-labelledby="tabs-logs-tab">
                     <div id="logs-list-container" class="row stretch">
                         <div class="col">
-                            <table id="logs-list" class="display hover row-border stripe nowrap pr-0" style="width: 100%;"></table>
+                            <table id="logs-list" class="display hover row-border stripe text-nowrap pr-0" style="width: 100%"></table>
                         </div>
                     </div>
 
                     <div id="view-log-container">
                         <div class="row mb-2">
-                            <div class="col-10">
-                                <h5 id="view-log-filename" class="view-filename mt-2 ml-3"></h5>
-                            </div>
-                            <div class="col text-right">
-                                <button id="close-log" class="btn btn-secondary close-button">Close</button>
+                            <div class="col">
+                                <span id="view-log-filename" class="view-filename text-nowrap mt-2 ml-3"></span>
                             </div>
                         </div>
-                        <div class="log-container stretch">
-                            <div id="view-log" class="console-log"></div>
+                        <div style="position: relative;">
+                            <button id="close-log" class="btn btn-secondary close-button"><i class="fas fa-times"></i></button>
+                            <div class="log-container stretch">
+                                <div id="view-log" class="console-log"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -545,17 +553,17 @@ function setStatusView() {
     setCookie("statusView", statusView, 365);
     $('#transcript-settings').slideUp();
     switch (  statusView ) {
-        case 'status':
+        case 'listeners':
             stopTranscriptStream();
             stopLogStream();
-            $('#status-container').show();
+            $('#listeners-container').show();
             $('#transcript-container').hide();
             $('#log-container').hide();
             break;
 
         case 'transcript':
             stopLogStream();
-            $('#status-container').hide();
+            $('#listeners-container').hide();
             $('#log-container').hide();
             $('#transcript-container').show();
             startTranscriptStream();
@@ -563,7 +571,7 @@ function setStatusView() {
 
         case 'console':
             stopTranscriptStream();
-            $('#status-container').hide();
+            $('#listeners-container').hide();
             $('#transcript-container').hide();
             $('#log-container').show();
             startLogStream();
@@ -918,8 +926,8 @@ $(document).ready(function() {
 
     transcripts_table = $('#transcripts-list').DataTable({
         "paging": false,
-        "scrollResize": true,
         "scrollY": "100%",
+        "scrollX": "100%",
         "scrollCollapse": true,
         "searching": false,
         "info": false,
@@ -929,11 +937,11 @@ $(document).ready(function() {
         "ordering": true,
         "order": [ 2 , 'desc' ],
         "columns": [
-            { "className": "dt-center pl-1 pr-0", "data": null, "orderable": false, "defaultContent": '<i class="fas fa-eye view" data-toggle="tooltip" data-placement="top" title="View"></i>' },
-            { "className": "dt-center pl-0 pr-1", "data": null, "orderable": false, "defaultContent": '<i class="fas fa-download download" data-toggle="tooltip" data-placement="top" title="Download"></i>' },
+            { "className": "dt-center p-0", "data": null, "orderable": false, "defaultContent": '<i style="width: 34px;" class="fas fa-eye view" data-toggle="tooltip" data-placement="top" title="View"></i>' },
+            { "className": "dt-center p-0", "data": null, "orderable": false, "defaultContent": '<i style="width: 34px;" class="fas fa-download download" data-toggle="tooltip" data-placement="top" title="Download"></i>' },
             { "title": "File Name", "data": "name" },
             { "title": "Created", "data": "created" },
-            { "className": "dt-center pl-1 pr-1", "data": null, "orderable": false, "defaultContent": '<i class="fas fa-trash-alt delete" style="color: red;" data-toggle="tooltip" data-placement="top" title="Delete"></i>' },
+            { "className": "dt-center p-0", "data": null, "orderable": false, "defaultContent": '<i style="color: red; width: 34px;" class="fas fa-trash-alt delete" data-toggle="tooltip" data-placement="top" title="Delete"></i>' },
         ],
         "drawCallback": function( settings ) {
             $('[data-toggle="tooltip"]').tooltip();
@@ -980,7 +988,7 @@ $(document).ready(function() {
 
     logs_table = $('#logs-list').DataTable({
         "paging": false,
-        "scrollResize": true,
+        "scrollX": "100%",
         "scrollY": "100%",
         "scrollCollapse": true,
         "searching": false,
@@ -991,11 +999,11 @@ $(document).ready(function() {
         "ordering": true,
         "order": [ 2 , 'desc' ],
         "columns": [
-            { "className": "dt-center pl-1 pr-0", "data": null, "orderable": false, "defaultContent": '<i class="fas fa-eye view" data-toggle="tooltip" data-placement="top" title="View"></i>' },
-            { "className": "dt-center pl-0 pr-1", "data": null, "orderable": false, "defaultContent": '<i class="fas fa-download download" data-toggle="tooltip" data-placement="top" title="Download"></i>' },
+            { "className": "dt-center p-0", "data": null, "orderable": false, "defaultContent": '<i style="width: 34px;" class="fas fa-eye view" data-toggle="tooltip" data-placement="top" title="View"></i>' },
+            { "className": "dt-center p-0", "data": null, "orderable": false, "defaultContent": '<i style="width: 34px;" class="fas fa-download download" data-toggle="tooltip" data-placement="top" title="Download"></i>' },
             { "title": "File Name", "data": "name" },
             { "title": "Created", "data": "created" },
-            { "className": "dt-center pl-1 pr-1", "data": null, "orderable": false, "defaultContent": '<i class="fas fa-trash-alt delete" style="color: red;" data-toggle="tooltip" data-placement="top" title="Delete"></i>' },
+            { "className": "dt-center p-0", "data": null, "orderable": false, "defaultContent": '<i style="width: 34px; color: red;" class="fas fa-trash-alt delete" data-toggle="tooltip" data-placement="top" title="Delete"></i>' },
         ],
         "drawCallback": function( settings ) {
             $('[data-toggle="tooltip"]').tooltip();
@@ -1033,6 +1041,8 @@ $(document).ready(function() {
             window.location.href = "download_file?log=" + data.name;
         };
     });
+
+    $( '.dataTables_scrollBody' ).addClass('stretch');
 
     $('#close-log').click(function() {
         $('#view-log-container').hide();
@@ -1138,6 +1148,7 @@ $(document).ready(function() {
 
             case '#tabs-logs':
                 $('#logs-list-container').show();
+                $('#logs-list').DataTable().draw();
                 break;
         }
         resizeContainers();

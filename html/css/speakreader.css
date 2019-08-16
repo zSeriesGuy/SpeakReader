@@ -1,12 +1,30 @@
 
-body,
-.listen-content {
+body {
     font-family: 'Open Sans', Arial, sans-serif;
     margin-left: auto;
     margin-right: auto;
-    background-color: #f2f2f2;
     margin-left: auto;
     margin-right: auto;
+}
+
+.light,
+.listen-content {
+    background-color: #f2f2f2;
+    color: #0d0d0d;
+}
+
+.dark {
+    background-color: #0d0d0d;
+    color: #f2f2f2;
+}
+
+.color-theme-button {
+    border-radius: 20px;
+    border-width: 0px;
+    height: 40px;
+    width: 40px;
+    vertical-align: middle;
+    font-size: 20px;
 }
 
 .manage-content {
@@ -20,9 +38,26 @@ body,
     height: -moz-available;          /* WebKit-based browsers will ignore this. */
     height: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
     height: fill-available;
-    overflow: auto;
+    overflow: hidden;
     padding: 0px 15px 15px 15px;
     position: relative;
+}
+
+.title-container {
+    position: relative;
+    background-color: #999999;
+    padding: 5px;
+}
+
+.title {
+    margin: 0px;
+    padding: 4px 0px 4px 0px;
+    font-size: 26px;
+}
+
+.navbar {
+    background-color: orange;
+    width: 100%;
 }
 
 .config-container .form-group {
@@ -50,23 +85,6 @@ body,
 
 .form-sub-group {
     padding: 10px 0px 0px 0px;
-}
-
-.navbar {
-    background-color: orange;
-    width: 100%;
-}
-
-.title-container {
-    position: relative;
-    background-color: #999999;
-    padding: 5px;
-}
-
-.title {
-    margin: 0px;
-    padding: 4px 0px 4px 0px;
-    font-size: 26px;
 }
 
 .logo-image {
@@ -101,9 +119,7 @@ body,
 .transcript {
     line-height: 1.4;
     margin: 5px 0px 10px 0px;
-    color: black;
     padding: 0px 10px 0px 10px;
-    background-color: #f2f2f2;
 }
 
 .console-log {
@@ -123,7 +139,6 @@ body,
 .transcript-container,
 .log-container {
     overflow: auto;
-    background-color: #f2f2f2;
     padding: 0px 10px 0px 10px;
 }
 
@@ -142,15 +157,12 @@ body,
     display: none;
 }
 
-#close-censored-words {
+.close-button {
     position: absolute;
-    top: 1px;
-    right: 1px;
+    top: 2px;
+    right: 2px;
     color: white;
     background-color: black;
-}
-
-.close-button {
 }
 
 .signout-button {
@@ -225,36 +237,6 @@ body,
     padding: 8px;
     display: none;
     width: 100%;
-}
-
-@media screen and (min-device-width: 980px) /* Desktop */ {
-    .listen-content {
-        font-size: 16px;
-    }
-}
-
-@media screen and (max-device-width: 979px) /* Tablet */ {
-    .listen-content {
-        font-size: 3.5vw;
-    }
-}
-
-@media screen and (max-device-width: 800px) /* Tablet */ {
-    .listen-content {
-        font-size: 3.2vw;
-    }
-}
-
-@media screen and (max-device-width: 500px) /* Mobile */ {
-    .listen-content {
-        font-size: 3.5vw;
-    }
-    .container {
-        padding: 0px 2px 10px 2px;
-    }
-    .title {
-        font-size: 16px;
-    }
 }
 
 .alert {
@@ -374,4 +356,41 @@ body,
 
 .status-card-table {
     margin: 5px;
+}
+
+.view-filename {
+    font-size: 20px;
+}
+
+@media screen and (min-width: 980px) /* Desktop */ {
+    .listen-content {
+        font-size: 16px;
+    }
+}
+
+@media screen and (max-width: 979px) /* Tablet */ {
+    .listen-content {
+        font-size: 3.5vw;
+    }
+}
+
+@media screen and (max-width: 800px) /* Tablet */ {
+    .listen-content {
+        font-size: 3.2vw;
+    }
+}
+
+@media screen and (max-width: 500px) /* Mobile */ {
+    .listen-content {
+        font-size: 3.5vw;
+    }
+    .container {
+        padding: 0px 2px 10px 2px;
+    }
+    .title {
+        font-size: 16px;
+    }
+    .view-filename {
+        font-size: 16px;
+    }
 }

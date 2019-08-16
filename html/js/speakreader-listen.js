@@ -142,3 +142,34 @@ if ( fontsize === "" ) {
 }
 
 setFont();
+
+function setTheme() {
+    var theme = getCookie("theme");
+    $('.listen-content').addClass(theme);
+    $('.color-theme-button.'+theme).each(function () {
+        $(this).children().addClass('fa-check');
+    });
+}
+
+$('.color-theme-button').click(function () {
+    var theme = $(this).val()
+    var themes = [];
+    $('.color-theme-button').each(function () {
+        $(this).children().removeClass('fa-check');
+        themes.push($(this).val());
+    });
+    $(this).children().addClass('fa-check');
+    themes.forEach(function (theme) {
+        $('.listen-content').removeClass(theme);
+    });
+    setCookie("theme", theme, 365);
+    setTheme();
+    return false;
+});
+
+var theme = getCookie("theme");
+if ( theme === "" ) {
+    theme = 'light';
+    setCookie("theme", theme, 365);
+}
+setTheme();

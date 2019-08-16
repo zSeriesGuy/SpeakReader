@@ -38,7 +38,7 @@ Access the web server. Be sure to include the port if you are not using the stan
 The home page on the SpeakReader web server is the transcription text.
 The web page automatically scrolls to bottom. To pause auto scroll, just scroll back in the transcription text. A bottom button will appear in the upper right that, when clicked, will resume auto scrolling at the bottom position in the transcript.
 
-To adjust the font, tap or click in the transcription window. A tab will slide up from the bottom allowing font size adjustment.
+To adjust the font, tap or click in the transcription window. A tab will slide up from the bottom allowing font size and color theme adjustment.
 
 #### Management Console
 To manage SpeakReader, access the web server's **`/manage`** page.
