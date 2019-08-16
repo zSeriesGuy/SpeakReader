@@ -1,12 +1,12 @@
-## Installation Instructions
-SpeakReader has been installed and tested on Windows 10 and Ubuntu 18.04 using Python 3.6.8.
+# Installation Instructions
+SpeakReader has been installed and tested on Windows 10 and Ubuntu 18.04 using Python 3.7.3.
 
 ### Windows
 
 Install the latest version of [Python 3](https://www.python.org/downloads/windows/). Download the Windows installer and complete the installation with all the default options.
 
 ##### Method 1 (easy):
-* Download SpeakReader from GitHub: https://github.com/zSeriesGuy/SpeakReader/zipball/master
+* Download SpeakReader from GitHub: [https://github.com/zSeriesGuy/SpeakReader/zipball/master](https://github.com/zSeriesGuy/SpeakReader/zipball/master)
 * Extract the ZIP file.
 * Open a CMD window.
 * CD to the directory where you unzipped SpeakReader.
@@ -18,12 +18,12 @@ Install the latest version of [Python 3](https://www.python.org/downloads/window
 * Type: `pip3 install -r requirements.txt`
 * Type: `.\scripts\python start.py` to start SpeakReader.
 * SpeakReader will be loaded in your browser or listening on http://localhost:8880
-* You can change the port in the Configuration tab of the management page or by editing config.ini.
+* You can change the port in the Settings tab of the management page or by editing config.ini.
 
 ##### Method 2 (preferred):
-> NOTE: This method is preferred because it adds the support to Windows to be able to auto update SpeakReader. This will install extra shell extensions and make adjustments to your path environment. 
+> NOTE: This method is preferred because it adds the support to Windows to be able to more reliably update SpeakReader. This will install extra shell extensions and make adjustments to your path environment. 
 
-* Go to https://gitforwindows.org/ and download git.
+* Go to [https://gitforwindows.org/](https://gitforwindows.org/) and download git.
 * Run the installation with the default options.
 * Right click on your desktop and select "Git Gui".
 * Select "Clone Existing Repository".
@@ -71,3 +71,13 @@ To run SpeakReader in the background as a Daemon on startup:
     * Edit `/lib/systemd/system/speakreader/service` and change user and group to *root*.
     * `sudo systemctl daemon-reload`
     * `sudo systemctl restart speakreader`
+
+# Google API Services
+
+You won't be able to start the transcribe engine until you have provided a valid Google API credentials JSON file.
+>NOTE: The [Google Speech-To-Text](https://cloud.google.com/speech-to-text/) API service is not free. But it is not very expensive, less than $1 US per hour. See the [pricing](https://cloud.google.com/speech-to-text/pricing).
+
+#### Setting Up API Access
+* Go to the [Google API Console](https://console.cloud.google.com)
+
+  

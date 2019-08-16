@@ -15,7 +15,6 @@ body,
 
 .container {
     max-width: 1000px;
-    min-width: 400px;
     background-color: #80ff80;
     height: 100%;
     height: -moz-available;          /* WebKit-based browsers will ignore this. */
@@ -58,11 +57,23 @@ body,
     width: 100%;
 }
 
-.title {
+.title-container {
+    position: relative;
     background-color: #999999;
+    padding: 5px;
+}
+
+.title {
     margin: 0px;
     padding: 4px 0px 4px 0px;
-    font-size: 28px;
+    font-size: 26px;
+}
+
+.logo-image {
+    background-image: url("/images/favicon/favicon-64x64.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-left: 10px;
 }
 
 .censored-words-container {
@@ -177,11 +188,12 @@ body,
 }
 
 .login-container {
-    margin-right: auto;
-    margin-left: auto;
-    padding-left: 15px;
-    padding-right: 15px;
-    width: 100%;
+    background-color: #404040;
+    color: #fff;
+    margin: 20px auto 20px auto;
+    padding: 20px;
+    width: 60%;
+    min-width: 400px;
 }
 
 .login-container .form-group {
@@ -241,7 +253,7 @@ body,
         padding: 0px 2px 10px 2px;
     }
     .title {
-        font-size: 18px;
+        font-size: 16px;
     }
 }
 

@@ -1,4 +1,4 @@
 # Changelog
 
-## v1.0.0 (2019-09-01)
+## v1.0.0 (2019-08-15)
 * Initial Release

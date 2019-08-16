@@ -1,1 +1,1 @@
-%comspec% /k .\venv373\scripts\python start.py
+%comspec% /k ..\venv373\scripts\python ..\start.py

@@ -1,26 +1,15 @@
-<!doctype html>
+<%inherit file="base.html"/>
 
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>SpeakReader - ${title}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
-    <link rel="stylesheet" href="${http_root}css/speakreader.css${cache_param}">
-</head>
-
-<body class="manage-content">
-<div class="container-fluid">
-    <div class="row">
+<%def name="body()">
+<div class="manage-content">
+    <div class="row flex-fill">
         <div class="col-md-12">
         </div>
     </div>
+</div>
+</%def>
 
+<%def name="modalIncludes()">
 <div id="state-change-modal" class="modal fade">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -42,10 +31,9 @@
         </div>
     </div>
 </div>
+</%def>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
-<script src="${http_root}js/speakreader.js${cache_param}"></script>
+<%def name="javascriptIncludes()">
 <script>
 
     // Use p.countdown as container, pass redirect, duration, and optional message
@@ -75,7 +63,7 @@
                 },
                 error: function () {
                     online = false;
-                    % if signal == 'shutdown':
+                    % if signal == 'shutdown' or signal == 'restart':
                     reloadPage();
                     % endif
                 },
@@ -87,5 +75,4 @@
         }, 1000);
     })();
 </script>
-</body>
-</html>
+</%def>

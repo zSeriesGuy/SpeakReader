@@ -1,12 +1,27 @@
-﻿# This file is part of SpeakReader.
-#
+﻿# **************************************************************************************
+# * This file is part of SpeakReader.
+# *
+# *  SpeakReader is free software: you can redistribute it and/or modify
+# *  it under the terms of the GNU General Public License V3 as published by
+# *  the Free Software Foundation.
+# *
+# *  SpeakReader is distributed in the hope that it will be useful,
+# *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+# *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# *  GNU General Public License for more details.
+# *
+# *  You should have received a copy of the GNU General Public License
+# *  along with SpeakReader.  If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
+# **************************************************************************************
+
+# This module contains the handlers for the web interface.
 
 import os
-from stat import ST_CTIME
 import json
 import datetime
 import time
 import queue
+from urllib.parse import urlparse
 
 import cherrypy
 from cherrypy.lib.static import serve_download
@@ -17,7 +32,6 @@ from passlib.hash import pbkdf2_sha256
 
 import speakreader
 from speakreader import logger
-from speakreader.session import get_session_info, get_session_user_id
 from speakreader.webauth import AuthController, requireAuth, is_admin
 
 
@@ -31,19 +45,17 @@ def checked(variable):
 def serve_template(templatename, **kwargs):
     http_root = speakreader.CONFIG.HTTP_ROOT
     server_name = speakreader.PRODUCT
-    # TODO: Remove timestamp from cache_param when done.
-    cache_param = '?v=' + speakreader.VERSION_RELEASE + '-' + datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+    cache_param = '?v=' + speakreader.VERSION_RELEASE
+    if speakreader.CONFIG.SERVER_ENVIRONMENT.lower() != 'production':
+        cache_param += '-' + datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
 
     template_dir = os.path.join(str(speakreader.PROG_DIR), 'html')
 
     _hplookup = TemplateLookup(directories=[template_dir], default_filters=['unicode', 'h'])
 
-    _session = get_session_info()
-
     try:
         template = _hplookup.get_template(templatename)
-        return template.render(http_root=http_root, server_name=server_name, cache_param=cache_param,
-                               _session=_session, **kwargs)
+        return template.render(http_root=http_root, server_name=server_name, cache_param=cache_param, **kwargs)
     except:
         return exceptions.html_error_template().render()
 
@@ -90,7 +102,6 @@ class WebInterface(object):
     @cherrypy.tools.json_out()
     @requireAuth(is_admin())
     def getSettings(self, **kwargs):
-
         config = {
             "start_transcribe_on_startup": speakreader.CONFIG.START_TRANSCRIBE_ON_STARTUP,
             "launch_browser": speakreader.CONFIG.LAUNCH_BROWSER,
@@ -189,7 +200,7 @@ class WebInterface(object):
         speakreader.CONFIG.write()
 
         if restartSpeakReader:
-            self.restart()
+            #self.restart()
             return {'portchanged': True}
 
         if restartTranscribeEngine and self.SR.transcribeEngine.is_online:
@@ -247,6 +258,20 @@ class WebInterface(object):
         self.SR.queueManager.closeAllListeners()
         return self.do_state_change('restart', 'Restarting', 30)
 
+    def do_state_change(self, signal, title, timer, **kwargs):
+        message = title
+        self.SR.SIGNAL = signal
+
+        protocol = 'https' if speakreader.CONFIG.ENABLE_HTTPS else 'http'
+        hostname = urlparse(cherrypy.url()).hostname
+        port = speakreader.CONFIG.HTTP_PORT
+        root = speakreader.CONFIG.HTTP_ROOT.strip('/')
+        root = root if root == '' else root + '/'
+        new_url = "%s://%s:%s/%s" % (protocol, hostname, port, root)
+
+        return serve_template(templatename="confirm.html", signal=signal, title=title,
+                              new_http_root=new_url, message=message, timer=timer)
+
     @cherrypy.expose
     @requireAuth(is_admin())
     def checkout_git_branch(self, git_remote=None, git_branch=None, **kwargs):
@@ -279,18 +304,6 @@ class WebInterface(object):
         since_prev_release = False
 
         return self.SR.versionInfo.read_changelog(latest_only=latest_only, since_prev_release=since_prev_release)
-
-    def do_state_change(self, signal, title, timer, **kwargs):
-        message = title
-        self.SR.SIGNAL = signal
-
-        if speakreader.CONFIG.HTTP_ROOT.strip('/'):
-            new_http_root = '/' + speakreader.CONFIG.HTTP_ROOT.strip('/') + '/'
-        else:
-            new_http_root = '/'
-
-        return serve_template(templatename="confirm.html", signal=signal, title=title,
-                              new_http_root=new_http_root, message=message, timer=timer)
 
     ###################################################################################################
     #  Event Sources

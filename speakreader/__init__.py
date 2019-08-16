@@ -1,10 +1,27 @@
-# SpeakReader
+# **************************************************************************************
+# * This file is part of SpeakReader.
+# *
+# *  SpeakReader is free software: you can redistribute it and/or modify
+# *  it under the terms of the GNU General Public License V3 as published by
+# *  the Free Software Foundation.
+# *
+# *  SpeakReader is distributed in the hope that it will be useful,
+# *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+# *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# *  GNU General Public License for more details.
+# *
+# *  You should have received a copy of the GNU General Public License
+# *  along with SpeakReader.  If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
+# **************************************************************************************
+
+# This module is the main initialization module for the SpeakReader functions.
 
 import os
 import threading
 import uuid
 import pyaudio
 import cherrypy
+import json
 
 # Some cut down versions of Python may not include this module and it's not critical for us
 try:
@@ -28,7 +45,6 @@ PRODUCT = version.PRODUCT
 VERSION_RELEASE = version.VERSION_RELEASE
 GITHUB_BRANCH = version.GITHUB_BRANCH
 
-# TODO: Recreate hang situation. Try to figure out what is hanging.
 
 class SpeakReader(object):
     _INITIALIZED = False
@@ -143,6 +159,13 @@ class SpeakReader(object):
     def startTranscribeEngine(self):
         if CONFIG.CREDENTIALS_FILE == "":
             logger.warn("API Credentials not available. Can't start Transcribe Engine.")
+            return
+
+        try:
+            with open(CONFIG.CREDENTIALS_FILE) as f:
+                json.loads(f.read())
+        except json.decoder.JSONDecodeError:
+            logger.warn("API Credentials does not appear to be a valid JSON file. Can't start Transcribe Engine.")
             return
 
         if self.transcribeEngine.is_online:

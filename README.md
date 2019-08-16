@@ -5,15 +5,15 @@ There is someone that attends my [church](https://www.ladoniabaptist.org) that i
 
 There seems to be many speech-to-text applications out there. But they all seem to be designed for input and output on the same device. I wanted something that could output the speech-to-text transcription to many in realtime.
 
-SpeakReader is an application that takes microphone or line-in input and transcribes it to text in realtime. It then sends the transcription text to a web page. As a speech is being given, anyone with a smart device (smart phone, tablet, laptop) can connect to the web server and read what is being spoken.
+SpeakReader is an application that takes microphone or line-in input and transcribes it to text in realtime. It then sends the transcription text to listening web clients. As a speech is being given, anyone with a smart device (smart phone, tablet, laptop) can connect to the web server and read what is being spoken.
  
-SpeakReader can be used anywhere that spoken words need to be transcribed to text and shared: churches, conferences, meetings, etc.
+SpeakReader can be used anywhere that spoken words need to be transcribed to text and shared to many: churches, conferences, meetings, etc.
 It is written in Python and can run on any platform that supports Python. As a very low cost solution, I am running SpeakReader in production at my church on a Raspberry Pi 3. SpeakReader's system requirements and demands are very low.
 
-SpeakReader is currently written to invoke the [Google Speech-To-Text](https://cloud.google.com/speech-to-text/) service. But I plan to add support in the future for [IBM Watson](https://www.ibm.com/watson/services/speech-to-text/) and [AWS](https://aws.amazon.com/transcribe/).
+SpeakReader is currently written to invoke the [Google Speech-To-Text](https://cloud.google.com/speech-to-text/) API service. I plan to add support in the future for [IBM Watson](https://www.ibm.com/watson/services/speech-to-text/) and [AWS](https://aws.amazon.com/transcribe/).
 
-If you find value in this project, please consider making a [donation via PayPal](https://paypal.me/jerryleenance). 80% of your donation will go to the [Ladonia Baptist Church](https://www.ladoniabaptist.org) building fund. 
-You may also make a [donation](https://onrealm.org/LadoniaBaptist/Give/EAVLVGBZJN) directly to the church building fund.
+If you find value in this project, please consider making a [donation via PayPal](https://paypal.me/jerryleenance). 80% of your donation will go to the [Ladonia Baptist Church](https://www.ladoniabaptist.org) building debt-retirement fund. 
+You may also make a [donation](https://onrealm.org/LadoniaBaptist/Give/EAVLVGBZJN) directly to the church building fund through their online-giving system.
 
 
 ## Installation
@@ -51,7 +51,8 @@ The Status page:
 * Shows the current input device.
 * Allows for starting and stopping the transcription engine.
 * Allows for restarting and shutting down the SpeakReader server.
-* Select status of connected listeners, view the active transcript, or view the active console log.
+* View list of connected listeners
+* Monitor the active transcript or console log.
 
 ##### Settings Page
 The Settings page allows you to make and save changes to the configuration which are stored in the config.ini file.

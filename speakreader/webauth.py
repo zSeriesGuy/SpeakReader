@@ -1,8 +1,23 @@
-#  This file is part of SpeakReader.
-#
+# **************************************************************************************
+# * This file is part of SpeakReader.
+# *
+# *  SpeakReader is free software: you can redistribute it and/or modify
+# *  it under the terms of the GNU General Public License V3 as published by
+# *  the Free Software Foundation.
+# *
+# *  SpeakReader is distributed in the hope that it will be useful,
+# *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+# *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# *  GNU General Public License for more details.
+# *
+# *  You should have received a copy of the GNU General Public License
+# *  along with SpeakReader.  If not, see <http://www.gnu.org/licenses/gpl-3.0.html>.
+# **************************************************************************************
+
+#  This modules is the authorization handler for the web interface to the
+#  management console.
 
 from datetime import datetime, timedelta
-from urllib.parse import quote, unquote
 
 import cherrypy
 from passlib.hash import pbkdf2_sha256
@@ -137,11 +152,11 @@ class AuthController(object):
     def on_login(self, username=None, success=False):
         """Called on successful login"""
         if success:
-            logger.debug("WebAuth :: Admin user '%s' logged into SpeakReader." % (username))
+            logger.info("WebAuth :: Admin user '%s' logged into SpeakReader." % (username))
     
     def on_logout(self, username):
         """Called on logout"""
-        logger.debug("WebAuth :: Admin user '%s' logged out of SpeakReader." % (username))
+        logger.info("WebAuth :: Admin user '%s' logged out of SpeakReader." % (username))
     
     def get_loginform(self):
         from speakreader.webserve import serve_template
@@ -212,6 +227,6 @@ class AuthController(object):
 
         else:
             self.on_login(username=username)
-            logger.debug("WebAuth :: Invalid admin login attempt from '%s'." % username)
+            logger.info("WebAuth :: Invalid admin login attempt from '%s'." % username)
             cherrypy.response.status = 401
             return error_message
