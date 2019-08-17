@@ -278,18 +278,15 @@ class Version(object):
             output, err = runGit('diff --name-only FETCH_HEAD')
 
             if output == '':
-                print("No differences found from the origin")
+                logger.debug("No differences found from the origin")
 
             elif output == 'requirements.txt':
-                print('requirements.txt is out of sync')
+                logger.warn('Requirements file is out of sync. Restoring to original.')
                 output, err = runGit('checkout %s requirements.txt' % speakreader.CONFIG.GIT_REMOTE)
             else:
-                print("Differences Found. Unable to update.")
-                print(output)
+                logger.error("Differences Found. Unable to update.")
+                logger.info('Output: ' + str(output))
                 return False
-
-            return True
-
 
             output, err = runGit('pull ' + speakreader.CONFIG.GIT_REMOTE + ' ' + speakreader.CONFIG.GIT_BRANCH)
 
