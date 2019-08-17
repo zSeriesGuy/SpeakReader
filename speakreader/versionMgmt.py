@@ -274,7 +274,21 @@ class Version(object):
             return False
 
         if self.INSTALL_TYPE == 'git':
-            # os.remove(os.path.join(speakreader.DATA_DIR, 'requirements.txt'))
+
+            output, err = runGit('fetch %s' % speakreader.CONFIG.GIT_REMOTE)
+            output, err = runGit('diff --name-only FETCH_HEAD')
+
+            if output == '':
+                print("No differences found from the origin")
+
+            elif output == 'requirements.txt':
+                print('requirements.txt is out of sync')
+                output, err = runGit('checkout %s requirements.txt' % speakreader.CONFIG.GIT_REMOTE)
+            else:
+                print("Differences Found. Unable to update.")
+                print(output)
+                return False
+
             output, err = runGit('pull ' + speakreader.CONFIG.GIT_REMOTE + ' ' + speakreader.CONFIG.GIT_BRANCH)
 
             if not output:
