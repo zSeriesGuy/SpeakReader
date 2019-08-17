@@ -361,10 +361,7 @@ class Version(object):
                 with open(version_path, 'w') as f:
                     f.write(str(self.LATEST_VERSION_HASH))
             except IOError as e:
-                logger.error(
-                    "Unable to write current version to version.txt, update not complete: %s",
-                    e
-                )
+                logger.error("Unable to write current version to version.txt, update not complete: %s" % e)
                 return False
 
         output, err = pip_sync()
