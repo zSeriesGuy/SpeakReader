@@ -294,7 +294,7 @@ class Version(object):
                 logger.error('Unable to download latest version')
                 return False
 
-            for line in output.split('\n'):
+            for line in output.decode('utf-8').split('\n'):
                 if 'Already up-to-date.' in line:
                     logger.info('No update available, not updating')
                     logger.info('Output: ' + str(output))
@@ -377,7 +377,7 @@ class Version(object):
                 logger.error('Unable to change git branch.')
                 return
 
-            for line in output.split('\n'):
+            for line in output.decode('utf-8').split('\n'):
                 if line.endswith(('Aborting', 'Aborting.')):
                     logger.error('Unable to checkout from git: ' + line)
                     logger.info('Output: ' + str(output))
@@ -466,7 +466,7 @@ def runGit(args):
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True,
                                  cwd=speakreader.PROG_DIR)
             output, err = p.communicate()
-            output = output.strip().decode('utf-8')
+            output = output.decode('utf-8').strip()
 
             logger.debug('Git output: ' + output)
         except OSError:
@@ -489,16 +489,16 @@ def pip_sync():
     logger.info("Running pip-sync to synchronize the environment.")
     cmd = 'pip-sync requirements.txt'
     try:
-        logger.debug('Trying to execute: "' + cmd + '" in ' + speakreader.PROG_DIR)
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=False,
+        logger.debug('Trying to execute: "' + cmd + '" with shell in ' + speakreader.PROG_DIR)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True,
                              cwd=speakreader.PROG_DIR)
         output, err = p.communicate()
-        logger.info('pip-sync output:')
-        for line in output.split('\n').decode('utf-8'):
-            logger.info(str(line))
+        for line in output.decode('utf-8').split('\n'):
+            if line:
+                logger.info('pip-sync output: ' + str(line))
 
-    except OSError:
-        logger.error('Command failed: %s', cmd)
+    except Exception as e:
+        logger.error('Command failed: %s' % e)
         return None, None
 
     return (output, err)
