@@ -487,7 +487,7 @@ def runGit(args):
 
 def pip_sync():
     logger.info("Running pip-sync to synchronize the environment.")
-    cmd = sys.executable + ' pip-sync requirements.txt'
+    cmd = sys.executable + ' -m pip-tools sync requirements.txt'
     try:
         logger.debug('Trying to execute: "' + cmd + '" with shell in ' + speakreader.PROG_DIR)
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True,
