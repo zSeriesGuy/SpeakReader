@@ -489,17 +489,19 @@ def runGit(args):
 
 
 def pip_sync():
-    cmd = 'pip-sync'
+    logger.info("Running pip-sync to synchronize the environment.")
+    cmd = 'pip-sync requirements.txt'
     try:
-        logger.debug('Trying to execute: "' + cmd + '" with shell in ' + speakreader.PROG_DIR)
+        logger.debug('Trying to execute: "' + cmd + '" in ' + speakreader.PROG_DIR)
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=False,
                              cwd=speakreader.PROG_DIR)
         output, err = p.communicate()
-        output = output.strip().decode('utf-8')
-        logger.debug('pip-sync output: ' + output)
+        logger.info('pip-sync output:')
+        for line in output.split('\n').decode('utf-8'):
+            logger.info(str(line))
 
     except OSError:
-        logger.debug('Command failed: %s', cmd)
+        logger.error('Command failed: %s', cmd)
         return None, None
 
     return (output, err)
