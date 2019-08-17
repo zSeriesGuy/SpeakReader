@@ -274,7 +274,7 @@ class Version(object):
             return False
 
         if self.INSTALL_TYPE == 'git':
-            os.remove(os.path.join(speakreader.DATA_DIR, 'requirements.txt'))
+            # os.remove(os.path.join(speakreader.DATA_DIR, 'requirements.txt'))
             output, err = runGit('pull ' + speakreader.CONFIG.GIT_REMOTE + ' ' + speakreader.CONFIG.GIT_BRANCH)
 
             if not output:
