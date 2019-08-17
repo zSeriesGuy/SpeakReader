@@ -17,6 +17,7 @@
 #  This modules handles product updates.
 
 import os
+import sys
 import re
 import subprocess
 import tarfile
@@ -264,7 +265,7 @@ class Version(object):
 
 
     def update(self):
-        if speakreader.CONFIG.SERVER_ENVIRONMENT != 'production':
+        if speakreader.CONFIG.SERVER_ENVIRONMENT.lower() != 'production':
             logger.info("Updating bypassed because this is not a production environment")
             return False
 
@@ -353,6 +354,7 @@ class Version(object):
                 )
                 return False
 
+        output, err = pip_sync()
         logger.info("Update Completed Successfully")
         return True
 
@@ -472,3 +474,19 @@ def runGit(args):
 
     return (output, err)
 
+
+def pip_sync():
+    cmd = 'pip-sync'
+    try:
+        logger.debug('Trying to execute: "' + cmd + '" with shell in ' + speakreader.PROG_DIR)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=False,
+                             cwd=speakreader.PROG_DIR)
+        output, err = p.communicate()
+        output = output.strip().decode('utf-8')
+        logger.debug('pip-sync output: ' + output)
+
+    except OSError:
+        logger.debug('Command failed: %s', cmd)
+        return None, None
+
+    return (output, err)
