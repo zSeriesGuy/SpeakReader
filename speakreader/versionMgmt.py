@@ -275,7 +275,6 @@ class Version(object):
 
         if self.INSTALL_TYPE == 'git':
 
-            output, err = runGit('fetch %s' % speakreader.CONFIG.GIT_REMOTE)
             output, err = runGit('diff --name-only FETCH_HEAD')
 
             if output == '':
@@ -288,6 +287,8 @@ class Version(object):
                 print("Differences Found. Unable to update.")
                 print(output)
                 return False
+
+            return True
 
             output, err = runGit('pull ' + speakreader.CONFIG.GIT_REMOTE + ' ' + speakreader.CONFIG.GIT_BRANCH)
 
