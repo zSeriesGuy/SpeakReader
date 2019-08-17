@@ -466,7 +466,7 @@ def runGit(args):
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True,
                                  cwd=speakreader.PROG_DIR)
             output, err = p.communicate()
-            output = output.strip()
+            output = output.decode('utf-8').strip()
 
             logger.debug('Git output: ' + output)
         except OSError:
