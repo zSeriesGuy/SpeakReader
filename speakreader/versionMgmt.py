@@ -227,7 +227,7 @@ class Version(object):
         self.LATEST_RELEASE_URL = url
 
         logger.info("Installed release is %s - %s" % (self.INSTALLED_RELEASE, self.INSTALLED_VERSION_HASH))
-        logger.info("Latest release is %s - %s" % (self.LATEST_RELEASE, self.LATEST_VERSION_HASH))
+        logger.info("   Latest release is %s - %s" % (self.LATEST_RELEASE, self.LATEST_VERSION_HASH))
 
         if self.LATEST_VERSION_HASH == self.INSTALLED_VERSION_HASH:
             logger.info('SpeakReader is up to date')
