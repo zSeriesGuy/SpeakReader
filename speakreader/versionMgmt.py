@@ -275,7 +275,7 @@ class Version(object):
 
         if self.INSTALL_TYPE == 'git':
 
-            output, err = runGit('diff --name-only FETCH_HEAD')
+            output, err = runGit('diff --name-only %s' % speakreader.CONFIG.GIT_REMOTE)
 
             if output == '':
                 logger.debug("No differences found from the origin")
