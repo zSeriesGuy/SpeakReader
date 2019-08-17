@@ -14,4 +14,3 @@ httplib2
 python-dateutil
 tzlocal
 passlib
-arrow
