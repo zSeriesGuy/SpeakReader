@@ -227,7 +227,7 @@ class Version(object):
         self.LATEST_RELEASE_URL = url
 
         logger.info("Installed release is %s - %s" % (self.INSTALLED_RELEASE, self.INSTALLED_VERSION_HASH))
-        logger.info("   Latest release is %s - %s" % (self.LATEST_RELEASE, self.LATEST_VERSION_HASH))
+        logger.info("Latest release is %s - %s" % (self.LATEST_RELEASE, self.LATEST_VERSION_HASH))
 
         if self.LATEST_VERSION_HASH == self.INSTALLED_VERSION_HASH:
             logger.info('SpeakReader is up to date')
@@ -294,7 +294,7 @@ class Version(object):
                 logger.error('Unable to download latest version')
                 return False
 
-            for line in output.decode('utf-8').split('\n'):
+            for line in output.split('\n'):
                 if 'Already up-to-date.' in line:
                     logger.info('No update available, not updating')
                     logger.info('Output: ' + str(output))
@@ -377,7 +377,7 @@ class Version(object):
                 logger.error('Unable to change git branch.')
                 return
 
-            for line in output.decode('utf-8').split('\n'):
+            for line in output.split('\n'):
                 if line.endswith(('Aborting', 'Aborting.')):
                     logger.error('Unable to checkout from git: ' + line)
                     logger.info('Output: ' + str(output))
@@ -466,7 +466,7 @@ def runGit(args):
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True,
                                  cwd=speakreader.PROG_DIR)
             output, err = p.communicate()
-            output = output.decode('utf-8').strip()
+            output = output.strip()
 
             logger.debug('Git output: ' + output)
         except OSError:
