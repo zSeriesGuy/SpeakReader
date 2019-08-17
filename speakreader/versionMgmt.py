@@ -290,6 +290,7 @@ class Version(object):
 
             return True
 
+
             output, err = runGit('pull ' + speakreader.CONFIG.GIT_REMOTE + ' ' + speakreader.CONFIG.GIT_BRANCH)
 
             if not output:
