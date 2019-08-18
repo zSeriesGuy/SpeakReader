@@ -4,7 +4,6 @@
 #
 #    pip-compile
 #
-arrow==0.14.5
 backports.functools-lru-cache==1.5  # via cheroot
 cachetools==3.1.1         # via google-auth
 certifi==2019.6.16        # via requests
