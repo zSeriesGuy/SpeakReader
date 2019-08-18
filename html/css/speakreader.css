@@ -136,7 +136,11 @@ body {
     overflow: auto;
 }
 
-.transcript-container,
+.transcript-container {
+    overflow: auto;
+    padding: 0px 10px 0px 10px;
+}
+
 .log-container {
     overflow: auto;
     padding: 0px 10px 0px 10px;
