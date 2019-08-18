@@ -468,7 +468,10 @@ def runGit(args):
             output, err = p.communicate()
             output = output.decode('utf-8').strip()
 
-            logger.debug('Git output: ' + output)
+            for line in output.split('\n'):
+                if line:
+                    logger.debug('Git output: ' + line)
+
         except OSError:
             logger.debug('Command failed: %s', cmd)
             continue
