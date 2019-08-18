@@ -101,11 +101,13 @@
                         </div>
                     </div>
 
-                    <div id="transcript-container" class="transcript-container listen-content stretch">
-                        <div id="transcript" class="transcript">
-                            <p></p>
-                        </div>
+                    <div style="position: relative;">
                         <button id="bottom-button" class="bottom-button"><i class="fas fa-chevron-down"></i></button>
+                        <div id="transcript-container" class="transcript-container listen-content stretch">
+                            <div id="transcript" class="transcript">
+                                <p></p>
+                            </div>
+                        </div>
 
                         <div id="transcript-settings" class="transcript-settings">
                             <div class="row">
@@ -123,11 +125,13 @@
                         </div>
                     </div>
 
-                    <div id="log-container" class="log-container stretch">
-                        <div id="console-log" class="console-log">
-                            <p></p>
-                        </div>
+                    <div style="position: relative;">
                         <button id="log-bottom-button" class="bottom-button"><i class="fas fa-chevron-down"></i></button>
+                        <div id="log-container" class="log-container stretch">
+                            <div id="console-log" class="console-log">
+                                <p></p>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
@@ -426,7 +430,7 @@
                         <div style="position: relative;">
                             <button id="close-transcript" class="btn btn-secondary close-button"><i class="fas fa-times"></i></button>
                             <div class="transcript-container stretch">
-                                <div id="view-transcript" class="transcript"></div>
+                                <div id="view-transcript" class="transcript view-transcript"></div>
                             </div>
                         </div>
                     </div>
@@ -448,7 +452,7 @@
                         <div style="position: relative;">
                             <button id="close-log" class="btn btn-secondary close-button"><i class="fas fa-times"></i></button>
                             <div class="log-container stretch">
-                                <div id="view-log" class="console-log"></div>
+                                <div id="view-log" class="console-log view-log"></div>
                             </div>
                         </div>
                     </div>
@@ -592,39 +596,6 @@ function resizeContainers() {
         }
         while ( e !== null );
         $(this).height(height);
-    });
-
-    // Set the position of the bottom button
-    $('.bottom-button').each( function() {
-        var buttonShown = $( this ).is(":visible");
-        $(this).show();
-        var e = $(this)[0].parentElement;
-        var top = 5;
-        var left = $(this).parent().prop("clientWidth") - $(this).prop("offsetWidth") - 5;
-        do {
-            top += e.offsetTop;
-            left += e.offsetLeft;
-            e = e.offsetParent;
-        }
-        while ( e !== null );
-        $( this ).css({"top": top + "px", "left": left + "px"});
-        if ( !buttonShown ) {
-            $(this).hide();
-        }
-    });
-
-    // Set the position of the font settings slide
-    $('#transcript-settings').each( function() {
-        var e = $(this)[0].parentElement;
-        var left = 0;
-        do {
-            left += e.offsetLeft;
-            e = e.offsetParent;
-        }
-        while ( e !== null );
-        var bottom = window.innerHeight - $('#transcript-container').prop('offsetTop') - $('#transcript-container').prop('clientHeight');
-        var width = $('#transcript-container').parent().prop('clientWidth');
-        $('#transcript-settings').css({'bottom': bottom + 'px', 'width': width + 'px', 'left': left + 'px'});
     });
 
 };

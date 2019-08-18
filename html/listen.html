@@ -4,17 +4,17 @@
 <%inherit file="base.html"/>
 
 <%def name="body()">
-<div id="transcript-container">
-    <div class="transcript-container">
-        <div id="transcript" class="transcript">
-            <p></p>
+    <button id="bottom-button" class="bottom-button" style="position: fixed;"><i class="fas fa-chevron-down"></i></button>
+    <div id="transcript-container">
+        <div class="transcript-container">
+            <div id="transcript" class="transcript">
+                <p></p>
+            </div>
         </div>
     </div>
-</div>
 
-<button id="bottom-button" class="bottom-button"><i class="fas fa-chevron-down"></i></button>
 
-<div id="transcript-settings" class="transcript-settings">
+<div id="transcript-settings" class="transcript-settings" style="position: fixed;">
     <div class="row">
         <div class="col text-center">
             <div class="d-inline-block h-100 pr-3">

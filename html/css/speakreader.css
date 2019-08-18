@@ -110,7 +110,7 @@ body {
 .transcript-settings {
     background-color: #99bbff;
     border-top: 2px solid black;
-    position: fixed;
+    position: absolute;
     bottom: 0px;
     display: none;
     width: 100%;
@@ -139,6 +139,7 @@ body {
 .transcript-container {
     overflow: auto;
     padding: 0px 10px 0px 10px;
+    position: relative;
 }
 
 .log-container {
@@ -153,7 +154,7 @@ body {
     font-size: 22px;
     line-height: 1.0;
     padding: 6px 6px 6px 6px;
-    position: fixed;
+    position: absolute;
     background-color: #009900;
     color: white;
     border: 2px solid black;
@@ -366,6 +367,12 @@ body {
 
 .view-filename {
     font-size: 20px;
+}
+
+.view-transcript,
+.view-log {
+    background-color: #f2f2f2;
+    color: #0d0d0d;
 }
 
 @media screen and (min-width: 980px) /* Desktop */ {

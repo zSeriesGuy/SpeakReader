@@ -64,7 +64,12 @@ function startTranscriptStream() {
                 break;
 
             case 'transcript':
-                var atBottom = scrollTarget.prop("scrollTop") + scrollTarget.prop("clientHeight") >= scrollTarget.prop("scrollHeight");
+                if ( scrollDoc ) {
+                    var ch = window.innerHeight;
+                } else {
+                    var ch = scrollTarget.prop("clientHeight");
+                }
+                var atBottom = scrollTarget.prop("scrollTop") + ch >= scrollTarget.prop("scrollHeight") - 10;
 
                 if ( data.final === "reload" ) {
                     $("#transcript").html(data.record);
@@ -101,7 +106,12 @@ $('#bottom-button').click(function() {
 });
 
 function showButton() {
-    var atBottom = scrollTarget.prop("scrollTop") + scrollTarget.prop("clientHeight") >= scrollTarget.prop("scrollHeight");
+    if ( scrollDoc ) {
+        var ch = window.innerHeight;
+    } else {
+        var ch = scrollTarget.prop("clientHeight");
+    }
+    var atBottom = scrollTarget.prop("scrollTop") + ch >= scrollTarget.prop("scrollHeight") - 10;
     if ( atBottom ) {
         $('#bottom-button').hide();
     } else {
