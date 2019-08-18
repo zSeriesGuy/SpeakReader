@@ -8,17 +8,20 @@ arrow==0.14.5
 backports.functools-lru-cache==1.5  # via cheroot
 cachetools==3.1.1         # via google-auth
 certifi==2019.6.16        # via requests
+cffi==1.12.3              # via gevent
 chardet==3.0.4            # via requests
 cheroot==6.5.5            # via cherrypy
 cherrypy==18.1.2
 click==7.0                # via pip-tools
 configobj==5.0.6
+gevent==1.4.0             # via websocket
 google-api-core[grpc]==1.14.2  # via google-cloud-speech
 google-api-python-client==1.7.11
 google-auth-httplib2==0.0.3  # via google-api-python-client
 google-auth==1.6.3        # via google-api-core, google-api-python-client, google-auth-httplib2
 google-cloud-speech==1.2.0
 googleapis-common-protos==1.6.0  # via google-api-core
+greenlet==0.4.15          # via gevent, websocket
 grpcio==1.23.0            # via google-api-core
 httplib2==0.13.1
 idna==2.8                 # via requests
@@ -33,6 +36,7 @@ protobuf==3.9.1           # via google-api-core, googleapis-common-protos
 pyasn1-modules==0.2.6     # via google-auth
 pyasn1==0.4.6             # via pyasn1-modules, rsa
 pyaudio==0.2.11
+pycparser==2.19           # via cffi
 pyjwt==1.7.1
 python-dateutil==2.8.0
 pytz==2019.2              # via google-api-core, tempora, tzlocal
@@ -44,6 +48,7 @@ tempora==1.14.1           # via portend
 tzlocal==2.0.0
 uritemplate==3.0.0        # via google-api-python-client
 urllib3==1.25.3           # via requests
+websocket==0.2.1
 wheel==0.33.5
 zc.lockfile==2.0          # via cherrypy
 
