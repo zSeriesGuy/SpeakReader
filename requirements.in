@@ -7,6 +7,7 @@ Mako
 google-cloud-speech
 google-api-python-client
 configobj
+pip-tools
 PyAudio
 pywin32; sys_platform == "win32"
 pyjwt
@@ -14,4 +15,4 @@ httplib2
 python-dateutil
 tzlocal
 passlib
-arrow
+wheel
