@@ -16,3 +16,4 @@ python-dateutil
 tzlocal
 passlib
 wheel
+arrow
