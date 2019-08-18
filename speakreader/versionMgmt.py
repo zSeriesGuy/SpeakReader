@@ -365,7 +365,7 @@ class Version(object):
                 return False
 
         output, err = pip_sync()
-        logger.info("Update Completed Successfully")
+        logger.info("Update Complete")
         return True
 
     def checkout_git_branch(self):
