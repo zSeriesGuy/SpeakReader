@@ -20,16 +20,24 @@
 
 import threading
 import re
+import os
+import datetime
 from google.cloud import speech
 
 import speakreader
 from speakreader import logger
 from speakreader.microphoneStream import MicrophoneStream
+from speakreader.queueManager import QueueManager
 
 # Audio recording parameters
 STREAMING_LIMIT = 50000
-SAMPLE_RATE = 44100
+SAMPLE_RATE = 16000
 CHUNK_SIZE = int(SAMPLE_RATE / 10)  # 100ms
+
+FILENAME_PREFIX = "Transcript-"
+FILENAME_DATE_FORMAT = "%Y-%m-%d-%H%M"
+TRANSCRIPT_FILENAME_SUFFIX = "txt"
+RECORDING_FILENAME_SUFFIX = "wav"
 
 
 class TranscribeEngine:
@@ -41,12 +49,18 @@ class TranscribeEngine:
     OFFLINE_MESSAGE = {"event": "transcript", "final": False, "record": "Transcription Engine is Offline"}
     ONLINE_MESSAGE = {"event": "transcript", "final": False, "record": "Welcome to SpeakReader -- Listening"}
 
-    def __init__(self, receiverQueue):
+    def __init__(self):
         if TranscribeEngine._INITIALIZED:
             logger.warn("Transcribe Engine already Initialized")
             return
+
         logger.info("Transcribe Engine Initializing")
-        self.receiverQueue = receiverQueue
+        ###################################################################################################
+        #  Initialize the Queue Manager
+        ###################################################################################################
+        self.queueManager = QueueManager()
+        self.receiverQueue = self.queueManager.transcriptHandler.getReceiverQueue()
+
         TranscribeEngine._INITIALIZED = True
 
     @property
@@ -64,7 +78,12 @@ class TranscribeEngine:
             self.microphoneStream.stop()
             self.receiverQueue.put_nowait(self.OFFLINE_MESSAGE)
             self._transcribeThread.join()
+            self.queueManager.transcriptHandler.setFileName(None)
             self._ONLINE = False
+
+    def shutdown(self):
+        self.stop()
+        self.queueManager.shutdown()
 
     def run(self):
         if self._ONLINE:
@@ -72,6 +91,15 @@ class TranscribeEngine:
             return
 
         logger.info("Transcribe Engine Starting")
+
+        FILENAME_DATESTRING = datetime.datetime.now().strftime(FILENAME_DATE_FORMAT)
+        TRANSCRIPT_FILENAME = FILENAME_PREFIX + FILENAME_DATESTRING + "." + TRANSCRIPT_FILENAME_SUFFIX
+        RECORDING_FILENAME = FILENAME_PREFIX + FILENAME_DATESTRING + "." + RECORDING_FILENAME_SUFFIX
+
+        tf = os.path.join(speakreader.CONFIG.TRANSCRIPTS_FOLDER, TRANSCRIPT_FILENAME)
+        self.queueManager.transcriptHandler.setFileName(tf)
+        self.transcriptFile = open(tf, "a+")
+
         credentials_json = speakreader.CONFIG.CREDENTIALS_FILE
 
         client = speech.SpeechClient.from_service_account_json(credentials_json)
@@ -91,17 +119,23 @@ class TranscribeEngine:
 
         try:
             self.microphoneStream = MicrophoneStream(speakreader.CONFIG.INPUT_DEVICE, SAMPLE_RATE, CHUNK_SIZE, STREAMING_LIMIT)
-            self._ONLINE = True
-            self.receiverQueue.put_nowait(self.ONLINE_MESSAGE)
+            rf = os.path.join(speakreader.CONFIG.RECORDINGS_FOLDER, RECORDING_FILENAME)
+            self.microphoneStream.initRecording(rf)
+
         except Exception as e:
             logger.debug("MicrophoneStream Exception: %s" % e)
             self.receiverQueue.put_nowait(self.OFFLINE_MESSAGE)
             return
 
+        self._ONLINE = True
+        self.receiverQueue.put_nowait(self.ONLINE_MESSAGE)
+
         try:
             with self.microphoneStream as stream:
+
                 while not stream.closed:
                     audio_generator = stream.generator()
+
                     requests = (speech.types.StreamingRecognizeRequest(
                         audio_content=content)
                         for content in audio_generator)
@@ -113,11 +147,13 @@ class TranscribeEngine:
                         self.process_responses(responses)
                     except Exception as e:
                         logger.debug("a: %s" % e)
+
                 logger.debug("Microphone Stream Closed")
 
         except Exception as e:
             logger.error("b: %s" % e)
 
+        self.transcriptFile.close()
         self.receiverQueue.put_nowait(self.OFFLINE_MESSAGE)
         self._ONLINE = False
         logger.info("Transcribe Engine Terminated")
@@ -169,6 +205,9 @@ class TranscribeEngine:
 
             self.receiverQueue.put(transcription)
 
+            if result.is_final:
+                self.transcriptFile.write(transcript.strip() + "\n\n")
+                self.transcriptFile.flush()
 
     def censor(self, input_text):
         """Returns input_text with any defined words censored."""

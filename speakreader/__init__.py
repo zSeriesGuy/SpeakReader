@@ -33,7 +33,6 @@ except ImportError:
 from speakreader import webstart, logger, config, version
 from speakreader.versionMgmt import Version
 from speakreader.transcribeEngine import TranscribeEngine
-from speakreader.queueManager import QueueManager
 
 PROG_DIR = None
 DATA_DIR = None
@@ -117,14 +116,9 @@ class SpeakReader(object):
             self.get_input_device()
 
             ###################################################################################################
-            #  Initialize the Queue Manager
-            ###################################################################################################
-            self.queueManager = QueueManager()
-
-            ###################################################################################################
             #  Initialize the Transcribe Engine
             ###################################################################################################
-            self.transcribeEngine = TranscribeEngine(self.queueManager.transcriptHandler.getReceiverQueue())
+            self.transcribeEngine = TranscribeEngine()
 
             if CONFIG.START_TRANSCRIBE_ON_STARTUP :
                 self.startTranscribeEngine()
@@ -191,8 +185,7 @@ class SpeakReader(object):
     def shutdown(self, restart=False, update=False, checkout=False):
         import time
         SpeakReader._INITIALIZED = False
-        self.stopTranscribeEngine()
-        self.queueManager.shutdown()
+        self.transcribeEngine.shutdown()
         logger.info('WebServer Terminating')
         cherrypy.engine.exit()
 

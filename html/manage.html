@@ -221,15 +221,30 @@
                                             </div>
 
                                             <div class="form-group">
+                                                <label for="log_dir" class="font-weight-bold">Logs Folder</label>
+                                                <input id="log_dir" type="text" class="form-control" name="log_dir" value="${config['log_dir']}" size="30">
+                                                <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the SpeakReader console logs.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
+                                            </div>
+
+                                            <div class="form-group">
                                                 <label for="transcripts_folder" class="font-weight-bold">Transcripts Folder</label>
                                                 <input id="transcripts_folder" type="text" class="form-control" name="transcripts_folder" value="${config['transcripts_folder']}" size="30">
                                                 <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the transcripts.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
                                             </div>
 
-                                            <div class="form-group">
-                                                <label for="log_dir" class="font-weight-bold">Logs Folder</label>
-                                                <input id="log_dir" type="text" class="form-control" name="log_dir" value="${config['log_dir']}" size="30">
-                                                <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the SpeakReader console logs.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
+
+                                            <div class="form-group form-check">
+                                                <div>
+                                                    <input id="save_recordings" type="checkbox" class="form-check-input" name="save_recordings" value="1" checked="${config['save_recordings']}"/>
+                                                    <label for="save_recordings" class="font-weight-bold form-check-label">Save Audio Recordings</label>
+                                                    <small class="form-text">Save Audio Recordings as wav files.</small>
+                                                </div>
+
+                                                <div class="form-sub-group">
+                                                    <label for="recordings_folder" class="font-weight-bold">Recordings Folder</label>
+                                                    <input id="recordings_folder" type="text" class="form-control" name="recordings_folder" value="${config['recordings_folder']}" size="30">
+                                                    <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the audio recordings.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -429,7 +444,7 @@
                         </div>
                         <div style="position: relative;">
                             <button id="close-transcript" class="btn btn-secondary close-button"><i class="fas fa-times"></i></button>
-                            <div class="transcript-container stretch">
+                            <div class="transcript-view-container stretch">
                                 <div id="view-transcript" class="transcript view-transcript"></div>
                             </div>
                         </div>
@@ -451,7 +466,7 @@
                         </div>
                         <div style="position: relative;">
                             <button id="close-log" class="btn btn-secondary close-button"><i class="fas fa-times"></i></button>
-                            <div class="log-container stretch">
+                            <div class="log-view-container stretch">
                                 <div id="view-log" class="console-log view-log"></div>
                             </div>
                         </div>
@@ -666,10 +681,12 @@ function getSettings() {
         $('#http_hash_password').prop('checked', config.http_hash_password);
         $('#enable_https').prop('checked', config.enable_https);
         $('#check_github').prop('checked', config.check_github);
+        $('#save_recordings').prop('checked', config.save_recordings);
 
         // Text Values
         $('#credentials_file').val(config.credentials_file);
         $('#transcripts_folder').val(config.transcripts_folder);
+        $('#recordings_folder').val(config.recordings_folder);
         $('#log_dir').val(config.log_dir);
         $('#http_port').val(config.http_port);
         $('#https_cert').val(config.https_cert);
@@ -704,6 +721,7 @@ function getSettings() {
             $('#update-available').hide();
         }
 
+        initConfigCheckbox('#save_recordings');
         initConfigCheckbox('#enable_https');
         initConfigCheckbox('#enable_censorship');
         initConfigCheckbox('#check_github');
@@ -1113,11 +1131,13 @@ $(document).ready(function() {
                 break;
 
             case '#tabs-transcripts':
+                transcripts_table.ajax.reload();
                 $('#transcripts-list-container').show();
                 $('#transcripts-list').DataTable().draw();
                 break;
 
             case '#tabs-logs':
+                logs_table.ajax.reload();
                 $('#logs-list-container').show();
                 $('#logs-list').DataTable().draw();
                 break;

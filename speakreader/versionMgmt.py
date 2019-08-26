@@ -41,8 +41,8 @@ class Version(object):
         self.UPDATE_AVAILABLE = False
         self.REMOTE_NAME = None
         self.BRANCH_NAME = None
-        self.version_lock_file = os.path.join(speakreader.DATA_DIR, "version.lock")
-        self.release_lock_file = os.path.join(speakreader.DATA_DIR, "release.lock")
+        self.version_lock_file = os.path.join(speakreader.PROG_DIR, "version.lock")
+        self.release_lock_file = os.path.join(speakreader.PROG_DIR, "release.lock")
 
         installed_release = self.getReleaseLock()
         if self.INSTALLED_RELEASE != installed_release:

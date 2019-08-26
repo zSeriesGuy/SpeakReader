@@ -139,9 +139,16 @@ body {
 .transcript-container {
     overflow: auto;
     padding: 0px 10px 0px 10px;
-    position: relative;
 }
 
+.transcript-view-container {
+    overflow: auto;
+    padding: 0px;
+    background-color: #f2f2f2;
+    color: #0d0d0d;
+}
+
+.log-view-container,
 .log-container {
     overflow: auto;
     padding: 0px 10px 0px 10px;

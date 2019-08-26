@@ -19,7 +19,16 @@
 import time
 import queue
 import pyaudio
+import os
+import wave
+import datetime
+import speakreader
 
+FILENAME_PREFIX = "Transcript-"
+FILENAME_SUFFIX = "wav"
+FILENAME_DATE_FORMAT = "%Y-%m-%d-%H%M"
+FILENAME_DATESTRING = datetime.datetime.now().strftime(FILENAME_DATE_FORMAT)
+FILENAME = FILENAME_PREFIX + FILENAME_DATESTRING + "." + FILENAME_SUFFIX
 
 def get_current_time():
     return int(round(time.time() * 1000))
@@ -37,7 +46,7 @@ class MicrophoneStream:
         self._chunk_size = chunk_size
         self._streaming_limit = streaming_limit
         self._num_channels = 1
-        self._max_replay_secs = 5
+        self._format = pyaudio.paInt16
 
         # Create a thread-safe buffer of audio data
         self._buff = queue.Queue()
@@ -49,13 +58,31 @@ class MicrophoneStream:
         self._bytes_per_second = self._rate * self._bytes_per_sample
 
         self._bytes_per_chunk = (self._chunk_size * self._bytes_per_sample)
-        self._chunks_per_second = (
-                self._bytes_per_second // self._bytes_per_chunk)
+        self._chunks_per_second = (self._bytes_per_second // self._bytes_per_chunk)
+
+        self._wavfile = None
+
+    def initRecording(self, filename):
+        if speakreader.CONFIG.SAVE_RECORDINGS:
+            wavfile = os.path.join(speakreader.CONFIG.RECORDINGS_FOLDER, filename)
+            try:
+                w = wave.open(wavfile, 'rb')
+                data = w.readframes(w.getnframes())
+                self._wavfile = wave.open(wavfile, 'wb')
+                self._wavfile.setparams(w.getparams())
+                w.close()
+                self._wavfile.writeframes(data)
+            except FileNotFoundError:
+                self._wavfile = wave.open(wavfile, 'wb')
+                self._wavfile.setnchannels(self._num_channels)
+                self._wavfile.setsampwidth(2)
+                self._wavfile.setframerate(self._rate)
 
     def __enter__(self):
         self.closed = False
 
         self._audio_interface = pyaudio.PyAudio()
+
         try:
             defaultHostAPIindex = self._audio_interface.get_default_host_api_info().get('index')
             numdevices = self._audio_interface.get_default_host_api_info().get('deviceCount')
@@ -67,7 +94,7 @@ class MicrophoneStream:
                     break
             self._audio_stream = self._audio_interface.open(
                 input_device_index=inputDeviceIndex,
-                format=pyaudio.paInt16,
+                format=self._format,
                 channels=self._num_channels,
                 rate=self._rate,
                 input=True,
@@ -93,6 +120,9 @@ class MicrophoneStream:
         self._buff.put(None)
         self._audio_interface.terminate()
 
+        if self._wavfile is not None:
+            self._wavfile.close()
+
     def stop(self):
         self.__exit__(None, None, None)
 
@@ -103,9 +133,6 @@ class MicrophoneStream:
 
     def generator(self):
         while not self.closed:
-            # if speakreader._SHUTDOWN:
-            #     self.closed = True
-            #     return
             if get_current_time() - self.start_time > self._streaming_limit:
                 self.start_time = get_current_time()
                 break
@@ -129,4 +156,9 @@ class MicrophoneStream:
                 except:
                     break
 
-            yield b''.join(data)
+            data = b''.join(data)
+
+            if self._wavfile is not None:
+                self._wavfile.writeframes(data)
+
+            yield data

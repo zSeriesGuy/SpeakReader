@@ -14,9 +14,12 @@ venv*/*
 *.ini
 *.lock
 *.json
-version.txt
-logs/*
-transcripts/*
+*.txt
+*.wav
+logs/**
+transcripts/**
+recordings/**
+data/**
 
 # HTTPS Cert/Key #
 ##################

@@ -19,19 +19,10 @@
 import threading
 import queue
 from queue import Queue
-import os
-import datetime
 
-import speakreader
 from speakreader import logger
 import logging
 from logging import handlers
-
-FILENAME_PREFIX = "Transcript-"
-FILENAME_SUFFIX = "txt"
-FILENAME_DATE_FORMAT = "%Y-%m-%d-%H%M"
-FILENAME_DATESTRING = datetime.datetime.now().strftime(FILENAME_DATE_FORMAT)
-FILENAME = FILENAME_PREFIX + FILENAME_DATESTRING + "." + FILENAME_SUFFIX
 
 
 class QueueManager(object):
@@ -80,22 +71,23 @@ class QueueManager(object):
         usage['log'] = self.logHandler.getUsage()
         return usage
 
+
 class QueueHandler(object):
 
     def __init__(self, name):
         self._STARTED = False
         self.fileLock = threading.Lock()
-        self._receiverQueue = None
         self._listenerQueues = {}
-        self._queueHandlerThread = None
-        self.logFileName = None
-        self.transcriptFile = None
+        self.fileName = None
         self.threadName = name
 
         # Initialize the Handler queue manager
         self._receiverQueue = Queue(maxsize=-1)
         self._queueHandlerThread = threading.Thread(name=self.threadName, target=self.runHandler)
         self._queueHandlerThread.start()
+
+    def setFileName(self, filename):
+        self.fileName = filename
 
     def getReceiverQueue(self):
         return self._receiverQueue
@@ -126,20 +118,17 @@ class QueueHandler(object):
 
         data = None
         if type == "log":
-            if self.logFileName:
-                with open(self.logFileName) as f:
+            if self.fileName:
+                with open(self.fileName) as f:
                     records = '<p>' + f.read().replace("\n", "</p><p>") + '</p>'
                 data = {"event": "logrecord",
                         "final": "reload",
                         "record": records,
                         }
         elif type == "transcript":
-            if self.transcriptFile:
-                with self.fileLock:
-                    self.transcriptFile.flush()
-                    os.fsync(self.transcriptFile.fileno())
-                    self.transcriptFile.seek(0)
-                    records = "<p>" + self.transcriptFile.read().rstrip("\n\n").replace("\n\n", "</p><p>") + "</p>"
+            if self.fileName:
+                with open(self.fileName, 'r') as f:
+                    records = "<p>" + f.read().rstrip("\n\n").replace("\n\n", "</p><p>") + "</p>"
                 data = {"event": "transcript",
                         "final": "reload",
                         "record": records,
@@ -185,10 +174,8 @@ class QueueHandler(object):
             list.append({'remoteIP': q.remoteIP, 'sessionID': q.sessionID})
         return {'count': count, 'list': list}
 
+
 class TranscriptHandler(QueueHandler):
-    def __init__(self, name):
-        super().__init__(name)
-        
 
     def runHandler(self):
         if self._STARTED:
@@ -197,20 +184,12 @@ class TranscriptHandler(QueueHandler):
 
         logger.info('Transcript Queue Handler starting')
         self._STARTED = True
-        self.filename = os.path.join(speakreader.CONFIG.TRANSCRIPTS_FOLDER, FILENAME)
-        self.transcriptFile = open(self.filename, "a+")
 
         while self._STARTED:
             try:
                 transcript = self._receiverQueue.get(timeout=2)
-
                 if transcript is None:
                     break
-
-                if transcript['event'] == 'transcript' and transcript['final']:
-                    with self.fileLock:
-                        self.transcriptFile.write(transcript['record'].strip() + "\n\n")
-                        self.transcriptFile.flush()
 
             except queue.Empty:
                 if self._STARTED:
@@ -224,7 +203,6 @@ class TranscriptHandler(QueueHandler):
                 except queue.Full:
                     self.removeListener(sessionID=queueElement.sessionID)
 
-        self.transcriptFile.close()
         self._STARTED = False
         self.closeAllListeners()
         logger.info('Transcript Queue Handler terminated')
@@ -248,7 +226,7 @@ class LogHandler(QueueHandler):
 
         for handler in mainLogger.handlers[:]:
             if isinstance(handler, handlers.RotatingFileHandler):
-                self.logFileName = handler.baseFilename
+                self.fileName = handler.baseFilename
                 break
 
         while self._STARTED:

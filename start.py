@@ -179,12 +179,23 @@ def main():
     if args.datadir:
         DATA_DIR = args.datadir
     else:
-        DATA_DIR = PROG_DIR
+        DATA_DIR = os.path.join(PROG_DIR, 'data')
 
     if args.config:
         CONFIG_FILE = args.config
     else:
         CONFIG_FILE = os.path.join(DATA_DIR, config.FILENAME)
+
+    # Try to create the DATA_DIR if it doesn't exist
+    if not os.path.exists(DATA_DIR):
+        try:
+            os.makedirs(DATA_DIR)
+        except OSError:
+            raise SystemExit('Could not create data directory: ' + DATA_DIR + '. Exiting....')
+
+    # Make sure the DATA_DIR is writeable
+    if not os.access(DATA_DIR, os.W_OK):
+        raise SystemExit('Cannot write to the data directory: ' + DATA_DIR + '. Exiting...')
 
     # Do an initial setup of the logging.
     logger.initLogger(console=not QUIET, log_dir=False, verbose=VERBOSE)
@@ -192,6 +203,9 @@ def main():
     # Initialize the configuration from the config file
     CONFIG = config.Config(CONFIG_FILE)
     assert CONFIG is not None
+
+    if CONFIG.SERVER_ENVIRONMENT.lower() != 'production':
+        VERBOSE = True
 
     CONFIG.LOG_DIR, log_writable = check_folder_writable(
         CONFIG.LOG_DIR, os.path.join(DATA_DIR, 'logs'), 'logs')
@@ -222,16 +236,8 @@ def main():
     CONFIG.TRANSCRIPTS_FOLDER, _ = check_folder_writable(
         CONFIG.TRANSCRIPTS_FOLDER, os.path.join(DATA_DIR, 'transcripts'), 'transcripts')
 
-    # Try to create the DATA_DIR if it doesn't exist
-    if not os.path.exists(DATA_DIR):
-        try:
-            os.makedirs(DATA_DIR)
-        except OSError:
-            raise SystemExit('Could not create data directory: ' + DATA_DIR + '. Exiting....')
-
-    # Make sure the DATA_DIR is writeable
-    if not os.access(DATA_DIR, os.W_OK):
-        raise SystemExit('Cannot write to the data directory: ' + DATA_DIR + '. Exiting...')
+    CONFIG.RECORDINGS_FOLDER, _ = check_folder_writable(
+        CONFIG.RECORDINGS_FOLDER, os.path.join(DATA_DIR, 'recordings'), 'recordings')
 
     if DAEMON:
         daemonize(CREATEPID, PIDFILE)

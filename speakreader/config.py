@@ -45,6 +45,8 @@ _CONFIG_DEFINITIONS = {
     'LOG_DIR': (str, 'General', ''),
     'ANON_REDIRECT': (str, 'General', 'http://www.nullrefer.com/?'),
     'SERVER_ENVIRONMENT': (str, 'Advanced', 'production'),
+    'SAVE_RECORDINGS': (int, 'General', 1),
+    'RECORDINGS_FOLDER': (str, 'General', ''),
 
     'HTTP_PORT': (int, 'HTTP', 8880),
     'ENABLE_HTTPS': (int, 'HTTP', 0),

@@ -107,6 +107,8 @@ class WebInterface(object):
             "launch_browser": speakreader.CONFIG.LAUNCH_BROWSER,
             "transcripts_folder": speakreader.CONFIG.TRANSCRIPTS_FOLDER,
             "log_dir": speakreader.CONFIG.LOG_DIR,
+            "save_recordings": speakreader.CONFIG.SAVE_RECORDINGS,
+            "recordings_folder": speakreader.CONFIG.RECORDINGS_FOLDER,
             "http_port": speakreader.CONFIG.HTTP_PORT,
             "enable_https": speakreader.CONFIG.ENABLE_HTTPS,
             "https_cert": speakreader.CONFIG.HTTPS_CERT,
@@ -144,6 +146,7 @@ class WebInterface(object):
             "start_transcribe_on_startup",
             "launch_browser",
             "enable_https",
+            "save_recordings",
             "show_interim_results",
             "enable_censorship",
             "http_hash_password",
@@ -164,7 +167,8 @@ class WebInterface(object):
 
         if kwargs.get('credentials_file') != speakreader.CONFIG.CREDENTIALS_FILE \
         or kwargs.get('enable_censorship') != speakreader.CONFIG.ENABLE_CENSORSHIP \
-        or kwargs.get('input_device') != speakreader.CONFIG.INPUT_DEVICE:
+        or kwargs.get('input_device') != speakreader.CONFIG.INPUT_DEVICE \
+        or kwargs.get('save_recordings') != speakreader.CONFIG.SAVE_RECORDINGS:
             restartTranscribeEngine = True
 
         if kwargs.get('http_port') != str(speakreader.CONFIG.HTTP_PORT) \
@@ -173,6 +177,7 @@ class WebInterface(object):
         or kwargs.get('https_cert_chain') != speakreader.CONFIG.HTTPS_CERT_CHAIN \
         or kwargs.get('https_key') != speakreader.CONFIG.HTTPS_KEY \
         or kwargs.get('transcripts_folder') != speakreader.CONFIG.TRANSCRIPTS_FOLDER \
+        or kwargs.get('recordings_folder') != speakreader.CONFIG.RECORDINGS_FOLDER \
         or kwargs.get('log_dir') != speakreader.CONFIG.LOG_DIR:
             restartSpeakReader = True
 
@@ -249,13 +254,13 @@ class WebInterface(object):
     @cherrypy.expose
     @requireAuth(is_admin())
     def shutdown(self, **kwargs):
-        self.SR.queueManager.closeAllListeners()
+        self.SR.transcribeEngine.queueManager.closeAllListeners()
         return self.do_state_change('shutdown', 'Shutting Down', 15)
 
     @cherrypy.expose
     @requireAuth(is_admin())
     def restart(self, **kwargs):
-        self.SR.queueManager.closeAllListeners()
+        self.SR.transcribeEngine.queueManager.closeAllListeners()
         return self.do_state_change('restart', 'Restarting', 30)
 
     def do_state_change(self, signal, title, timer, **kwargs):
@@ -313,7 +318,7 @@ class WebInterface(object):
     def removeListener(self, **kwargs):
         cl = cherrypy.request.headers['Content-Length']
         data = json.loads(cherrypy.request.body.read(int(cl)))
-        self.SR.queueManager.removeListener(type=data['type'], sessionID=data['sessionID'])
+        self.SR.transcribeEngine.queueManager.removeListener(type=data['type'], sessionID=data['sessionID'])
 
     @cherrypy.expose
     def addListener(self, **kwargs):
@@ -322,7 +327,7 @@ class WebInterface(object):
         sessionID = cherrypy.session.id
         remoteIP = cherrypy.request.remote.ip
         def eventSource(type, listenerQueue, remoteIP, sessionID):
-            while self.SR.queueManager.is_initialized:
+            while self.SR.transcribeEngine.queueManager.is_initialized:
                 try:
                     data = listenerQueue.get(timeout=2)
                     if data is None:
@@ -334,7 +339,7 @@ class WebInterface(object):
                     continue
             logger.debug("Exiting " + type.capitalize() + " Listener loop for IP: " + remoteIP + " with sessionID: " + sessionID)
 
-        listenerQueue = self.SR.queueManager.addListener(type=type, remoteIP=remoteIP, sessionID=sessionID)
+        listenerQueue = self.SR.transcribeEngine.queueManager.addListener(type=type, remoteIP=remoteIP, sessionID=sessionID)
 
         if type == 'transcript':
             if self.SR.transcribeEngine.is_online:
@@ -354,7 +359,7 @@ class WebInterface(object):
             while self.SR.is_initialized:
                 status = {}
                 status['status'] = self.SR.transcribeEngine.is_online
-                status['usage'] = self.SR.queueManager.getUsage()
+                status['usage'] = self.SR.transcribeEngine.queueManager.getUsage()
                 yield 'data: {}\n\n'.format(json.dumps(status))
                 time.sleep(1.5)
             yield 'data: {}\n\n'.format('Close')
