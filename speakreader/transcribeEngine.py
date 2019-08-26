@@ -31,7 +31,7 @@ from speakreader.queueManager import QueueManager
 
 # Audio recording parameters
 STREAMING_LIMIT = 50000
-SAMPLE_RATE = 16000
+SAMPLE_RATE = 44100
 CHUNK_SIZE = int(SAMPLE_RATE / 10)  # 100ms
 
 FILENAME_PREFIX = "Transcript-"
