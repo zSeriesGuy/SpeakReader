@@ -23,7 +23,6 @@ import pyaudio
 import cherrypy
 import json
 
-# Some cut down versions of Python may not include this module and it's not critical for us
 try:
     import webbrowser
     no_browser = False
