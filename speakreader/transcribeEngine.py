@@ -29,16 +29,10 @@ from speakreader import logger
 from speakreader.microphoneStream import MicrophoneStream
 from speakreader.queueManager import QueueManager
 
-# Audio recording parameters
-STREAMING_LIMIT = 50000
-SAMPLE_RATE = 48000
-CHUNK_SIZE = int(SAMPLE_RATE / 10)  # 100ms
-
 FILENAME_PREFIX = "Transcript-"
 FILENAME_DATE_FORMAT = "%Y-%m-%d-%H%M"
 TRANSCRIPT_FILENAME_SUFFIX = "txt"
 RECORDING_FILENAME_SUFFIX = "wav"
-
 
 class TranscribeEngine:
 
@@ -100,13 +94,23 @@ class TranscribeEngine:
         self.queueManager.transcriptHandler.setFileName(tf)
         self.transcriptFile = open(tf, "a+")
 
+        try:
+            self.microphoneStream = MicrophoneStream(speakreader.CONFIG.INPUT_DEVICE)
+            rf = os.path.join(speakreader.CONFIG.RECORDINGS_FOLDER, RECORDING_FILENAME)
+            self.microphoneStream.initRecording(rf)
+
+        except Exception as e:
+            logger.debug("MicrophoneStream Exception: %s" % e)
+            self.receiverQueue.put_nowait(self.OFFLINE_MESSAGE)
+            return
+
         credentials_json = speakreader.CONFIG.CREDENTIALS_FILE
 
         client = speech.SpeechClient.from_service_account_json(credentials_json)
 
         config = speech.types.RecognitionConfig(
             encoding=speech.enums.RecognitionConfig.AudioEncoding.LINEAR16,
-            sample_rate_hertz=SAMPLE_RATE,
+            sample_rate_hertz=self.microphoneStream._rate,
             language_code='en-US',
             max_alternatives=1,
             enable_word_time_offsets=True,
@@ -116,16 +120,6 @@ class TranscribeEngine:
         streaming_config = speech.types.StreamingRecognitionConfig(
             config=config,
             interim_results=True)
-
-        try:
-            self.microphoneStream = MicrophoneStream(speakreader.CONFIG.INPUT_DEVICE, SAMPLE_RATE, CHUNK_SIZE, STREAMING_LIMIT)
-            rf = os.path.join(speakreader.CONFIG.RECORDINGS_FOLDER, RECORDING_FILENAME)
-            self.microphoneStream.initRecording(rf)
-
-        except Exception as e:
-            logger.debug("MicrophoneStream Exception: %s" % e)
-            self.receiverQueue.put_nowait(self.OFFLINE_MESSAGE)
-            return
 
         self._ONLINE = True
         self.receiverQueue.put_nowait(self.ONLINE_MESSAGE)

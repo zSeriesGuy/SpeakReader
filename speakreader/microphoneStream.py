@@ -30,6 +30,10 @@ FILENAME_DATE_FORMAT = "%Y-%m-%d-%H%M"
 FILENAME_DATESTRING = datetime.datetime.now().strftime(FILENAME_DATE_FORMAT)
 FILENAME = FILENAME_PREFIX + FILENAME_DATESTRING + "." + FILENAME_SUFFIX
 
+# Audio recording parameters
+STREAMING_LIMIT = 50000
+
+
 def get_current_time():
     return int(round(time.time() * 1000))
 
@@ -40,13 +44,27 @@ def duration_to_secs(duration):
 
 class MicrophoneStream:
     """Opens a recording stream as a generator yielding the audio chunks."""
-    def __init__(self, input_device, rate, chunk_size, streaming_limit):
+    def __init__(self, input_device):
+        self._audio_interface = pyaudio.PyAudio()
         self._inputDevice = input_device
-        self._rate = rate
-        self._chunk_size = chunk_size
-        self._streaming_limit = streaming_limit
         self._num_channels = 1
         self._format = pyaudio.paInt16
+
+        defaultHostAPIindex = self._audio_interface.get_default_host_api_info().get('index')
+        numdevices = self._audio_interface.get_default_host_api_info().get('deviceCount')
+        self.inputDeviceIndex = self._audio_interface.get_default_input_device_info().get('index')
+        for i in range(0, numdevices):
+            inputDevice = self._audio_interface.get_device_info_by_host_api_device_index(defaultHostAPIindex, i)
+            if self._inputDevice == inputDevice.get('name'):
+                inputDeviceIndex = inputDevice.get('index')
+                break
+
+        deviceInfo = self._audio_interface.get_device_info_by_index(self.inputDeviceIndex)
+        self._rate = int(deviceInfo.get('defaultSampleRate'))
+        self._chunk_size = int(self._rate / 10)
+        self._streaming_limit = STREAMING_LIMIT
+
+        self._wavfile = None
 
         # Create a thread-safe buffer of audio data
         self._buff = queue.Queue()
@@ -60,40 +78,11 @@ class MicrophoneStream:
         self._bytes_per_chunk = (self._chunk_size * self._bytes_per_sample)
         self._chunks_per_second = (self._bytes_per_second // self._bytes_per_chunk)
 
-        self._wavfile = None
-
-    def initRecording(self, filename):
-        if speakreader.CONFIG.SAVE_RECORDINGS:
-            wavfile = os.path.join(speakreader.CONFIG.RECORDINGS_FOLDER, filename)
-            try:
-                w = wave.open(wavfile, 'rb')
-                data = w.readframes(w.getnframes())
-                self._wavfile = wave.open(wavfile, 'wb')
-                self._wavfile.setparams(w.getparams())
-                w.close()
-                self._wavfile.writeframes(data)
-            except FileNotFoundError:
-                self._wavfile = wave.open(wavfile, 'wb')
-                self._wavfile.setnchannels(self._num_channels)
-                self._wavfile.setsampwidth(2)
-                self._wavfile.setframerate(self._rate)
-
     def __enter__(self):
         self.closed = False
-
-        self._audio_interface = pyaudio.PyAudio()
-
         try:
-            defaultHostAPIindex = self._audio_interface.get_default_host_api_info().get('index')
-            numdevices = self._audio_interface.get_default_host_api_info().get('deviceCount')
-            inputDeviceIndex = self._audio_interface.get_default_input_device_info().get('index')
-            for i in range(0, numdevices):
-                inputDevice = self._audio_interface.get_device_info_by_host_api_device_index(defaultHostAPIindex, i)
-                if self._inputDevice == inputDevice.get('name'):
-                    inputDeviceIndex = inputDevice.get('index')
-                    break
             self._audio_stream = self._audio_interface.open(
-                input_device_index=inputDeviceIndex,
+                input_device_index=self.inputDeviceIndex,
                 format=self._format,
                 channels=self._num_channels,
                 rate=self._rate,
@@ -122,6 +111,22 @@ class MicrophoneStream:
 
         if self._wavfile is not None:
             self._wavfile.close()
+
+    def initRecording(self, filename):
+        if speakreader.CONFIG.SAVE_RECORDINGS:
+            wavfile = os.path.join(speakreader.CONFIG.RECORDINGS_FOLDER, filename)
+            try:
+                w = wave.open(wavfile, 'rb')
+                data = w.readframes(w.getnframes())
+                self._wavfile = wave.open(wavfile, 'wb')
+                self._wavfile.setparams(w.getparams())
+                w.close()
+                self._wavfile.writeframes(data)
+            except FileNotFoundError:
+                self._wavfile = wave.open(wavfile, 'wb')
+                self._wavfile.setnchannels(self._num_channels)
+                self._wavfile.setsampwidth(2)
+                self._wavfile.setframerate(self._rate)
 
     def stop(self):
         self.__exit__(None, None, None)
