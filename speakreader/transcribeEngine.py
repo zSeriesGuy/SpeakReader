@@ -34,6 +34,9 @@ FILENAME_DATE_FORMAT = "%Y-%m-%d-%H%M"
 TRANSCRIPT_FILENAME_SUFFIX = "txt"
 RECORDING_FILENAME_SUFFIX = "wav"
 
+SAMPLERATE = 16000
+
+
 class TranscribeEngine:
 
     _INITIALIZED = False
@@ -95,7 +98,7 @@ class TranscribeEngine:
         self.transcriptFile = open(tf, "a+")
 
         try:
-            self.microphoneStream = MicrophoneStream(speakreader.CONFIG.INPUT_DEVICE)
+            self.microphoneStream = MicrophoneStream(speakreader.CONFIG.INPUT_DEVICE, SAMPLERATE)
             rf = os.path.join(speakreader.CONFIG.RECORDINGS_FOLDER, RECORDING_FILENAME)
             self.microphoneStream.initRecording(rf)
 
@@ -110,7 +113,7 @@ class TranscribeEngine:
 
         config = speech.types.RecognitionConfig(
             encoding=speech.enums.RecognitionConfig.AudioEncoding.LINEAR16,
-            sample_rate_hertz=self.microphoneStream._rate,
+            sample_rate_hertz=SAMPLERATE,
             language_code='en-US',
             max_alternatives=1,
             enable_word_time_offsets=True,
