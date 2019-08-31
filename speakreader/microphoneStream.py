@@ -22,6 +22,8 @@ import pyaudio
 import os
 import wave
 import datetime
+import numpy as np
+import samplerate as sr
 import speakreader
 
 FILENAME_PREFIX = "Transcript-"
@@ -44,11 +46,12 @@ def duration_to_secs(duration):
 
 class MicrophoneStream:
     """Opens a recording stream as a generator yielding the audio chunks."""
-    def __init__(self, input_device):
+    def __init__(self, input_device, outputSampleRate):
         self._audio_interface = pyaudio.PyAudio()
         self._inputDevice = input_device
         self._num_channels = 1
         self._format = pyaudio.paInt16
+        self._outputSampleRate = outputSampleRate
 
         defaultHostAPIindex = self._audio_interface.get_default_host_api_info().get('index')
         numdevices = self._audio_interface.get_default_host_api_info().get('deviceCount')
@@ -126,7 +129,7 @@ class MicrophoneStream:
                 self._wavfile = wave.open(wavfile, 'wb')
                 self._wavfile.setnchannels(self._num_channels)
                 self._wavfile.setsampwidth(2)
-                self._wavfile.setframerate(self._rate)
+                self._wavfile.setframerate(self._outputSampleRate)
 
     def stop(self):
         self.__exit__(None, None, None)
@@ -137,6 +140,9 @@ class MicrophoneStream:
         return None, pyaudio.paContinue
 
     def generator(self):
+        resampler = sr.Resampler()
+        ratio = self._outputSampleRate / self._rate
+
         while not self.closed:
             if get_current_time() - self.start_time > self._streaming_limit:
                 self.start_time = get_current_time()
@@ -147,7 +153,7 @@ class MicrophoneStream:
             chunk = self._buff.get()
             if chunk is None:
                 return
-            data = [chunk]
+            audioData = [chunk]
 
             # Now consume whatever other data's still buffered.
             while True:
@@ -155,15 +161,19 @@ class MicrophoneStream:
                     chunk = self._buff.get(block=False)
                     if chunk is None:
                         return
-                    data.append(chunk)
+                    audioData.append(chunk)
                 except queue.Empty:
                     break
                 except:
                     break
 
-            data = b''.join(data)
+            audioData = b''.join(audioData)
+            audioData = np.frombuffer(audioData, dtype=np.int16)
+            audioData = resampler.process(audioData, ratio)
+            audioData = audioData.astype(np.int16)
+            audioData = audioData.tobytes()
 
             if self._wavfile is not None:
-                self._wavfile.writeframes(data)
+                self._wavfile.writeframes(audioData)
 
-            yield data
+            yield audioData
