@@ -100,7 +100,8 @@ class TranscribeEngine:
         try:
             self.microphoneStream = MicrophoneStream(speakreader.CONFIG.INPUT_DEVICE, SAMPLERATE)
             rf = os.path.join(speakreader.CONFIG.RECORDINGS_FOLDER, RECORDING_FILENAME)
-            self.microphoneStream.initRecording(rf)
+            self.microphoneStream.initRecording(RECORDING_FILENAME)
+            self.microphoneStream.receiverQueue = self.queueManager.meterHandler.getReceiverQueue()
 
         except Exception as e:
             logger.debug("MicrophoneStream Exception: %s" % e)

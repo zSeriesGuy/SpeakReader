@@ -33,6 +33,11 @@
 
                 <a id="signout-button" class="signout-button" style="display: ${'none' if config['http_username'] == '' else 'inline'}" href="/auth/logout">Sign Out</a>
 
+                <div class="col-md-3 col-sm-3 btn-group order-2 pl-2 pr-2" role="group" aria-label="btn2">
+                    <button type="button" id="restart-button" class="btn btn-primary" value="restart" >Restart</button>
+                    <button type="button" id="shutdown-button" class="btn btn-primary" value="shutdown">Shutdown</button>
+                </div>
+
             </nav>
         </div>
 
@@ -47,12 +52,7 @@
                                     <button type="button" id="tes-button" class="btn btn-primary" value="start">Start</button>
                                 </div>
 
-                                <div class="col-md-3 col-sm-3 btn-group order-2 pl-2 pr-2" role="group" aria-label="btn2">
-                                    <button type="button" id="restart-button" class="btn btn-primary" value="restart" >Restart</button>
-                                    <button type="button" id="shutdown-button" class="btn btn-primary" value="shutdown">Shutdown</button>
-                                </div>
-
-                                <div class="col-md-6 col-sm-7 text-center align-middle order-1 pl-2 pr-2">
+                                <div class="col-md-5 col-sm-7 text-center align-middle order-1 pl-2 pr-2">
                                     <div class="status-view-container">
                                         <p class="status-view-title font-weight-bold">Monitor</p>
                                         <div class="d-flex justify-content-around align-items-center mb-1" role="radiogroup">
@@ -60,6 +60,11 @@
                                             <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="transcript" checked>Transcript</label>
                                             <label class="radio-inline d-flex align-items-center mb-0 ml-2 mr-2"><input type="radio" class="mr-1" name="status_view" value="console">Console</label>
                                         </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 col-sm-5 text-center align-middle order-2 pl-2 pr-2">
+                                    <div id="dbMeter" style="height: 52px;">
                                     </div>
                                 </div>
 
@@ -514,6 +519,7 @@
 </%def>
 
 <%def name="javascriptIncludes()">
+<script src="${http_root}js/dbmeter.js${cache_param}"></script>
 <script>
 // Global Variables
 var logStream = "";
@@ -522,7 +528,6 @@ var prev_hashed_password = "";
 var update_available = ${productInfo['update_available']};
 var transcripts_table = false;
 var logs_table = false;
-
 
 function startLogStream() {
     // Create Log Stream.
@@ -600,7 +605,6 @@ function setStatusView() {
 };
 
 function resizeContainers() {
-
     // Set the size of the stretched containers
     $('.stretch:visible').each( function() {
         var e = $(this)[0];
@@ -612,7 +616,6 @@ function resizeContainers() {
         while ( e !== null );
         $(this).height(height);
     });
-
 };
 
 function setLatestRelease(data) {
@@ -627,7 +630,7 @@ function setLatestRelease(data) {
         $('#check-for-update').show();
         $('#update-available').hide();
     }
-}
+};
 
 function checkForUpdate() {
     $('#check-for-update-button').html('<span><i class="fas fa-sync fa-spin"/> Checking</span>');
@@ -766,7 +769,6 @@ function verifyAuthentication() {
 
 
 $(document).ready(function() {
-
     var statusView = getCookie("statusView");
     if ( statusView !== "" ) {
         $('input[type=radio][name=status_view][value="' +statusView+ '"]').prop('checked', true);
@@ -843,8 +845,10 @@ $(document).ready(function() {
     $('#tes-button').click(function() {
         if ( $(this).val() === "start") {
             $.ajax({url: "startTranscribe"});
+            audioPeakMeter.startMeterStream();
         } else {
             $.ajax({url: "stopTranscribe"});
+            audioPeakMeter.stopMeterStream();
         }
     });
 
@@ -1195,6 +1199,8 @@ $(document).ready(function() {
         }
     });
 
+    audioPeakMeter.createMeter('dbMeter', {});
+    audioPeakMeter.startMeterStream();
 
 });
 
