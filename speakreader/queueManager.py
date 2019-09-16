@@ -36,6 +36,7 @@ class QueueManager(object):
         logger.info('Queue Manager Initializing')
         self.transcriptHandler = TranscriptHandler("TranscriptQueueHandler")
         self.logHandler = LogHandler("LogQueueHandler")
+        self.meterHandler = MeterHandler("SoundMeterQueueHandler")
         self._INITIALIZED = True
 
     @property
@@ -46,6 +47,7 @@ class QueueManager(object):
         self._INITIALIZED = False
         self.transcriptHandler.shutdown()
         self.logHandler.shutdown()
+        self.meterHandler.shutdown()
         logger.info("Queue Manager terminated")
 
     def closeAllListeners(self):
@@ -57,6 +59,8 @@ class QueueManager(object):
             return self.logHandler.addListener(type=type, sessionID=sessionID, remoteIP=remoteIP)
         elif type == "transcript":
             return self.transcriptHandler.addListener(type=type, sessionID=sessionID, remoteIP=remoteIP)
+        elif type == "meter":
+            return self.meterHandler.addListener(type=type, sessionID=sessionID, remoteIP=remoteIP)
         return None
 
     def removeListener(self, type=None, sessionID=None, remoteIP=None):
@@ -64,6 +68,8 @@ class QueueManager(object):
             self.logHandler.removeListener(sessionID=sessionID)
         elif type == "transcript":
             self.transcriptHandler.removeListener(sessionID=sessionID)
+        elif type == "meter":
+            self.meterHandler.removeListener(sessionID=sessionID)
 
     def getUsage(self):
         usage = {}
@@ -92,6 +98,9 @@ class QueueHandler(object):
     def getReceiverQueue(self):
         return self._receiverQueue
 
+    def setReceiverQueue(self, queue):
+        self._receiverQueue = queue
+
     @property
     def is_started(self):
         if self._queueHandlerThread is None or not self._queueHandlerThread.is_alive():
@@ -108,7 +117,12 @@ class QueueHandler(object):
 
         logger.info("Adding " + type.capitalize() + " Listener Queue for IP: " + remoteIP + " with SessionID: " + sessionID)
 
-        queueElement = QueueElement(type=type, remoteIP=remoteIP, sessionID=sessionID)
+        if type == 'meter':
+            maxsize = 100
+        else:
+            maxsize = 10
+
+        queueElement = QueueElement(type=type, remoteIP=remoteIP, sessionID=sessionID, maxsize=maxsize)
         self._listenerQueues[sessionID] = queueElement
 
         data = {"event": "open",
@@ -264,14 +278,52 @@ class LogHandler(QueueHandler):
         logger.info('Log Queue Handler terminated')
 
 
+class MeterHandler(QueueHandler):
+
+    def runHandler(self):
+        if self._STARTED:
+            logger.warn('Sound Meter Queue Handler already started')
+            return
+
+        logger.info('Sound Meter Queue Handler starting')
+        self._STARTED = True
+
+        while self._STARTED:
+            try:
+                meterRecord = self._receiverQueue.get(timeout=2)
+                if meterRecord is None:
+                    break
+
+                data = {"event": "meterrecord",
+                        "final": True,
+                        "record": meterRecord,
+                        }
+
+            except queue.Empty:
+                if self._STARTED:
+                    data = {"event": "ping"}
+                else:
+                    break
+
+            for queueElement in list(self._listenerQueues.values()):
+                try:
+                    queueElement.put_nowait(data)
+                except queue.Full:
+                    self.removeListener(sessionID=queueElement.sessionID)
+
+        self._STARTED = False
+        self.closeAllListeners()
+        logger.info('Sound Meter Queue Handler terminated')
+
+
 class QueueElement(object):
     type = None
     sessionID = None
     remoteIP = None
     listenerQueue = None
 
-    def __init__(self, type, remoteIP, sessionID):
-        self.listenerQueue = Queue(maxsize=10)
+    def __init__(self, type, remoteIP, sessionID, maxsize=10):
+        self.listenerQueue = Queue(maxsize=maxsize)
         self.type = type.lower()
         self.remoteIP = remoteIP
         self.sessionID = sessionID

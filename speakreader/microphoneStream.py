@@ -52,6 +52,7 @@ class MicrophoneStream:
         self._num_channels = 1
         self._format = pyaudio.paInt16
         self._outputSampleRate = outputSampleRate
+        self.receiverQueue = None
 
         defaultHostAPIindex = self._audio_interface.get_default_host_api_info().get('index')
         numdevices = self._audio_interface.get_default_host_api_info().get('deviceCount')
@@ -114,6 +115,7 @@ class MicrophoneStream:
 
         if self._wavfile is not None:
             self._wavfile.close()
+            self._wavfile = None
 
     def initRecording(self, filename):
         if speakreader.CONFIG.SAVE_RECORDINGS:
@@ -143,6 +145,11 @@ class MicrophoneStream:
         resampler = sr.Resampler()
         ratio = self._outputSampleRate / self._rate
 
+        tps = 25        # times per second to compute RMS.
+        peak_secs = 5   # seconds to accumulate for peak computation
+        peak_np = np.empty(0, dtype=np.int16)
+        time = float(0)
+
         while not self.closed:
             if get_current_time() - self.start_time > self._streaming_limit:
                 self.start_time = get_current_time()
@@ -168,12 +175,28 @@ class MicrophoneStream:
                     break
 
             audioData = b''.join(audioData)
-            audioData = np.frombuffer(audioData, dtype=np.int16)
-            audioData = resampler.process(audioData, ratio)
-            audioData = audioData.astype(np.int16)
-            audioData = audioData.tobytes()
+
+            audioData_np = np.frombuffer(audioData, dtype=np.int16)
+            audioData_np = resampler.process(audioData_np, ratio)
+            audioData_np = audioData_np.astype(np.int16)
+            audioData_resampled = audioData_np.tobytes()
+
+            yield audioData_resampled
 
             if self._wavfile is not None:
-                self._wavfile.writeframes(audioData)
+                self._wavfile.writeframes(audioData_resampled)
 
-            yield audioData
+            peak_np = np.concatenate((peak_np, audioData_np), axis=0)
+            stop = peak_np.size - (peak_secs * self._outputSampleRate)
+            if stop > 0:
+                peak_np = np.delete(peak_np, np.s_[0:stop], axis=0)
+            peak_rms = np.max(np.absolute(audioData_np / 32768))
+            db_peak = int(round(20 * np.log10(peak_rms)))
+
+            chunk_size = int(self._outputSampleRate / tps)
+            for i in range(0, audioData_np.size, chunk_size):
+                rms = np.sqrt(np.mean(np.absolute(audioData_np[i:i+chunk_size] / 32768) ** 2))
+                db_rms = int(round(20 * np.log10(rms)))
+                t = "{0:.2f}".format(time)
+                self.receiverQueue.put({'time': t, 'db_rms': db_rms, 'db_peak': db_peak})
+                time += 1 / tps
