@@ -129,9 +129,12 @@ scrollTarget.click(function() {
     }
 });
 
+var minFontsize = 10;
+var maxFontsize = 64;
+
 $('#fontsize-button-down').click(function() {
     var fontsize = parseInt($("#transcript").css('font-size')) - 1;
-    if (fontsize < 10) { fontsize = 10; }
+    if (fontsize < minFontsize) { fontsize = minFontsize; }
     setCookie("fontsize", fontsize, 365);
     setFont();
     return false;
@@ -139,7 +142,7 @@ $('#fontsize-button-down').click(function() {
 
 $('#fontsize-button-up').click(function() {
     var fontsize = parseInt($("#transcript").css('font-size')) + 1;
-    if (fontsize > 32) { fontsize = 32; }
+    if (fontsize > maxFontsize) { fontsize = maxFontsize; }
     setCookie("fontsize", fontsize, 365);
     setFont();
     return false;
