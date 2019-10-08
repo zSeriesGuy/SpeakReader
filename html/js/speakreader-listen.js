@@ -21,14 +21,30 @@ var noSleep = new NoSleep();
 var sessionID = "";
 var transcriptStream = "";
 
+
 // Determine where the scroll target is.
 if ( $('#transcript-container').parent().prop('tagName') === 'BODY' ) {
     var scrollDoc = true;
     var scrollTarget = $('html');
+    $(document).click(showFontSettings);
+    if ( /iPhone|iPad|iPod/i.test(navigator.userAgent) ) {
+        scrollTarget = $('body');
+        document.querySelector('html').classList.add('is-ios');
+    }
 } else {
     var scrollDoc = false;
     var scrollTarget = $("#transcript").parent();
+    scrollTarget.click(showFontSettings);
 }
+
+function showFontSettings() {
+    var container = $("#transcript-settings");
+    if (container.is(":visible")) {
+        container.slideUp(1000);
+    } else {
+        container.slideDown(1000);
+    }
+};
 
 function setFont() {
     var fontsize = getCookie("fontsize");
@@ -52,7 +68,7 @@ function startTranscriptStream() {
 
         switch (data.event) {
             case 'ping':
-                return;
+                break;
 
             case 'open':
                 sessionID = data.sessionID;
@@ -119,15 +135,6 @@ function showButton() {
     }
 };
 window.addEventListener('scroll', showButton, true);
-
-scrollTarget.click(function() {
-    var container = $("#transcript-settings");
-    if (container.is(":visible")) {
-        container.slideUp(1000);
-    } else {
-        container.slideDown(1000);
-    }
-});
 
 var minFontsize = 10;
 var maxFontsize = 64;

@@ -240,7 +240,7 @@ var audioPeakMeter = (function() {
 
             switch (data.event) {
                 case 'ping':
-                    return;
+                    break;
 
                 case 'open':
                     meterSessionID = data.sessionID;

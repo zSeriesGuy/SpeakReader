@@ -1,4 +1,3 @@
-
 body {
     font-family: 'Open Sans', Arial, sans-serif;
     margin-left: auto;
@@ -117,7 +116,7 @@ body {
 }
 
 .transcript {
-    line-height: 1.4;
+    line-height: 1.2;
     margin: 5px 0px 10px 0px;
     padding: 0px 10px 0px 10px;
 }
@@ -380,6 +379,10 @@ body {
 .view-log {
     background-color: #f2f2f2;
     color: #0d0d0d;
+}
+
+.is-ios * {
+    cursor: pointer;
 }
 
 @media screen and (min-width: 980px) /* Desktop */ {

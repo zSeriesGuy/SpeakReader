@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.4 (2019-10-08)
+* Increase max size of transcript font setting.
+* Correct issues using IOS Safari browser.
+
 ## v1.0.3 (2019-09-15)
 * Added db sound meter.
 

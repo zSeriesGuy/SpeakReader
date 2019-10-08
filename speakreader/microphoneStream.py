@@ -198,5 +198,8 @@ class MicrophoneStream:
                 rms = np.sqrt(np.mean(np.absolute(audioData_np[i:i+chunk_size] / 32768) ** 2))
                 db_rms = int(round(20 * np.log10(rms)))
                 t = "{0:.2f}".format(time)
-                self.receiverQueue.put({'time': t, 'db_rms': db_rms, 'db_peak': db_peak})
+                try:
+                    self.receiverQueue.put_nowait({'time': t, 'db_rms': db_rms, 'db_peak': db_peak})
+                except:
+                    pass
                 time += 1 / tps
