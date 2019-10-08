@@ -118,9 +118,9 @@ class QueueHandler(object):
         logger.info("Adding " + type.capitalize() + " Listener Queue for IP: " + remoteIP + " with SessionID: " + sessionID)
 
         if type == 'meter':
-            maxsize = 100
+            maxsize = 200
         else:
-            maxsize = 10
+            maxsize = 20
 
         queueElement = QueueElement(type=type, remoteIP=remoteIP, sessionID=sessionID, maxsize=maxsize)
         self._listenerQueues[sessionID] = queueElement
