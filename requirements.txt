@@ -12,7 +12,7 @@ cheroot==7.0.0            # via cherrypy
 cherrypy==18.3.0
 click==7.0                # via pip-tools
 configobj==5.0.6
-google-api-core[grpc]==1.14.2  # via google-cloud-speech
+google-api-core[grpc]==1.14.3  # via google-cloud-speech
 google-api-python-client==1.7.11
 google-auth-httplib2==0.0.3  # via google-api-python-client
 google-auth==1.6.3        # via google-api-core, google-api-python-client, google-auth-httplib2
