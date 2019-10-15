@@ -383,6 +383,7 @@ class Version(object):
                     logger.info('Output: ' + str(output))
 
             output, err = runGit('pull %s %s' % (speakreader.CONFIG.GIT_REMOTE, speakreader.CONFIG.GIT_BRANCH))
+            output, err = pip_sync()
 
 
     def read_changelog(self, latest_only=False, since_prev_release=False):
