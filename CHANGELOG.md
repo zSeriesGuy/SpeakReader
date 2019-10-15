@@ -10,6 +10,9 @@
 
 > **NOTE:** Due to the modifications to support multiple transcription services, if you are upgrading from a previous release, you will need to re-upload your Google API JSON file or edit the config.ini file and change credentials_file to google_credentials_file.
 
+## v1.0.5 (2019-10-15)
+* Run pip-sync on git branch change.
+
 ## v1.0.4 (2019-10-08)
 * Increase max size of transcript font setting.
 * Correct issues using IOS Safari browser.
