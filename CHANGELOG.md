@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.5 (2019-10-15)
+* Run pip-sync on git branch change.
+
 ## v1.0.4 (2019-10-08)
 * Increase max size of transcript font setting.
 * Correct issues using IOS Safari browser.
