@@ -38,6 +38,10 @@ FILENAME = FILENAME_PREFIX + FILENAME_DATESTRING + "." + FILENAME_SUFFIX
 # Audio recording parameters
 SAMPLERATE = 16000
 
+# Sound Meter Parameters
+METER_TPS = 25  # times per second to compute RMS.
+METER_PEAK_SECS = 3  # seconds to accumulate for peak computation
+
 
 class MicrophoneStream:
     """Opens a recording stream as a generator yielding the audio chunks."""
@@ -51,8 +55,6 @@ class MicrophoneStream:
         self._outputSampleRate = SAMPLERATE
 
         self.meterQueue = None
-        self.meter_tps = 25        # times per second to compute RMS.
-        self.meter_peak_secs = 3   # seconds to accumulate for peak computation
         self.meter_peak_np = np.empty(0, dtype=np.int16)
         self.meter_time = float(0)
 
@@ -163,13 +165,13 @@ class MicrophoneStream:
 
         # Compute db and put to meter queue
         self.meter_peak_np = np.concatenate((self.meter_peak_np, audioData_np), axis=0)
-        stop = self.meter_peak_np.size - (self.meter_peak_secs * self._outputSampleRate)
+        stop = self.meter_peak_np.size - (METER_PEAK_SECS * self._outputSampleRate)
         if stop > 0:
             self.meter_peak_np = np.delete(self.meter_peak_np, np.s_[0:stop], axis=0)
         peak_rms = np.max(np.absolute(audioData_np / 32768))
         db_peak = int(round(20 * np.log10(peak_rms)))
 
-        chunk_size = int(round(self._outputSampleRate / self.meter_tps))
+        chunk_size = int(round(self._outputSampleRate / METER_TPS))
         for i in range(0, audioData_np.size, chunk_size):
             rms = np.sqrt(np.mean(np.absolute(audioData_np[i:i + chunk_size] / 32768) ** 2))
             db_rms = int(round(20 * np.log10(rms)))
@@ -178,7 +180,7 @@ class MicrophoneStream:
                 self.meterQueue.put_nowait({'time': t, 'db_rms': db_rms, 'db_peak': db_peak})
             except:
                 pass
-            self.meter_time += 1 / self.meter_tps
+            self.meter_time += 1 / METER_TPS
 
         return None, pyaudio.paContinue
 
