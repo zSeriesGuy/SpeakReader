@@ -6,9 +6,9 @@
 #
 cachetools==3.1.1         # via google-auth
 certifi==2019.9.11        # via requests
-cffi==1.12.3              # via samplerate
+cffi==1.13.0              # via samplerate
 chardet==3.0.4            # via requests
-cheroot==7.0.0            # via cherrypy
+cheroot==8.2.0            # via cherrypy
 cherrypy==18.3.0
 click==7.0                # via pip-tools
 configobj==5.0.6
@@ -20,6 +20,8 @@ google-cloud-speech==1.2.0
 googleapis-common-protos==1.6.0  # via google-api-core
 grpcio==1.24.1            # via google-api-core
 httplib2==0.14.0
+ibm-watson==4.0.1
+ibm_cloud_sdk_core==1.0.0  # via ibm-watson
 idna==2.8                 # via requests
 jaraco.functools==2.0     # via cheroot, tempora
 mako==1.1.0
@@ -27,10 +29,10 @@ markupsafe==1.1.1         # via mako
 more-itertools==7.2.0     # via cheroot, cherrypy, jaraco.functools
 numpy==1.17.2             # via samplerate
 passlib==1.7.1
-pip-tools==4.1.0
+pip-tools==4.2.0
 portend==2.5
 protobuf==3.10.0          # via google-api-core, googleapis-common-protos
-pyasn1-modules==0.2.6     # via google-auth
+pyasn1-modules==0.2.7     # via google-auth
 pyasn1==0.4.7             # via pyasn1-modules, rsa
 pyaudio==0.2.11
 pycparser==2.19           # via cffi
@@ -38,14 +40,15 @@ pyjwt==1.7.1
 python-dateutil==2.8.0
 pytz==2019.3              # via google-api-core, tempora, tzlocal
 pywin32==225 ; sys_platform == "win32"
-requests==2.22.0          # via google-api-core
+requests==2.22.0          # via google-api-core, ibm-cloud-sdk-core, ibm-watson
 rsa==4.0                  # via google-auth
 samplerate==0.1.0
-six==1.12.0               # via cheroot, configobj, google-api-core, google-api-python-client, google-auth, grpcio, pip-tools, protobuf, python-dateutil, tempora
+six==1.12.0               # via cheroot, configobj, google-api-core, google-api-python-client, google-auth, grpcio, pip-tools, protobuf, python-dateutil, tempora, websocket-client
 tempora==1.14.1           # via portend
 tzlocal==2.0.0
 uritemplate==3.0.0        # via google-api-python-client
 urllib3==1.25.6           # via requests
+websocket-client==0.48.0  # via ibm-watson
 wheel==0.33.6
 zc.lockfile==2.0          # via cherrypy
 

@@ -6,6 +6,7 @@ portend
 Mako
 google-cloud-speech
 google-api-python-client
+ibm-watson
 configobj
 pip-tools
 PyAudio

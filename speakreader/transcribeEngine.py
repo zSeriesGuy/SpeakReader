@@ -22,19 +22,18 @@ import threading
 import re
 import os
 import datetime
-from google.cloud import speech
 
 import speakreader
 from speakreader import logger
 from speakreader.microphoneStream import MicrophoneStream
 from speakreader.queueManager import QueueManager
+from speakreader.googleTranscribe import googleTranscribe
+from speakreader.ibmTranscribe import ibmTranscribe
 
 FILENAME_PREFIX = "Transcript-"
 FILENAME_DATE_FORMAT = "%Y-%m-%d-%H%M"
 TRANSCRIPT_FILENAME_SUFFIX = "txt"
 RECORDING_FILENAME_SUFFIX = "wav"
-
-SAMPLERATE = 16000
 
 
 class TranscribeEngine:
@@ -56,7 +55,7 @@ class TranscribeEngine:
         #  Initialize the Queue Manager
         ###################################################################################################
         self.queueManager = QueueManager()
-        self.receiverQueue = self.queueManager.transcriptHandler.getReceiverQueue()
+        self.transcriptQueue = self.queueManager.transcriptHandler.getReceiverQueue()
 
         TranscribeEngine._INITIALIZED = True
 
@@ -73,7 +72,7 @@ class TranscribeEngine:
     def stop(self):
         if self._ONLINE:
             self.microphoneStream.stop()
-            self.receiverQueue.put_nowait(self.OFFLINE_MESSAGE)
+            self.transcriptQueue.put_nowait(self.OFFLINE_MESSAGE)
             self._transcribeThread.join()
             self.queueManager.transcriptHandler.setFileName(None)
             self._ONLINE = False
@@ -92,69 +91,44 @@ class TranscribeEngine:
         FILENAME_DATESTRING = datetime.datetime.now().strftime(FILENAME_DATE_FORMAT)
         TRANSCRIPT_FILENAME = FILENAME_PREFIX + FILENAME_DATESTRING + "." + TRANSCRIPT_FILENAME_SUFFIX
         RECORDING_FILENAME = FILENAME_PREFIX + FILENAME_DATESTRING + "." + RECORDING_FILENAME_SUFFIX
-
         tf = os.path.join(speakreader.CONFIG.TRANSCRIPTS_FOLDER, TRANSCRIPT_FILENAME)
         self.queueManager.transcriptHandler.setFileName(tf)
-        self.transcriptFile = open(tf, "a+")
 
         try:
-            self.microphoneStream = MicrophoneStream(speakreader.CONFIG.INPUT_DEVICE, SAMPLERATE)
-            rf = os.path.join(speakreader.CONFIG.RECORDINGS_FOLDER, RECORDING_FILENAME)
-            self.microphoneStream.initRecording(RECORDING_FILENAME)
-            self.microphoneStream.receiverQueue = self.queueManager.meterHandler.getReceiverQueue()
-
+            self.microphoneStream = MicrophoneStream(speakreader.CONFIG.INPUT_DEVICE)
+            self.microphoneStream.recordingFilename = RECORDING_FILENAME
+            self.microphoneStream.meterQueue = self.queueManager.meterHandler.getReceiverQueue()
         except Exception as e:
             logger.debug("MicrophoneStream Exception: %s" % e)
-            self.receiverQueue.put_nowait(self.OFFLINE_MESSAGE)
+            self.transcriptQueue.put_nowait(self.OFFLINE_MESSAGE)
             return
 
-        credentials_json = speakreader.CONFIG.CREDENTIALS_FILE
+        if speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE == 'google':
+            transcribeService = googleTranscribe(self.microphoneStream)
+        elif speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE == 'IBM':
+            transcribeService = ibmTranscribe(self.microphoneStream)
+        # elif speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE == 'microsoft':
+        #    transcribeService = microsoftTranscribe(self.microphoneStream)
+        else:
+            logger.warn("No Transcribe Service Selected. Can't start Transcribe Engine.")
+            return
 
-        client = speech.SpeechClient.from_service_account_json(credentials_json)
-
-        config = speech.types.RecognitionConfig(
-            encoding=speech.enums.RecognitionConfig.AudioEncoding.LINEAR16,
-            sample_rate_hertz=SAMPLERATE,
-            language_code='en-US',
-            max_alternatives=1,
-            enable_word_time_offsets=True,
-            enable_automatic_punctuation=True,
-            profanity_filter=speakreader.CONFIG.ENABLE_CENSORSHIP)
-
-        streaming_config = speech.types.StreamingRecognitionConfig(
-            config=config,
-            interim_results=True)
-
+        self.transcriptFile = open(tf, "a+")
+        self.transcriptQueue.put_nowait(self.ONLINE_MESSAGE)
         self._ONLINE = True
-        self.receiverQueue.put_nowait(self.ONLINE_MESSAGE)
 
-        try:
-            with self.microphoneStream as stream:
+        with self.microphoneStream as stream:
+            while not stream.closed:
+                responses = transcribeService.transcribe()
+                self.process_responses(responses)
 
-                while not stream.closed:
-                    audio_generator = stream.generator()
-
-                    requests = (speech.types.StreamingRecognizeRequest(
-                        audio_content=content)
-                        for content in audio_generator)
-
-                    responses = client.streaming_recognize(streaming_config, requests)
-
-                    # Now, put the transcription responses to use.
-                    try:
-                        self.process_responses(responses)
-                    except Exception as e:
-                        logger.debug("a: %s" % e)
-
-                logger.debug("Microphone Stream Closed")
-
-        except Exception as e:
-            logger.error("b: %s" % e)
+            logger.info("Transcription Engine Stream Closed")
 
         self.transcriptFile.close()
-        self.receiverQueue.put_nowait(self.OFFLINE_MESSAGE)
+        self.transcriptQueue.put_nowait(self.OFFLINE_MESSAGE)
         self._ONLINE = False
         logger.info("Transcribe Engine Terminated")
+
 
     def process_responses(self, responses):
 
@@ -170,26 +144,12 @@ class TranscribeEngine:
         final one, print a newline to preserve the finalized transcription.
         """
 
-        responses = (r for r in responses if (
-                r.results and r.results[0].alternatives))
-
         for response in responses:
 
-            if not response.results:
+            if not response['is_final'] and not speakreader.CONFIG.SHOW_INTERIM_RESULTS:
                 continue
 
-            result = response.results[0]
-
-            if not result.is_final and not speakreader.CONFIG.SHOW_INTERIM_RESULTS:
-                continue
-
-            if not result.alternatives:
-                continue
-
-            if not result.is_final and result.stability < 0.80:
-                continue
-
-            transcript = result.alternatives[0].transcript
+            transcript = response['transcript']
 
             """ If there are any additionally defined censor words, censor the transcript """
             if speakreader.CONFIG.ENABLE_CENSORSHIP and speakreader.CONFIG.CENSORED_WORDS:
@@ -197,15 +157,16 @@ class TranscribeEngine:
 
             transcription = {
                 'event': 'transcript',
-                'final': result.is_final,
+                'final': response['is_final'],
                 'record': transcript,
             }
 
-            self.receiverQueue.put(transcription)
+            self.transcriptQueue.put(transcription)
 
-            if result.is_final:
+            if response['is_final']:
                 self.transcriptFile.write(transcript.strip() + "\n\n")
                 self.transcriptFile.flush()
+
 
     def censor(self, input_text):
         """Returns input_text with any defined words censored."""

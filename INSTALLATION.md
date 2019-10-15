@@ -73,6 +73,11 @@ To run SpeakReader in the background as a Daemon on startup:
     * `sudo systemctl daemon-reload`
     * `sudo systemctl restart speakreader`
 
+
+## Choose a Transcription Service
+Google API and IBM Watson are supported.
+
+
 # Google API Services
 
 You won't be able to start the transcribe engine until you have provided a valid Google API credentials JSON file.
@@ -99,3 +104,21 @@ You won't be able to start the transcribe engine until you have provided a valid
 * Go to the SpeakReader management console Settings page and upload this json file.
 * You should now be able to start the transcribe engine.
 > HINT: When you go to the Google API Console, there may be at the very top of the screen something about Free Trial. You can activate that to get $300 credit good for one year. This will allow you to test and use SpeakReader at no cost for one year or $300 worth, whichever comes first.
+
+
+# IBM Cloud API Services
+
+You won't be able to start the transcribe engine until you have provided a valid IBM Cloud API credentials ENV file.
+
+> NOTE: The [IBM Cloud Speech-To-Text](https://www.ibm.com/watson/services/speech-to-text/) API service is not free. But it is not very expensive, less than $1 US per hour. See the [pricing](hhttps://www.ibm.com/cloud/watson-speech-to-text/pricing). There is a Lite level that includes 500 minutes per month FREE.
+
+#### Setting Up API Access
+
+* Go to the [IBM Cloud API Dashboard](https://cloud.ibm.com/login). Sign in with your IBM Cloud Account if you have one or create one.
+* Set up your billing method by clicking on Manage->Billing and Usage. Then click on Payments.
+* Next, set up your resource by clicking on Resource List. Then click Create Resource (upper right).
+* Search for speech to text. It should find AI Speech to Text. Click on it. The free Lite plan is a good start.
+* Once you have completed creating the resource, click Resource List at the top. Then choose Manage on the menu at the left.
+* It should be showing you a screen with the API Key. Click Download to save the credentials ENV file to your computer.
+* Go to the SpeakReader management console Settings page and upload this ENV file.
+* You should now be able to start the transcribe engine.

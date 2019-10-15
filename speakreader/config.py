@@ -39,7 +39,6 @@ _CONFIG_DEFINITIONS = {
     'START_TRANSCRIBE_ON_STARTUP': (int, 'General', 1),
     'SHOW_INTERIM_RESULTS': (int, 'General', 1),
     'TRANSCRIPTS_FOLDER': (str, 'General', ''),
-    'CREDENTIALS_FILE': (str, 'General', ''),
     'ENABLE_CENSORSHIP': (int, 'General', 1),
     'CENSORED_WORDS': (list, 'General', ''),
     'LOG_DIR': (str, 'General', ''),
@@ -47,6 +46,9 @@ _CONFIG_DEFINITIONS = {
     'SERVER_ENVIRONMENT': (str, 'Advanced', 'production'),
     'SAVE_RECORDINGS': (int, 'General', 1),
     'RECORDINGS_FOLDER': (str, 'General', ''),
+    'SPEECH_TO_TEXT_SERVICE': (str, 'General', 'google'),
+    'GOOGLE_CREDENTIALS_FILE': (str, 'General', ''),
+    'IBM_CREDENTIALS_FILE': (str, 'General', ''),
 
     'HTTP_PORT': (int, 'HTTP', 8880),
     'ENABLE_HTTPS': (int, 'HTTP', 0),

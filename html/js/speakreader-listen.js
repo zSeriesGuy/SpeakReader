@@ -104,6 +104,10 @@ function startTranscriptStream() {
                 break;
         };
     };
+    transcriptStream.onerror = function (e) {
+        //console.log('onerror called');
+        //$('#transcript').append('<p>!!onError!!</p>');
+    };
     scrollTarget.scrollTop(scrollTarget.prop("scrollHeight"));
 };
 

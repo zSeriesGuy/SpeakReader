@@ -212,17 +212,41 @@
                                                 </div>
                                             </div>
 
+
                                             <div class="form-group">
-                                                <label for="credentials_file" class="font-weight-bold">GoogleAPI Credentials JSON File</label>
-                                                <div class="input-group">
-                                                    <input id="credentials_file" class="form-control col-md-11" type="text" name="credentials_file" value="${config['credentials_file']}">
-                                                    <div class="input-group-append">
-                                                        <button id="upload_credentials_button" class="btn btn-secondary">Upload</button>
-                                                    </div>
+                                                <label class="font-weight-bold">Speech to Text Service</label>
+
+                                                <div class="ml-3" role="radiogroup">
+                                                    <label class="radio-inline ml-1 mr-3"><input type="radio" class="mr-1" name="speech_to_text_service" value="google" data-target="#google_service">Google</label>
+                                                    <label class="radio-inline ml-1 mr-3"><input type="radio" class="mr-1" name="speech_to_text_service" value="IBM" data-target="#IBM_service">IBM</label>
                                                 </div>
-                                                <div id="credentials_file_error" class="alert alert-danger" role="alert"></div>
-                                                <small class="form-text">Required: Select and Upload your GoogleAPI JSON credentials file.</small>
-                                                <input id="upload_credentials_file" type="file" name="upload_credentials_file" style="display: none;" />
+                                                <small class="form-text">Choose which speech-to-text service you want to use.</small>
+
+                                                <div id="google_service" class="form-sub-group">
+                                                    <label for="google_credentials_file" class="font-weight-bold">Google Cloud API Credentials JSON File</label>
+                                                    <div class="input-group">
+                                                        <input id="google_credentials_file" class="form-control col-md-11" type="text" name="google_credentials_file" value="${config['google_credentials_file']}">
+                                                        <div class="input-group-append">
+                                                            <button id="upload_google_credentials_button" class="btn btn-secondary">Upload</button>
+                                                        </div>
+                                                    </div>
+                                                    <div id="google_credentials_file_error" class="alert alert-danger" role="alert"></div>
+                                                    <small class="form-text">Required: Select and Upload your Google Cloud API JSON credentials file.</small>
+                                                    <input id="upload_google_credentials_file" type="file" name="upload_google_credentials_file" style="display: none;" />
+                                                </div>
+
+                                                <div id="IBM_service" class="form-sub-group">
+                                                    <label for="ibm_credentials_file" class="font-weight-bold">IBM Cloud API Credentials ENV File</label>
+                                                    <div class="input-group">
+                                                        <input id="ibm_credentials_file" class="form-control col-md-11" type="text" name="ibm_credentials_file" value="${config['ibm_credentials_file']}">
+                                                        <div class="input-group-append">
+                                                            <button id="upload_ibm_credentials_button" class="btn btn-secondary">Upload</button>
+                                                        </div>
+                                                    </div>
+                                                    <div id="ibm_credentials_file_error" class="alert alert-danger" role="alert"></div>
+                                                    <small class="form-text">Required: Select and Upload your IBM Cloud API credentials ENV file.</small>
+                                                    <input id="upload_ibm_credentials_file" type="file" name="upload_ibm_credentials_file" style="display: none;" />
+                                                </div>
                                             </div>
 
                                             <div class="form-group">
@@ -649,10 +673,12 @@ function postSaveChecks(jqXHR) {
         });
     }
     $('#listeningOn').text($('#inputDeviceSelection').val());
-    $('#upload_credentials_file').val("");
+    $('#upload_google_credentials_file').val("");
+    $('#upload_ibm_credentials_file').val("");
     $('#http_password').val("");
     $('#set_http_password').val(0);
-    $('#credentials_file').val(response.credentials_file);
+    $('#google_credentials_file').val(response.google_credentials_file);
+    $('#ibm_credentials_file').val(response.ibm_credentials_file);
     if ( response.logout ) {
         window.location.href = "auth/logout";
     }
@@ -687,7 +713,8 @@ function getSettings() {
         $('#save_recordings').prop('checked', config.save_recordings);
 
         // Text Values
-        $('#credentials_file').val(config.credentials_file);
+        $('#google_credentials_file').val(config.google_credentials_file);
+        $('#ibm_credentials_file').val(config.ibm_credentials_file);
         $('#transcripts_folder').val(config.transcripts_folder);
         $('#recordings_folder').val(config.recordings_folder);
         $('#log_dir').val(config.log_dir);
@@ -703,6 +730,16 @@ function getSettings() {
         $('#git_path').val(config.git_path);
 
         $('#git_branch').val(config.git_branch);
+
+        $('input[type=radio][name=speech_to_text_service][value="' +config.speech_to_text_service+ '"]').prop('checked', true);
+        var selectedTarget = $('input[type=radio][name=speech_to_text_service][value="' +config.speech_to_text_service+ '"]').data('target');
+
+        var allTargets = $('input[type=radio][name=speech_to_text_service]');
+        allTargets.each(function(i) {
+            var target = $(this).data('target');
+            $(target).hide();
+        });
+        $(selectedTarget).show();
 
         prev_username = config.http_username;
         prev_hashed_password = config.hashed_password;
@@ -785,22 +822,38 @@ $(document).ready(function() {
         return false;
     }, false);
 
-    $('#upload_credentials_button').click(function(e) {
+    $('#upload_google_credentials_button').click(function(e) {
         e.preventDefault();
-        $('#credentials_file_error').hide();
-        $('#upload_credentials_file').trigger('click');
+        $('#google_credentials_file_error').hide();
+        $('#upload_google_credentials_file').trigger('click');
     });
 
-    $('#upload_credentials_file').change(function(event) {
-        $('#credentials_file').val(this.files[0].name);
+    $('#upload_google_credentials_file').change(function(event) {
+        $('#google_credentials_file').val(this.files[0].name);
         var reader = new FileReader();
         reader.onload = function onReaderLoad(event){
                 console.log(event.target.result);
                 $('#configForm').attr('validated', 'true');
                 if ( !(isValidJson(event.target.result)) ) {
-                    $('#credentials_file_error').html("<span>This file is not a valid JSON file.</span>").show();
+                    $('#google_credentials_file_error').html("<span>This file is not a valid JSON file.</span>").show();
                     $('#configForm').attr('validated', 'false');
                 }
+        }
+        reader.readAsText(event.target.files[0]);
+    });
+
+    $('#upload_ibm_credentials_button').click(function(e) {
+        e.preventDefault();
+        $('#ibm_credentials_file_error').hide();
+        $('#upload_ibm_credentials_file').trigger('click');
+    });
+
+    $('#upload_ibm_credentials_file').change(function(event) {
+        $('#ibm_credentials_file').val(this.files[0].name);
+        var reader = new FileReader();
+        reader.onload = function onReaderLoad(event){
+                console.log(event.target.result);
+                $('#configForm').attr('validated', 'true');
         }
         reader.readAsText(event.target.files[0]);
     });
@@ -1183,6 +1236,16 @@ $(document).ready(function() {
 
     $('input[type=radio][name=status_view]').change(function() {
         setStatusView();
+    });
+
+    $('input[type=radio][name=speech_to_text_service]').change(function () {
+        var selectedTarget = $(this).data('target');
+        var allTargets = $('input[type=radio][name=speech_to_text_service]');
+        allTargets.each(function(i) {
+            var target = $(this).data('target');
+            $(target).hide();
+        });
+        $(selectedTarget).show();
     });
 
     $('#log-bottom-button').click(function() {
