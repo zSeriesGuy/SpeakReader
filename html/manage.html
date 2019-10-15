@@ -403,7 +403,7 @@
                                                                 <div class="input-group git-group">
                                                                     <input type="text" class="form-control" id="git_remote" name="git_remote" value="${config['git_remote']}">
                                                                     <select class="form-control" id="git_branch" name="git_branch">
-                                                                        <% branches = ('master', 'beta', 'nightly') %>
+                                                                        <% branches = ('master', 'beta') %>
                                                                         % for branch in branches:
                                                                         <option value="${branch}" ${'selected' if config['git_branch'] == branch else ''}>${branch}</option>
                                                                         % endfor
