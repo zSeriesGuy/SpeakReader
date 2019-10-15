@@ -1,1 +1,3 @@
 PRODUCT = 'SpeakReader'
+VERSION_RELEASE = 'v1.1.0'
+GITHUB_BRANCH = 'master'
