@@ -150,23 +150,47 @@ class SpeakReader(object):
     #  Start the Transcribe Engine
     ###################################################################################################
     def startTranscribeEngine(self):
-        if CONFIG.CREDENTIALS_FILE == "":
-            logger.warn("API Credentials not available. Can't start Transcribe Engine.")
-            return
-
-        try:
-            with open(CONFIG.CREDENTIALS_FILE) as f:
-                json.loads(f.read())
-        except json.decoder.JSONDecodeError:
-            logger.warn("API Credentials does not appear to be a valid JSON file. Can't start Transcribe Engine.")
-            return
-
         if self.transcribeEngine.is_online:
             logger.info("Transcribe Engine already started.")
             return
 
         if self.get_input_device() is None:
             logger.warn("No Input Devices Available. Can't start Transcribe Engine.")
+            return
+
+        if CONFIG.SPEECH_TO_TEXT_SERVICE == 'google':
+            if CONFIG.GOOGLE_CREDENTIALS_FILE == "":
+                logger.warn("API Credentials not available. Can't start Transcribe Engine.")
+                return
+            try:
+                with open(CONFIG.GOOGLE_CREDENTIALS_FILE) as f:
+                    json.loads(f.read())
+            except json.decoder.JSONDecodeError:
+                logger.warn("API Credentials does not appear to be a valid JSON file. Can't start Transcribe Engine.")
+                return
+
+        elif CONFIG.SPEECH_TO_TEXT_SERVICE == 'IBM':
+            if CONFIG.IBM_CREDENTIALS_FILE == "":
+                logger.warn("API Credentials not available. Can't start Transcribe Engine.")
+                return
+
+            APIKEY = None
+            URL = None
+            try:
+                with open(CONFIG.IBM_CREDENTIALS_FILE) as f:
+                    for line in f.read().splitlines():
+                        parm = line.split('=')
+                        if parm[0] == 'SPEECH_TO_TEXT_APIKEY':
+                            APIKEY = parm[1]
+                        if parm[0] == 'SPEECH_TO_TEXT_URL':
+                            URL = parm[1]
+            except:
+                pass
+            if APIKEY is None or URL is None:
+                logger.warn("APIKEY or URL not found in IBM credentials file. Can't start Transcribe Engine.")
+                return
+
+        else:
             return
 
         self.transcribeEngine.start()
@@ -182,23 +206,24 @@ class SpeakReader(object):
     #  Shutdown SpeakReader
     ###################################################################################################
     def shutdown(self, restart=False, update=False, checkout=False):
-        import time
         SpeakReader._INITIALIZED = False
         self.transcribeEngine.shutdown()
-        logger.info('WebServer Terminating')
-        cherrypy.engine.exit()
-
         CONFIG.write()
 
         if not restart and not update and not checkout:
             logger.info("Shutting Down SpeakReader")
 
         if update:
-            logger.info("SpeakReader is updating...")
+            logger.info("********************************")
+            logger.info("*  SpeakReader is updating...  *")
+            logger.info("********************************")
             try:
                 self.versionInfo.update()
             except Exception as e:
                 logger.warn("SpeakReader failed to update: %s. Restarting." % e)
+
+        logger.info('WebServer Terminating')
+        cherrypy.engine.exit()
 
         if checkout:
             logger.info("SpeakReader is switching the git branch...")

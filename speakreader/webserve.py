@@ -114,7 +114,9 @@ class WebInterface(object):
             "https_cert": speakreader.CONFIG.HTTPS_CERT,
             "https_cert_chain": speakreader.CONFIG.HTTPS_CERT_CHAIN,
             "https_key": speakreader.CONFIG.HTTPS_KEY,
-            "credentials_file": speakreader.CONFIG.CREDENTIALS_FILE,
+            "speech_to_text_service": speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE,
+            "google_credentials_file": speakreader.CONFIG.GOOGLE_CREDENTIALS_FILE,
+            "ibm_credentials_file": speakreader.CONFIG.IBM_CREDENTIALS_FILE,
             "show_interim_results": speakreader.CONFIG.SHOW_INTERIM_RESULTS,
             "enable_censorship": speakreader.CONFIG.ENABLE_CENSORSHIP,
             "censored_words": '\r\n'.join(speakreader.CONFIG.CENSORED_WORDS),
@@ -160,12 +162,22 @@ class WebInterface(object):
             else:
                 kwargs[checked_config] = 1
 
-        upload_credentials_file = kwargs.pop('upload_credentials_file')
-        if upload_credentials_file.file != None:
-            self.upload_credentials_file(upload_credentials_file)
-            kwargs['credentials_file'] = os.path.join(speakreader.DATA_DIR, upload_credentials_file.filename)
+        upload_google_credentials_file = kwargs.pop('upload_google_credentials_file')
+        upload_ibm_credentials_file = kwargs.pop('upload_ibm_credentials_file')
+        #upload_microsoft_credentials_file = kwargs.pop('upload_microsoft_credentials_file')
+        #microsoft_credentials_file = kwargs.pop('microsoft_credentials_file')
 
-        if kwargs.get('credentials_file') != speakreader.CONFIG.CREDENTIALS_FILE \
+        if upload_google_credentials_file.file is not None:
+            self.upload_credentials_file(upload_google_credentials_file)
+            kwargs['google_credentials_file'] = os.path.join(speakreader.DATA_DIR, upload_google_credentials_file.filename)
+
+        if upload_ibm_credentials_file.file is not None:
+            self.upload_credentials_file(upload_ibm_credentials_file)
+            kwargs['ibm_credentials_file'] = os.path.join(speakreader.DATA_DIR, upload_ibm_credentials_file.filename)
+
+        if kwargs.get('speech_to_text_service') != speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE \
+        or kwargs.get('google_credentials_file') != speakreader.CONFIG.GOOGLE_CREDENTIALS_FILE \
+        or kwargs.get('ibm_credentials_file') != speakreader.CONFIG.IBM_CREDENTIALS_FILE \
         or kwargs.get('enable_censorship') != speakreader.CONFIG.ENABLE_CENSORSHIP \
         or kwargs.get('input_device') != speakreader.CONFIG.INPUT_DEVICE \
         or kwargs.get('save_recordings') != speakreader.CONFIG.SAVE_RECORDINGS:
@@ -212,7 +224,12 @@ class WebInterface(object):
             self.SR.stopTranscribeEngine()
             self.SR.startTranscribeEngine()
 
-        return {'result': 'success', 'credentials_file': kwargs['credentials_file'], 'logout': logout, 'portchanged': False}
+        return {'result': 'success',
+                'google_credentials_file': kwargs['google_credentials_file'],
+                'ibm_credentials_file': kwargs['ibm_credentials_file'],
+                'logout': logout,
+                'portchanged': False,
+        }
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -246,7 +263,7 @@ class WebInterface(object):
     @requireAuth(is_admin())
     def update(self, **kwargs):
         if self.SR.versionInfo.UPDATE_AVAILABLE:
-            return self.do_state_change('update', 'Updating', 60)
+            return self.do_state_change('update', 'Updating', 180)
         else:
             logger.info("No Updates Available")
             return self.manage()
