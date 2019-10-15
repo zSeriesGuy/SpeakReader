@@ -76,13 +76,15 @@ class MicrophoneStream:
             self._inputDeviceIndex = defaultInputDeviceIndex
 
         deviceInfo = self._audio_interface.get_device_info_by_index(self._inputDeviceIndex)
+        self._rate = int(deviceInfo.get('defaultSampleRate'))
 
-        if self._audio_interface.is_format_supported(self._outputSampleRate, input_device=self._inputDeviceIndex,
-                                                     input_channels=self._num_channels,
-                                                     input_format=self._format):
-            self._rate = self._outputSampleRate
-        else:
-            self._rate = int(deviceInfo.get('defaultSampleRate'))
+        try:
+            if self._audio_interface.is_format_supported(self._outputSampleRate, input_device=self._inputDeviceIndex,
+                                                         input_channels=self._num_channels,
+                                                         input_format=self._format):
+                self._rate = self._outputSampleRate
+        except ValueError:
+            pass
 
         self.resampler = sr.Resampler()
         self.resampler_ratio = self._outputSampleRate / self._rate
