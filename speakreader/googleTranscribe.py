@@ -34,7 +34,7 @@ class googleTranscribe:
     def transcribe(self):
         # Generator to return transcription results
         logger.debug("googleTranscribe.transcribe Entering")
-        audio_generator = self.audio_device.googleGenerator()
+        audio_generator = self.audio_device.streamGenerator()
 
         requests = (speech.types.StreamingRecognizeRequest(
             audio_content=content)

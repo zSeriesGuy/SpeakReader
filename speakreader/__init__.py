@@ -190,6 +190,11 @@ class SpeakReader(object):
                 logger.warn("APIKEY or URL not found in IBM credentials file. Can't start Transcribe Engine.")
                 return
 
+        elif CONFIG.SPEECH_TO_TEXT_SERVICE == 'microsoft':
+            if CONFIG.MICROSOFT_SERVICE_APIKEY == "" or CONFIG.MICROSOFT_SERVICE_REGION == "":
+                logger.warn("Microsoft Azure APIKEY and Region are required. Can't start Transcribe Engine.")
+                return
+
         else:
             return
 

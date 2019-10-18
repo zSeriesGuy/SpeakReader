@@ -49,6 +49,8 @@ _CONFIG_DEFINITIONS = {
     'SPEECH_TO_TEXT_SERVICE': (str, 'General', 'google'),
     'GOOGLE_CREDENTIALS_FILE': (str, 'General', ''),
     'IBM_CREDENTIALS_FILE': (str, 'General', ''),
+    'MICROSOFT_SERVICE_APIKEY': (str, 'General', ''),
+    'MICROSOFT_SERVICE_REGION': (str, 'General', 'eastus'),
 
     'HTTP_PORT': (int, 'HTTP', 8880),
     'ENABLE_HTTPS': (int, 'HTTP', 0),

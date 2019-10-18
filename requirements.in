@@ -7,6 +7,7 @@ Mako
 google-cloud-speech
 google-api-python-client
 ibm-watson
+azure-cognitiveservices-speech
 configobj
 pip-tools
 PyAudio

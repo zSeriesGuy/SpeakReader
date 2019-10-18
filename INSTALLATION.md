@@ -122,3 +122,24 @@ You won't be able to start the transcribe engine until you have provided a valid
 * It should be showing you a screen with the API Key. Click Download to save the credentials ENV file to your computer.
 * Go to the SpeakReader management console Settings page and upload this ENV file.
 * You should now be able to start the transcribe engine.
+
+
+# Microsoft Azure Speech API Services
+
+You won't be able to start the transcribe engine until you have provided a valid Microsoft Azure APIKEY and Region setting.
+
+> NOTE: The [Microsoft Azure Speech-To-Text](https://azure.microsoft.com/en-us/services/cognitive-services/speech-to-text/) API service is not free. But it is not very expensive and includes a free tier. See the [pricing](https://azure.microsoft.com/en-us/pricing/details/cognitive-services/speech-services/). There is a Free tier that allows for 5 audio hours per month.
+
+#### Setting Up API Access
+
+* Check out the [Getting Started](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/get-started) page for more instruction detail.
+* Go to the [Azure Portal Dashboard](https://portal.azure.com/#home). Sign in to your Azure Account.
+* Click the **Create a resource** in the top of the left menu.
+* Search for Speech and click on Speech.
+* Click **Create**
+* Once you have completed creating the resource, you can click on **All resources** in the left menu, then select your resource.
+* In the resource page, you will find the APIKEY in **Quick start**
+* Copy and paste the APIKEY into the SpeakReader management console settings page after choosing the Microsoft transcription service.
+* Set the Service Region that you chose when you created the Azure resource.
+* You should now be able to start the transcribe engine.
+ 

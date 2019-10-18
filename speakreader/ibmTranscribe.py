@@ -81,7 +81,7 @@ class ibmTranscribe:
 # define callback for the speech to text service
 class ProcessResponses(RecognizeCallback):
     def __init__(self):
-        logger.debug("ibmTransribe.ProcessResponse.Init entering")
+        logger.debug("ibmTranscribe.ProcessResponse.Init entering")
         self.responseQueue = Queue(maxsize=100)
         RecognizeCallback.__init__(self)
 

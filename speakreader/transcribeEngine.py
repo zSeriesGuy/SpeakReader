@@ -29,6 +29,7 @@ from speakreader.microphoneStream import MicrophoneStream
 from speakreader.queueManager import QueueManager
 from speakreader.googleTranscribe import googleTranscribe
 from speakreader.ibmTranscribe import ibmTranscribe
+from speakreader.microsoftTranscribe import microsoftTranscribe
 
 FILENAME_PREFIX = "Transcript-"
 FILENAME_DATE_FORMAT = "%Y-%m-%d-%H%M"
@@ -107,8 +108,8 @@ class TranscribeEngine:
             transcribeService = googleTranscribe(self.microphoneStream)
         elif speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE == 'IBM':
             transcribeService = ibmTranscribe(self.microphoneStream)
-        # elif speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE == 'microsoft':
-        #    transcribeService = microsoftTranscribe(self.microphoneStream)
+        elif speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE == 'microsoft':
+            transcribeService = microsoftTranscribe(self.microphoneStream)
         else:
             logger.warn("No Transcribe Service Selected. Can't start Transcribe Engine.")
             return
