@@ -214,8 +214,6 @@ class Version(object):
         if speakreader.CONFIG.GIT_BRANCH == 'master':
             release = next((r for r in releases if not r['prerelease']), releases[0])
         elif speakreader.CONFIG.GIT_BRANCH == 'beta':
-            release = next((r for r in releases if not r['tag_name'].endswith('-nightly')), releases[0])
-        elif speakreader.CONFIG.GIT_BRANCH == 'nightly':
             release = next((r for r in releases), releases[0])
         else:
             release = releases[0]
