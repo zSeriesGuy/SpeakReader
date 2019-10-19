@@ -10,10 +10,18 @@ SpeakReader is a web server application that takes microphone or line-in input a
 SpeakReader can be used anywhere that spoken words need to be transcribed to text and shared to many such as churches, conferences, meetings, etc.
 It is written in Python and can run on any platform that supports Python. As a very low cost solution, I am running SpeakReader in production at my church on a Raspberry Pi 3.
 
-SpeakReader supports the use of [Google Speech-To-Text](https://cloud.google.com/speech-to-text/) and [IBM Watson](https://www.ibm.com/watson/services/speech-to-text/) transcription cloud services. 
+SpeakReader supports the following speech-to-text transcription services:
+* [Google Speech-to-Text](https://cloud.google.com/speech-to-text/)
+* [IBM Watson Speech-to-Text](https://www.ibm.com/watson/services/speech-to-text/)
+* [Microsoft Azure Speech-to-Text](https://azure.microsoft.com/en-us/services/cognitive-services/speech-to-text/)
+
+Not all transcription service providers are available on all platforms. For example, Microsoft Azure Speech Services is currently only available for Windows 32-bit and 64-bit, MacOS, and Linux 64-bit on non-ARM processors. 
 
 If you find value in this project, please consider making a [donation via PayPal](https://paypal.me/jerryleenance). 80% of your donation will go to the [Ladonia Baptist Church](https://www.ladoniabaptist.org) building debt-retirement fund. 
 You may also make a [donation](https://onrealm.org/LadoniaBaptist/Give/EAVLVGBZJN) directly to the church building fund through their online-giving system.
+
+## Requirements
+SpeakReader requires Python 3.6 or higher.
 
 
 ## Installation

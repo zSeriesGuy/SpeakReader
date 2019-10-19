@@ -217,12 +217,19 @@
                                                 <label class="font-weight-bold">Speech to Text Service</label>
 
                                                 <div class="ml-3" role="radiogroup">
+                                                    % if productInfo['google_service'] == True:
                                                     <label class="radio-inline ml-1 mr-3"><input type="radio" class="mr-1" name="speech_to_text_service" value="google" data-target="#google_service">Google</label>
+                                                    % endif
+                                                    % if productInfo['ibm_service'] == True:
                                                     <label class="radio-inline ml-1 mr-3"><input type="radio" class="mr-1" name="speech_to_text_service" value="IBM" data-target="#IBM_service">IBM</label>
+                                                    % endif
+                                                    % if productInfo['microsoft_service'] == True:
                                                     <label class="radio-inline ml-1 mr-3"><input type="radio" class="mr-1" name="speech_to_text_service" value="microsoft" data-target="#microsoft_service">Microsoft</label>
+                                                    % endif
                                                 </div>
                                                 <small class="form-text">Choose which speech-to-text service you want to use.</small>
 
+                                                % if productInfo['google_service'] == True:
                                                 <div id="google_service" class="form-sub-group">
                                                     <label for="google_credentials_file" class="font-weight-bold">Google Cloud API Credentials JSON File</label>
                                                     <div class="input-group">
@@ -235,7 +242,9 @@
                                                     <small class="form-text">Required: Select and Upload your Google Cloud API JSON credentials file.</small>
                                                     <input id="upload_google_credentials_file" type="file" name="upload_google_credentials_file" style="display: none;" />
                                                 </div>
+                                                % endif
 
+                                                % if productInfo['ibm_service'] == True:
                                                 <div id="IBM_service" class="form-sub-group">
                                                     <label for="ibm_credentials_file" class="font-weight-bold">IBM Cloud API Credentials ENV File</label>
                                                     <div class="input-group">
@@ -248,7 +257,9 @@
                                                     <small class="form-text">Required: Select and Upload your IBM Cloud API credentials ENV file.</small>
                                                     <input id="upload_ibm_credentials_file" type="file" name="upload_ibm_credentials_file" style="display: none;" />
                                                 </div>
+                                                % endif
 
+                                                % if productInfo['microsoft_service'] == True:
                                                 <div id="microsoft_service" class="form-sub-group">
                                                     <label for="microsoft_service" class="font-weight-bold">Microsoft Azure Credentials</label>
                                                     <div class="row">
@@ -307,14 +318,12 @@
                                                                 <option value="${region['value']}" ${'selected' if config['microsoft_service_region'] == region['value'] else ''}>${region['name']}</option>
                                                                 % endfor
                                                             </select>
-
-
                                                         </div>
                                                     </div>
-
                                                     <div id="microsoft_service_error" class="alert alert-danger" role="alert"></div>
                                                     <small class="form-text">Required: Set your Microsoft Azure API key and region.</small>
                                                 </div>
+                                                % endif
 
                                             </div>
 

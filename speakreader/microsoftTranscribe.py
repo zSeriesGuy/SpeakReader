@@ -1,17 +1,21 @@
 from queue import Queue, Empty
 
-import azure.cognitiveservices.speech as speechsdk
-
 import speakreader
 from speakreader import logger
 
-RAW = 2
-MASKED = 0
+try:
+    import azure.cognitiveservices.speech as speechsdk
+    is_supported = True
+except ImportError:
+    is_supported = False
 
 
 class microsoftTranscribe(object):
 
     def __init__(self, audio_device):
+        self.is_supported = is_supported
+        if not self.is_supported:
+            return
 
         self.audio_device = audio_device
 
@@ -21,6 +25,8 @@ class microsoftTranscribe(object):
         self.speech_config = speechsdk.SpeechConfig(subscription=speakreader.CONFIG.MICROSOFT_SERVICE_APIKEY,
                                                     region=speakreader.CONFIG.MICROSOFT_SERVICE_REGION)
         self.speech_config.enable_dictation()
+        RAW = 2
+        MASKED = 0
         if speakreader.CONFIG.ENABLE_CENSORSHIP:
             profanityOption = speechsdk.ProfanityOption(MASKED)
         else:
@@ -29,6 +35,8 @@ class microsoftTranscribe(object):
 
 
     def transcribe(self):
+        if not self.is_supported:
+            return
         # Generator to return transcription results
         logger.debug("microsoftTranscribe.transcribe Enter")
 

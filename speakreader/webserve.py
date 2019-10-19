@@ -87,13 +87,15 @@ class WebInterface(object):
     @cherrypy.expose
     @requireAuth()
     def manage(self, **kwargs):
-
         productInfo = {
             "product": speakreader.PRODUCT,
             "current_version": self.SR.versionInfo.INSTALLED_RELEASE,
             "latest_release": self.SR.versionInfo.LATEST_RELEASE,
             "latest_release_url": self.SR.versionInfo.LATEST_RELEASE_URL,
             "update_available": "true" if self.SR.versionInfo.UPDATE_AVAILABLE else "false",
+            "google_service": self.SR.transcribeEngine.GOOGLE_SERVICE,
+            "ibm_service": self.SR.transcribeEngine.IBM_SERVICE,
+            "microsoft_service": self.SR.transcribeEngine.MICROSOFT_SERVICE,
         }
         settings = self.getSettings()
         return serve_template(templatename="manage.html", title="Management Console", productInfo=productInfo, config=settings['config'])

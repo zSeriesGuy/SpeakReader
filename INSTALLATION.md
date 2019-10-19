@@ -39,10 +39,9 @@ Install the latest version of [Python 3](https://www.python.org/downloads/window
 SpeakReader will be installed to `/opt/SpeakReader`.
 
 * Open a terminal
-* Install Git
-    * Ubuntu/Debian: `sudo apt-get install git-core`
 * Install prerequisites:
     * Ubuntu/Debian:
+        * `sudo apt-get install git-core`
         * `sudo apt-get install build-essential libffi-dev libssl-dev libxml2-dev libxslt1-dev libjpeg8-dev zlib1g-dev alsa-utils portaudio19-dev`
         * `sudo apt-get install python3 python3-venv python3-all-dev`
 * Type: `cd /opt`
@@ -52,12 +51,11 @@ SpeakReader will be installed to `/opt/SpeakReader`.
 * Type: `source /opt/SpeakReader/bin/activate`
 * Type: `python -m pip install --upgrade pip setuptools wheel pip-tools`
 * Type: `pip3 install -r /opt/SpeakReader/requirements.txt`
-* Type: `sudo usermod -aG audio userid` where userid is the user that you signed in to the terminal with.   
+* Type: `sudo usermod -aG audio {userid}` where {userid} is the user that you signed in to the terminal with.   
 * Type: `/opt/SpeakReader/bin/python3 /opt/SpeakReader/start.py` to start SpeakReader
 * SpeakReader will be loaded in your browser or listening on http://localhost:8880
 
-To run SpeakReader in the background as a Daemon on startup:
-
+#### To run SpeakReader in the background as a Daemon on startup:
 * Ubuntu/Debian:
     * `sudo cp /opt/SpeakReader/init-scripts/speakreader.service /lib/systemd/system`
     * `sudo systemctl daemon-reload`
@@ -75,8 +73,9 @@ To run SpeakReader in the background as a Daemon on startup:
 
 
 ## Choose a Transcription Service
-Google API and IBM Watson are supported.
+Google API, IBM Watson, and Microsoft Azure are supported.
 
+Not all transcription service providers are available on all platforms. For example, Microsoft Azure Speech Services is currently only available for Windows 32-bit and 64-bit, MacOS, and Linux 64-bit on non-ARM processors. 
 
 # Google API Services
 
@@ -143,3 +142,7 @@ You won't be able to start the transcribe engine until you have provided a valid
 * Set the Service Region that you chose when you created the Azure resource.
 * You should now be able to start the transcribe engine.
  
+# Upgrades
+If you installed SpeakReader via GIT, you will be notified when upgrades are available on the management console's Settings page.
+
+Upgrading will run an environment sync. On some platforms, this may run a while. So if the upgrade process does not restart the management console, you can check the log in the data/logs folder. 

@@ -4,7 +4,7 @@
 #
 #    pip-compile
 #
-azure-cognitiveservices-speech==1.7.0
+azure-cognitiveservices-speech==1.7.0 ; sys_platform in "win32 macos" or (sys_platform == "linux" and platform_machine in "AMD64")
 cachetools==3.1.1         # via google-auth
 certifi==2019.9.11        # via requests
 cffi==1.13.0              # via samplerate
