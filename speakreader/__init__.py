@@ -22,6 +22,10 @@ import uuid
 import pyaudio
 import cherrypy
 import json
+import datetime
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
 
 try:
     import webbrowser
@@ -140,6 +144,14 @@ class SpeakReader(object):
             if CONFIG.LAUNCH_BROWSER and not initOptions['nolaunch']:
                 launch_browser(CONFIG.HTTP_HOST, self.HTTP_PORT, CONFIG.HTTP_ROOT + 'manage')
 
+            ###################################################################################################
+            #  Run cleanup of old logs, transcripts, and recordings and start a scheduler to run every 24 hours
+            ###################################################################################################
+            self.cleanup_files()
+            self.scheduler = BackgroundScheduler()
+            self.scheduler.add_job(self.cleanup_files, 'interval', hours=24)
+            self.scheduler.start()
+
             SpeakReader._INITIALIZED = True
 
     @property
@@ -213,6 +225,7 @@ class SpeakReader(object):
     def shutdown(self, restart=False, update=False, checkout=False):
         SpeakReader._INITIALIZED = False
         self.transcribeEngine.shutdown()
+        self.scheduler.shutdown()
         CONFIG.write()
 
         if not restart and not update and not checkout:
@@ -277,6 +290,35 @@ class SpeakReader(object):
             pass
 
         return deviceList
+
+
+    ###################################################################################################
+    #  Delete any files over the retention days
+    ###################################################################################################
+    def cleanup_files(self):
+        logger.info("Running File Cleanup")
+        def delete(path, days):
+            try:
+                days = int(days)
+            except ValueError:
+                return
+            delete_date = datetime.datetime.now() - datetime.timedelta(days=days)
+            with os.scandir(path=path) as files:
+                for file in files:
+                    file_info = file.stat()
+                    if datetime.datetime.fromtimestamp(file_info.st_ctime) < delete_date:
+                        filename = os.path.join(path, file.name)
+                        logger.debug("Deleting: %s" % filename)
+                        os.remove(filename)
+
+        if CONFIG.LOG_RETENTION_DAYS != "":
+            delete(CONFIG.LOG_DIR, CONFIG.LOG_RETENTION_DAYS)
+
+        if CONFIG.TRANSCRIPT_RETENTION_DAYS != "":
+            delete(CONFIG.TRANSCRIPTS_FOLDER, CONFIG.TRANSCRIPT_RETENTION_DAYS)
+
+        if CONFIG.RECORDING_RETENTION_DAYS != "":
+            delete(CONFIG.RECORDINGS_FOLDER, CONFIG.RECORDING_RETENTION_DAYS)
 
 
 def generate_uuid():

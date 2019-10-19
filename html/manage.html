@@ -331,12 +331,28 @@
                                                 <label for="log_dir" class="font-weight-bold">Logs Folder</label>
                                                 <input id="log_dir" type="text" class="form-control" name="log_dir" value="${config['log_dir']}" size="30">
                                                 <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the SpeakReader console logs.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
+
+                                                <div class="row mt-3">
+                                                    <label for="log_retention_days" class="font-weight-bold col-md-2 col-form-label">Retention Days</label>
+                                                    <div class="col-md-2">
+                                                        <input id="log_retention_days" type="number" class="form-control" name="log_retention_days" value="${config['log_retention_days']}" min="1">
+                                                    </div>
+                                                </div>
+                                                <small class="form-text">Number of days to keep log files before automatically deleting them. Set to blank to not automatically delete them.</small>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="transcripts_folder" class="font-weight-bold">Transcripts Folder</label>
                                                 <input id="transcripts_folder" type="text" class="form-control" name="transcripts_folder" value="${config['transcripts_folder']}" size="30">
                                                 <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the transcripts.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
+
+                                                <div class="row mt-3">
+                                                    <label for="transcript_retention_days" class="font-weight-bold col-md-2 col-form-label">Retention Days</label>
+                                                    <div class="col-md-2">
+                                                        <input id="transcript_retention_days" type="number" class="form-control" name="transcript_retention_days" value="${config['transcript_retention_days']}" min="1">
+                                                    </div>
+                                                </div>
+                                                <small class="form-text">Number of days to keep transcript files before automatically deleting them. Set to blank to not automatically delete them.</small>
                                             </div>
 
 
@@ -351,6 +367,14 @@
                                                     <label for="recordings_folder" class="font-weight-bold">Recordings Folder</label>
                                                     <input id="recordings_folder" type="text" class="form-control" name="recordings_folder" value="${config['recordings_folder']}" size="30">
                                                     <small class="form-text">Optional: Change the folder where you would like SpeakReader to store the audio recordings.<br><strong>Restart Required.</strong> A change here will become active with the next restart.</small>
+
+                                                    <div class="row mt-3">
+                                                        <label for="recording_retention_days" class="font-weight-bold col-md-2 col-form-label">Retention Days</label>
+                                                        <div class="col-md-2">
+                                                            <input id="recording_retention_days" type="number" class="form-control" name="recording_retention_days" value="${config['recording_retention_days']}" min="1">
+                                                        </div>
+                                                    </div>
+                                                    <small class="form-text">Number of days to keep recording files before automatically deleting them. Set to blank to not automatically delete them.</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -808,6 +832,9 @@ function getSettings() {
         $('#git_token').val(config.git_token);
         $('#git_remote').val(config.git_remote);
         $('#git_path').val(config.git_path);
+        $('#log_retention_days').val(config.log_retention_days);
+        $('#transcript_retention_days').val(config.transcript_retention_days);
+        $('#recording_retention_days').val(config.recording_retention_days);
 
         $('#git_branch').val(config.git_branch);
 

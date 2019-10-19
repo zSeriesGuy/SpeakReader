@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.2 (2019-10-19)
+* Add settings and process for deleting logs, transcripts, and recordings after a specified number of days.
+
 ## v1.2.1 (2019-10-19)
 * Microsoft Azure Speech-to-Text Cloud service is not available on some platforms. Added support for detecting failure to load service.
 

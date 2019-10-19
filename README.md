@@ -25,7 +25,7 @@ SpeakReader requires Python 3.6 or higher.
 
 
 ## Installation
-Installation instructions can be found in the wiki.
+[Installation instructions](https://github.com/zSeriesGuy/SpeakReader/wiki) can be found in the wiki.
  
 
 ## Usage
