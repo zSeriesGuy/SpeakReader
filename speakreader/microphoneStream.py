@@ -221,7 +221,7 @@ class MicrophoneStream:
     def recordingGenerator(self):
         return self._generator(self._recordingBuff)
 
-    def googleGenerator(self):
+    def streamGenerator(self):
         return self._generator(self._streamBuff)
 
     def _generator(self, q):

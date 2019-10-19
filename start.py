@@ -25,7 +25,7 @@
 import os
 import sys
 import subprocess
-from platform import node, system, release, version
+from platform import system, release, version, machine, processor
 
 import argparse
 import datetime
@@ -63,7 +63,10 @@ def main():
     PLATFORM_RELEASE = release()
     PLATFORM_VERSION = version()
     PLATFORM_LINUX_DISTRO = None
-    PLATFORM_DEVICE_NAME = node()
+
+    PLATFORM_PROCESSOR = processor()
+    PLATFORM_MACHINE = machine()
+    PLATFORM_IS_64BITS = sys.maxsize > 2**32
 
     # Fixed paths to application
     if hasattr(sys, 'frozen'):
@@ -73,7 +76,6 @@ def main():
 
     PROG_DIR = os.path.dirname(FULL_PATH)
 
-    # From sickbeard
     SYS_PLATFORM = sys.platform
     SYS_ENCODING = None
 
@@ -136,7 +138,7 @@ def main():
         QUIET = True
 
     if args.daemon:
-        if sys.platform == 'win32':
+        if SYS_PLATFORM == 'win32':
             sys.stderr.write("Daemonizing not supported under Windows, starting normally\n")
         else:
             DAEMON = True
@@ -220,16 +222,20 @@ def main():
         PLATFORM, PLATFORM_RELEASE, PLATFORM_VERSION,
         ' - {}'.format(PLATFORM_LINUX_DISTRO) if PLATFORM_LINUX_DISTRO else ''
     ))
+    logger.info("{} ({} {})".format(
+        PLATFORM_PROCESSOR, PLATFORM_MACHINE,
+        '{}'.format('64-BIT') if PLATFORM_IS_64BITS else '32-BIT'
+    ))
+    logger.info("Python {}".format(
+        sys.version
+    ))
     logger.info("{} (UTC{})".format(
         SYS_TIMEZONE, SYS_UTC_OFFSET
     ))
-    logger.info(u"Python {}".format(
-        sys.version
-    ))
-    logger.info(u"Program Dir: {}".format(
+    logger.info("Program Dir: {}".format(
         PROG_DIR
     ))
-    logger.info(u"Config File: {}".format(
+    logger.info("Config File: {}".format(
         CONFIG_FILE
     ))
 

@@ -1,6 +1,7 @@
 
 from os.path import abspath, dirname, join
 from setuptools import find_packages, setup
+from speakreader import PRODUCT, VERSION_RELEASE
 
 def read_file(filename):
     """Read the contents of a file located relative to setup.py"""
@@ -8,11 +9,11 @@ def read_file(filename):
         return thefile.read()
 
 setup(
-    name="SpeakReader",
-    version="1.0.0",
+    name=PRODUCT,
+    version=VERSION_RELEASE,
     author="Jerry Nance",
     author_email="jerry@nance.us",
-    description="Speech to Text on a Web Server",
+    description="Serve Speech-to-Text to many concurrently in realtime.",
     long_description=read_file("README.MD"),
     long_description_content_type="text/markdown",
     url="",
@@ -29,8 +30,6 @@ setup(
         'CherryPy',
         'portend',
         'Mako',
-        'google-cloud-speech',
-        'google-api-python-client',
         'configobj',
         'PyAudio',
         'pywin32; sys_platform == "win32"',
@@ -39,5 +38,11 @@ setup(
         'python-dateutil',
         'tzlocal',
         'passlib',
+        'wheel',
+        'samplerate',
+        'google-cloud-speech',
+        'google-api-python-client',
+        'ibm-watson',
+        'azure-cognitiveservices-speech; (sys_platform in "win32 macos") or (sys_platform == "linux" and platform_machine in "AMD64")',
     ],
 )

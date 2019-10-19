@@ -6,19 +6,27 @@
 # recordings to the queue, and the websocket client would be sending the
 # recordings to the speech to text service
 
-from ibm_watson import SpeechToTextV1
-from ibm_watson.websocket import RecognizeCallback, AudioSource
 from threading import Thread
-from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from queue import Queue
 
 import speakreader
 from speakreader import logger
 
+try:
+    from ibm_watson import SpeechToTextV1
+    from ibm_watson.websocket import RecognizeCallback, AudioSource
+    from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+    is_supported = True
+except ImportError:
+    is_supported = False
+
 
 class ibmTranscribe:
 
     def __init__(self, audio_device):
+        self.is_supported = is_supported
+        if not self.is_supported:
+            return
 
         self.audio_device = audio_device
 
@@ -44,6 +52,8 @@ class ibmTranscribe:
         self.audio_source = AudioSource(audio_device._streamBuff, is_recording=True, is_buffer=True)
 
     def transcribe(self):
+        if not self.is_supported:
+            return
         # Generator to return transcription results
         logger.debug('ibmTranscribe.transcribe entering')
 
@@ -81,7 +91,7 @@ class ibmTranscribe:
 # define callback for the speech to text service
 class ProcessResponses(RecognizeCallback):
     def __init__(self):
-        logger.debug("ibmTransribe.ProcessResponse.Init entering")
+        logger.debug("ibmTranscribe.ProcessResponse.Init entering")
         self.responseQueue = Queue(maxsize=100)
         RecognizeCallback.__init__(self)
 

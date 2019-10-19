@@ -87,13 +87,15 @@ class WebInterface(object):
     @cherrypy.expose
     @requireAuth()
     def manage(self, **kwargs):
-
         productInfo = {
             "product": speakreader.PRODUCT,
             "current_version": self.SR.versionInfo.INSTALLED_RELEASE,
             "latest_release": self.SR.versionInfo.LATEST_RELEASE,
             "latest_release_url": self.SR.versionInfo.LATEST_RELEASE_URL,
             "update_available": "true" if self.SR.versionInfo.UPDATE_AVAILABLE else "false",
+            "google_service": self.SR.transcribeEngine.GOOGLE_SERVICE,
+            "ibm_service": self.SR.transcribeEngine.IBM_SERVICE,
+            "microsoft_service": self.SR.transcribeEngine.MICROSOFT_SERVICE,
         }
         settings = self.getSettings()
         return serve_template(templatename="manage.html", title="Management Console", productInfo=productInfo, config=settings['config'])
@@ -117,6 +119,8 @@ class WebInterface(object):
             "speech_to_text_service": speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE,
             "google_credentials_file": speakreader.CONFIG.GOOGLE_CREDENTIALS_FILE,
             "ibm_credentials_file": speakreader.CONFIG.IBM_CREDENTIALS_FILE,
+            "microsoft_service_apikey": speakreader.CONFIG.MICROSOFT_SERVICE_APIKEY,
+            "microsoft_service_region": speakreader.CONFIG.MICROSOFT_SERVICE_REGION,
             "show_interim_results": speakreader.CONFIG.SHOW_INTERIM_RESULTS,
             "enable_censorship": speakreader.CONFIG.ENABLE_CENSORSHIP,
             "censored_words": '\r\n'.join(speakreader.CONFIG.CENSORED_WORDS),
@@ -162,10 +166,8 @@ class WebInterface(object):
             else:
                 kwargs[checked_config] = 1
 
-        upload_google_credentials_file = kwargs.pop('upload_google_credentials_file')
-        upload_ibm_credentials_file = kwargs.pop('upload_ibm_credentials_file')
-        #upload_microsoft_credentials_file = kwargs.pop('upload_microsoft_credentials_file')
-        #microsoft_credentials_file = kwargs.pop('microsoft_credentials_file')
+        upload_google_credentials_file = kwargs.pop('upload_google_credentials_file', None)
+        upload_ibm_credentials_file = kwargs.pop('upload_ibm_credentials_file', None)
 
         if upload_google_credentials_file.file is not None:
             self.upload_credentials_file(upload_google_credentials_file)
@@ -178,6 +180,8 @@ class WebInterface(object):
         if kwargs.get('speech_to_text_service') != speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE \
         or kwargs.get('google_credentials_file') != speakreader.CONFIG.GOOGLE_CREDENTIALS_FILE \
         or kwargs.get('ibm_credentials_file') != speakreader.CONFIG.IBM_CREDENTIALS_FILE \
+        or kwargs.get('microsoft_service_apikey') != speakreader.CONFIG.MICROSOFT_SERVICE_APIKEY \
+        or kwargs.get('microsoft_service_region') != speakreader.CONFIG.MICROSOFT_SERVICE_REGION \
         or kwargs.get('enable_censorship') != speakreader.CONFIG.ENABLE_CENSORSHIP \
         or kwargs.get('input_device') != speakreader.CONFIG.INPUT_DEVICE \
         or kwargs.get('save_recordings') != speakreader.CONFIG.SAVE_RECORDINGS:

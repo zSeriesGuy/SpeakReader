@@ -217,11 +217,19 @@
                                                 <label class="font-weight-bold">Speech to Text Service</label>
 
                                                 <div class="ml-3" role="radiogroup">
+                                                    % if productInfo['google_service'] == True:
                                                     <label class="radio-inline ml-1 mr-3"><input type="radio" class="mr-1" name="speech_to_text_service" value="google" data-target="#google_service">Google</label>
+                                                    % endif
+                                                    % if productInfo['ibm_service'] == True:
                                                     <label class="radio-inline ml-1 mr-3"><input type="radio" class="mr-1" name="speech_to_text_service" value="IBM" data-target="#IBM_service">IBM</label>
+                                                    % endif
+                                                    % if productInfo['microsoft_service'] == True:
+                                                    <label class="radio-inline ml-1 mr-3"><input type="radio" class="mr-1" name="speech_to_text_service" value="microsoft" data-target="#microsoft_service">Microsoft</label>
+                                                    % endif
                                                 </div>
                                                 <small class="form-text">Choose which speech-to-text service you want to use.</small>
 
+                                                % if productInfo['google_service'] == True:
                                                 <div id="google_service" class="form-sub-group">
                                                     <label for="google_credentials_file" class="font-weight-bold">Google Cloud API Credentials JSON File</label>
                                                     <div class="input-group">
@@ -234,7 +242,9 @@
                                                     <small class="form-text">Required: Select and Upload your Google Cloud API JSON credentials file.</small>
                                                     <input id="upload_google_credentials_file" type="file" name="upload_google_credentials_file" style="display: none;" />
                                                 </div>
+                                                % endif
 
+                                                % if productInfo['ibm_service'] == True:
                                                 <div id="IBM_service" class="form-sub-group">
                                                     <label for="ibm_credentials_file" class="font-weight-bold">IBM Cloud API Credentials ENV File</label>
                                                     <div class="input-group">
@@ -247,6 +257,74 @@
                                                     <small class="form-text">Required: Select and Upload your IBM Cloud API credentials ENV file.</small>
                                                     <input id="upload_ibm_credentials_file" type="file" name="upload_ibm_credentials_file" style="display: none;" />
                                                 </div>
+                                                % endif
+
+                                                % if productInfo['microsoft_service'] == True:
+                                                <div id="microsoft_service" class="form-sub-group">
+                                                    <label for="microsoft_service" class="font-weight-bold">Microsoft Azure Credentials</label>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label for="microsoft_service_apikey" class="font-weight-bold">APIKEY</label>
+                                                            <input id="microsoft_service_apikey" type="text" class="form-control" name="microsoft_service_apikey" value="${config['microsoft_service_apikey']}" size="25">
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="microsoft_service_region" class="font-weight-bold">Region</label>
+
+                                                            <select class="form-control" id="microsoft_service_region" name="microsoft_service_region">
+
+                                                                <% regions = [  { 'name': 'East US', 'value': 'eastus' },
+                                                                                { 'name': 'East US 2', 'value': 'eastus2' },
+                                                                                { 'name': 'West US', 'value': 'westus' },
+                                                                                { 'name': 'West US 2', 'value': 'westus2' },
+                                                                                { 'name': 'Central US', 'value': 'centralus' },
+                                                                                { 'name': 'West Central US', 'value': 'westcentralus' },
+                                                                                { 'name': 'North Central US', 'value': 'northcentralus' },
+                                                                                { 'name': 'South Central US', 'value': 'southcentralus' },
+                                                                                { 'name': 'East Asia', 'value': 'eastasia' },
+                                                                                { 'name': 'Southeast Asia', 'value': 'southeastasia' },
+                                                                                { 'name': 'North Europe', 'value': 'northeurope' },
+                                                                                { 'name': 'West Europe', 'value': 'westeurope' },
+                                                                                { 'name': 'Japan West', 'value': 'japanwest' },
+                                                                                { 'name': 'Japan East', 'value': 'japaneast' },
+                                                                                { 'name': 'Brazil South', 'value': 'brazilsouth' },
+                                                                                { 'name': 'Australia East', 'value': 'australiaeast' },
+                                                                                { 'name': 'Australia Southeast', 'value': 'australiasoutheast' },
+                                                                                { 'name': 'South India', 'value': 'southindia' },
+                                                                                { 'name': 'Central India', 'value': 'centralindia' },
+                                                                                { 'name': 'West India', 'value': 'westindia' },
+                                                                                { 'name': 'Canada Central', 'value': 'canadacentral' },
+                                                                                { 'name': 'Canada East', 'value': 'canadaeast' },
+                                                                                { 'name': 'UK South', 'value': 'uksouth' },
+                                                                                { 'name': 'UK West', 'value': 'ukwest' },
+                                                                                { 'name': 'Korea Central', 'value': 'koreacentral' },
+                                                                                { 'name': 'Korea South', 'value': 'koreasouth' },
+                                                                                { 'name': 'France Central', 'value': 'francecentral' },
+                                                                                { 'name': 'France South', 'value': 'francesouth' },
+                                                                                { 'name': 'Australia Central', 'value': 'australiacentral' },
+                                                                                { 'name': 'Australia Central 2', 'value': 'australiacentral2' },
+                                                                                { 'name': 'UAE Central', 'value': 'uaecentral' },
+                                                                                { 'name': 'UAE North', 'value': 'uaenorth' },
+                                                                                { 'name': 'South Africa North', 'value': 'southafricanorth' },
+                                                                                { 'name': 'South Africa West', 'value': 'southafricawest' },
+                                                                                { 'name': 'Switzerland North', 'value': 'switzerlandnorth' },
+                                                                                { 'name': 'Switzerland West', 'value': 'switzerlandwest' },
+                                                                                { 'name': 'Germany North', 'value': 'germanynorth' },
+                                                                                { 'name': 'Germany West Central', 'value': 'germanywestcentral' },
+                                                                                { 'name': 'Norway West', 'value': 'norwaywest' },
+                                                                                { 'name': 'Norway East', 'value': 'norwayeast' },
+                                                                              ]
+                                                                %>
+                                                                % for region in regions:
+                                                                <option value="${region['value']}" ${'selected' if config['microsoft_service_region'] == region['value'] else ''}>${region['name']}</option>
+                                                                % endfor
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div id="microsoft_service_error" class="alert alert-danger" role="alert"></div>
+                                                    <small class="form-text">Required: Set your Microsoft Azure API key and region.</small>
+                                                </div>
+                                                % endif
+
                                             </div>
 
                                             <div class="form-group">
@@ -403,7 +481,7 @@
                                                                 <div class="input-group git-group">
                                                                     <input type="text" class="form-control" id="git_remote" name="git_remote" value="${config['git_remote']}">
                                                                     <select class="form-control" id="git_branch" name="git_branch">
-                                                                        <% branches = ('master', 'beta', 'nightly') %>
+                                                                        <% branches = ('master', 'beta') %>
                                                                         % for branch in branches:
                                                                         <option value="${branch}" ${'selected' if config['git_branch'] == branch else ''}>${branch}</option>
                                                                         % endfor
@@ -715,6 +793,8 @@ function getSettings() {
         // Text Values
         $('#google_credentials_file').val(config.google_credentials_file);
         $('#ibm_credentials_file').val(config.ibm_credentials_file);
+        $('#microsoft_service_apikey').val(config.microsoft_service_apikey);
+        $('#microsoft_service_region').val(config.microsoft_service_region);
         $('#transcripts_folder').val(config.transcripts_folder);
         $('#recordings_folder').val(config.recordings_folder);
         $('#log_dir').val(config.log_dir);

@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.2.1 (2019-10-19)
+* Microsoft Azure Speech-to-Text Cloud service is not available on some platforms. Added support for detecting failure to load service.
+
+## v1.2.0 (2019-10-15)
+* Add support for Microsoft Azure Speech-to-Text Cloud service.
+* Remove Nightly as a selectable git branch.
+
 ## v1.1.0 (2019-10-15)
 **Changes:**
 * Modifications to support different transcription services.

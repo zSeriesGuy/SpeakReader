@@ -1,13 +1,20 @@
-from google.cloud import speech
 from queue import Queue
 
 import speakreader
 from speakreader import logger
 
+try:
+    from google.cloud import speech
+    is_supported = True
+except ImportError:
+    is_supported = False
 
 class googleTranscribe:
 
     def __init__(self, audio_device):
+        self.is_supported = is_supported
+        if not self.is_supported:
+            return
 
         self.audio_device = audio_device
 
@@ -32,9 +39,11 @@ class googleTranscribe:
             interim_results=True)
 
     def transcribe(self):
+        if not self.is_supported:
+            return
         # Generator to return transcription results
         logger.debug("googleTranscribe.transcribe Entering")
-        audio_generator = self.audio_device.googleGenerator()
+        audio_generator = self.audio_device.streamGenerator()
 
         requests = (speech.types.StreamingRecognizeRequest(
             audio_content=content)

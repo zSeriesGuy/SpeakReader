@@ -4,11 +4,12 @@
 #
 #    pip-compile
 #
+azure-cognitiveservices-speech==1.7.0 ; sys_platform in "win32 macos" or (sys_platform == "linux" and platform_machine in "AMD64")
 cachetools==3.1.1         # via google-auth
 certifi==2019.9.11        # via requests
 cffi==1.13.0              # via samplerate
 chardet==3.0.4            # via requests
-cheroot==8.2.0            # via cherrypy
+cheroot==8.2.1            # via cherrypy
 cherrypy==18.3.0
 click==7.0                # via pip-tools
 configobj==5.0.6
@@ -27,7 +28,7 @@ jaraco.functools==2.0     # via cheroot, tempora
 mako==1.1.0
 markupsafe==1.1.1         # via mako
 more-itertools==7.2.0     # via cheroot, cherrypy, jaraco.functools
-numpy==1.17.2             # via samplerate
+numpy==1.17.3             # via samplerate
 passlib==1.7.1
 pip-tools==4.2.0
 portend==2.5

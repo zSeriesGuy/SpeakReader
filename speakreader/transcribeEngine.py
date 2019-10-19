@@ -27,8 +27,24 @@ import speakreader
 from speakreader import logger
 from speakreader.microphoneStream import MicrophoneStream
 from speakreader.queueManager import QueueManager
-from speakreader.googleTranscribe import googleTranscribe
-from speakreader.ibmTranscribe import ibmTranscribe
+
+try:
+    from speakreader.googleTranscribe import googleTranscribe
+    GOOGLE_SERVICE = True
+except:
+    GOOGLE_SERVICE = False
+
+try:
+    from speakreader.ibmTranscribe import ibmTranscribe
+    IBM_SERVICE = True
+except:
+    IBM_SERVICE = False
+
+try:
+    from speakreader.microsoftTranscribe import microsoftTranscribe
+    MICROSOFT_SERVICE = True
+except:
+    MICROSOFT_SERVICE = False
 
 FILENAME_PREFIX = "Transcript-"
 FILENAME_DATE_FORMAT = "%Y-%m-%d-%H%M"
@@ -51,6 +67,14 @@ class TranscribeEngine:
             return
 
         logger.info("Transcribe Engine Initializing")
+
+        ###################################################################################################
+        #  Set Supported Platforms
+        ###################################################################################################
+        self.GOOGLE_SERVICE = GOOGLE_SERVICE
+        self.IBM_SERVICE = IBM_SERVICE
+        self.MICROSOFT_SERVICE = MICROSOFT_SERVICE
+
         ###################################################################################################
         #  Initialize the Queue Manager
         ###################################################################################################
@@ -103,14 +127,14 @@ class TranscribeEngine:
             self.transcriptQueue.put_nowait(self.OFFLINE_MESSAGE)
             return
 
-        if speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE == 'google':
+        if speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE == 'google' and self.GOOGLE_SERVICE:
             transcribeService = googleTranscribe(self.microphoneStream)
-        elif speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE == 'IBM':
+        elif speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE == 'IBM' and self.IBM_SERVICE:
             transcribeService = ibmTranscribe(self.microphoneStream)
-        # elif speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE == 'microsoft':
-        #    transcribeService = microsoftTranscribe(self.microphoneStream)
+        elif speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE == 'microsoft' and self.MICROSOFT_SERVICE:
+            transcribeService = microsoftTranscribe(self.microphoneStream)
         else:
-            logger.warn("No Transcribe Service Selected. Can't start Transcribe Engine.")
+            logger.warn("No Supported Transcribe Service Selected. Can't start Transcribe Engine.")
             return
 
         self.transcriptFile = open(tf, "a+")
