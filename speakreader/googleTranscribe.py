@@ -5,6 +5,7 @@ from speakreader import logger
 
 try:
     from google.cloud import speech
+    from google.api_core import exceptions
     is_supported = True
 except ImportError:
     is_supported = False
@@ -51,26 +52,29 @@ class googleTranscribe:
 
         responses = self.client.streaming_recognize(self.streaming_config, requests)
 
-        for response in responses:
-            if not response.results:
-                continue
+        try:
+            for response in responses:
+                if not response.results:
+                    continue
 
-            result = response.results[0]
+                result = response.results[0]
 
-            if not result.is_final and not speakreader.CONFIG.SHOW_INTERIM_RESULTS:
-                continue
+                if not result.is_final and not speakreader.CONFIG.SHOW_INTERIM_RESULTS:
+                    continue
 
-            if not result.alternatives:
-                continue
+                if not result.alternatives:
+                    continue
 
-            if not result.is_final and result.stability < 0.75:
-                continue
+                if not result.is_final and result.stability < 0.75:
+                    continue
 
-            transcript = {
-                'transcript': result.alternatives[0].transcript,
-                'is_final': result.is_final,
-            }
+                transcript = {
+                    'transcript': result.alternatives[0].transcript,
+                    'is_final': result.is_final,
+                }
 
-            yield transcript
-
-        logger.debug("googleTranscribe.transcribe Exiting")
+                yield transcript
+            logger.debug("googleTranscribe.transcribe Exiting")
+        except exceptions.OutOfRange:
+            logger.debug("googleTranscribe.transcribe OutOfRange Exception: Time Limit Exceeded. Restarting.")
+            pass

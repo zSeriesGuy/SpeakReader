@@ -122,7 +122,7 @@ class MicrophoneStream:
                 stream_callback=self._fill_buff,
             )
         except OSError:
-            print("microphone __enter__.OSError")
+            logger.error("microphone __enter__.OSError")
             self.closed = True
             raise Exception("Microphone Not Functioning")
 
@@ -132,6 +132,8 @@ class MicrophoneStream:
         return self
 
     def __exit__(self, type, value, traceback):
+        if self.closed:
+            return
         logger.debug('MicrophoneStream.exit ENTER')
         self._audio_stream.stop_stream()
         self._audio_stream.close()

@@ -150,6 +150,7 @@ class WebInterface(object):
         restartTranscribeEngine = False
         restartSpeakReader = False
         logout = False
+        cleanup = False
 
         checked_configs = [
             "start_transcribe_on_startup",
@@ -220,8 +221,16 @@ class WebInterface(object):
         if kwargs['http_username'] != speakreader.CONFIG.HTTP_USERNAME or set_http_password:
             logout = True
 
+        if kwargs.get('log_retention_days') != speakreader.CONFIG.LOG_RETENTION_DAYS \
+        or kwargs.get('transcript_retention_days') != speakreader.CONFIG.TRANSCRIPT_RETENTION_DAYS \
+        or kwargs.get('recording_retention_days') != speakreader.CONFIG.RECORDING_RETENTION_DAYS:
+            cleanup = True
+
         speakreader.CONFIG.process_kwargs(kwargs)
         speakreader.CONFIG.write()
+
+        if cleanup:
+            self.SR.cleanup_files()
 
         if restartSpeakReader:
             #self.restart()

@@ -35,6 +35,7 @@ import signal
 import time
 import tzlocal
 import threading
+import psutil
 
 import speakreader
 from speakreader import logger, config, SpeakReader
@@ -51,8 +52,6 @@ def main():
 
     DAEMON = False
     NOFORK = False
-    CREATEPID = False
-    PIDFILE = None
 
     QUIET = False
     VERBOSE = False
@@ -67,6 +66,7 @@ def main():
     PLATFORM_PROCESSOR = processor()
     PLATFORM_MACHINE = machine()
     PLATFORM_IS_64BITS = sys.maxsize > 2**32
+    SYS_PLATFORM = sys.platform
 
     # Fixed paths to application
     if hasattr(sys, 'frozen'):
@@ -76,18 +76,25 @@ def main():
 
     PROG_DIR = os.path.dirname(FULL_PATH)
 
-    SYS_PLATFORM = sys.platform
-    SYS_ENCODING = None
+    # Ensure only one instance of SpeakReader running.
+    PIDFILE = os.path.join(PROG_DIR, 'pidfile')
+    myPid = os.getpid()
+    if os.path.exists(PIDFILE) and os.path.isfile(PIDFILE):
+        for p in psutil.process_iter():
+            if 'python' in p.name() and p.pid != myPid:
+                for f in p.open_files():
+                    if f.path == PIDFILE:
+                        logger.error("SpeakReader is already Running. Exiting.")
+                        sys.exit(0)
+
+    myPidFile = open(PIDFILE, 'w+')
+    myPidFile.write(str(myPid))
+    myPidFile.flush()
 
     try:
         locale.setlocale(locale.LC_ALL, "")
-        SYS_LANGUAGE, SYS_ENCODING = locale.getdefaultlocale()
     except (locale.Error, IOError):
         pass
-
-    # for OSes that are poorly configured I'll just force UTF-8
-    if not SYS_ENCODING or SYS_ENCODING in ('ANSI_X3.4-1968', 'US-ASCII', 'ASCII'):
-        SYS_ENCODING = 'UTF-8'
 
     try:
         SYS_TIMEZONE = str(tzlocal.get_localzone())
@@ -117,8 +124,6 @@ def main():
     parser.add_argument(
         '--nolaunch', action='store_true', help='Prevent browser from launching on startup')
     parser.add_argument(
-        '--pidfile', help='Create a pid file (only relevant when running as a daemon)')
-    parser.add_argument(
         '--nofork', action='store_true', help='Start SpeakReader as a service, do not fork when restarting')
 
     args = parser.parse_args()
@@ -147,35 +152,6 @@ def main():
     if args.nofork:
         NOFORK = True
         logger.info("SpeakReader is running as a service, it will not fork when restarted.")
-
-    if args.pidfile:
-        PIDFILE = str(args.pidfile)
-
-        # If the pidfile already exists, SpeakReader may still be running, so EXIT
-        if os.path.exists(PIDFILE):
-            try:
-                with open(PIDFILE, 'r') as fp:
-                    pid = int(fp.read())
-                os.kill(pid, 0)
-            except IOError as e:
-                raise SystemExit("Unable to read PID file: %s", e)
-            except OSError:
-                logger.warn("PID file '%s' already exists, but PID %d is not running. Ignoring PID file." %
-                            (PIDFILE, pid))
-            else:
-                # The pidfile exists and points to a live PID. SpeakReader may still be running, so exit.
-                raise SystemExit("PID file '%s' already exists. Exiting." % PIDFILE)
-
-        # The pidfile is only useful in daemon mode, make sure we can write the file properly
-        if DAEMON:
-            CREATEPID = True
-            try:
-                with open(PIDFILE, 'w') as fp:
-                    fp.write("pid\n")
-            except IOError as e:
-                raise SystemExit("Unable to write PID file: %s", e)
-        else:
-            logger.warn("Not running in daemon mode. PID file creation disabled.")
 
     # Determine which data directory and config file to use
     if args.datadir:
@@ -246,7 +222,7 @@ def main():
         CONFIG.RECORDINGS_FOLDER, os.path.join(DATA_DIR, 'recordings'), 'recordings')
 
     if DAEMON:
-        daemonize(CREATEPID, PIDFILE)
+        daemonize(myPidFile)
 
     # Store the original umask
     UMASK = os.umask(0)
@@ -295,9 +271,8 @@ def main():
 
     SR.shutdown(restart=restart, update=update, checkout=checkout)
 
-    if CREATEPID:
-        logger.info("Removing pidfile %s", PIDFILE)
-        os.remove(PIDFILE)
+    myPidFile.close()
+    os.remove(PIDFILE)
 
     if restart:
         logger.info("SpeakReader is restarting...")
@@ -332,7 +307,7 @@ def main():
     sys.exit(0)
 
 
-def daemonize(CREATEPID, PIDFILE):
+def daemonize(myPidFile):
 
     if threading.activeCount() != 1:
         logger.warn(
@@ -377,12 +352,10 @@ def daemonize(CREATEPID, PIDFILE):
     os.dup2(se.fileno(), sys.stderr.fileno())
 
     pid = os.getpid()
-    logger.info(u"Daemonized to PID: %d", pid)
-
-    if CREATEPID:
-        logger.info(u"Writing PID %d to %s", pid, PIDFILE)
-        with open(PIDFILE, 'w') as fp:
-            fp.write("%s\n" % pid)
+    myPidFile.seek(0)
+    myPidFile.write(str(pid))
+    myPidFile.flush()
+    logger.info("Daemonized to PID: %d", pid)
 
 
 def check_folder_writable(folder, fallback, name):
@@ -393,17 +366,17 @@ def check_folder_writable(folder, fallback, name):
         try:
             os.makedirs(folder)
         except OSError as e:
-            logger.error(u"Could not create %s dir '%s': %s" % (name, folder, e))
+            logger.error("Could not create %s dir '%s': %s" % (name, folder, e))
             if folder != fallback:
-                logger.warn(u"Falling back to %s dir '%s'" % (name, fallback))
+                logger.warn("Falling back to %s dir '%s'" % (name, fallback))
                 return check_folder_writable(None, fallback, name)
             else:
                 return folder, None
 
     if not os.access(folder, os.W_OK):
-        logger.error(u"Cannot write to %s dir '%s'" % (name, folder))
+        logger.error("Cannot write to %s dir '%s'" % (name, folder))
         if folder != fallback:
-            logger.warn(u"Falling back to %s dir '%s'" % (name, fallback))
+            logger.warn("Falling back to %s dir '%s'" % (name, fallback))
             return check_folder_writable(None, fallback, name)
         else:
             return folder, False
