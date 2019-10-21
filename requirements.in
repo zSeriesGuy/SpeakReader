@@ -20,3 +20,4 @@ passlib
 wheel
 samplerate
 apscheduler
+psutil

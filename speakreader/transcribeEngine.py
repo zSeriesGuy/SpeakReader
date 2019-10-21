@@ -95,11 +95,11 @@ class TranscribeEngine:
 
     def stop(self):
         if self._ONLINE:
+            self._ONLINE = False
             self.microphoneStream.stop()
             self.transcriptQueue.put_nowait(self.OFFLINE_MESSAGE)
             self._transcribeThread.join()
             self.queueManager.transcriptHandler.setFileName(None)
-            self._ONLINE = False
 
     def shutdown(self):
         self.stop()
@@ -141,12 +141,14 @@ class TranscribeEngine:
         self.transcriptQueue.put_nowait(self.ONLINE_MESSAGE)
         self._ONLINE = True
 
-        with self.microphoneStream as stream:
-            while not stream.closed:
-                responses = transcribeService.transcribe()
-                self.process_responses(responses)
-
-            logger.info("Transcription Engine Stream Closed")
+        try:
+            with self.microphoneStream as stream:
+                while self._ONLINE:
+                    responses = transcribeService.transcribe()
+                    self.process_responses(responses)
+                logger.info("Transcription Engine Stream Closed")
+        except Exception as e:
+            logger.error(e)
 
         self.transcriptFile.close()
         self.transcriptQueue.put_nowait(self.OFFLINE_MESSAGE)

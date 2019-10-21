@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.2.3 (2019-10-21)
+* Add support to ensure only one instance of SpeakReader is running.
+* Add exception handler for Google OutOfRange exception. Streaming limit is 5 minutes.
+* Run file cleanup if days changes in management console settings.
+* Upgrade packages.
+
 ## v1.2.2 (2019-10-19)
 * Add settings and process for deleting logs, transcripts, and recordings after a specified number of days.
 
