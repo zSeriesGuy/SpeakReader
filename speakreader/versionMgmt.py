@@ -273,14 +273,14 @@ class Version(object):
 
         if self.INSTALL_TYPE == 'git':
 
-            output, err = runGit('diff --name-only %s' % speakreader.CONFIG.GIT_REMOTE)
+            output, err = runGit('diff --name-only %s/%s' % (speakreader.CONFIG.GIT_REMOTE, speakreader.CONFIG.GIT_BRANCH))
 
             if output == '':
                 logger.debug("No differences found from the origin")
 
             elif output == 'requirements.txt':
                 logger.warn('Requirements file is out of sync. Restoring to original.')
-                output, err = runGit('checkout %s requirements.txt' % speakreader.CONFIG.GIT_REMOTE)
+                output, err = runGit('checkout %s/%s requirements.txt' % (speakreader.CONFIG.GIT_REMOTE), speakreader.CONFIG.GIT_BRANCH)
             else:
                 logger.error("Differences Found. Unable to update.")
                 logger.info('Output: ' + str(output))
@@ -488,6 +488,24 @@ def runGit(args):
 
 
 def pip_sync():
+    """
+        Run pip install requirements first because running pip-sync will fail if pip-tools gets updated.
+    """
+    logger.info("Running pip install for requirements update to synchronize the environment.")
+    cmd = sys.executable + ' -m pip install -r requirements.txt'
+    try:
+        logger.debug('Trying to execute: "' + cmd + '" with shell in ' + speakreader.PROG_DIR)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True,
+                             cwd=speakreader.PROG_DIR)
+        output, err = p.communicate()
+        for line in output.decode('utf-8').split('\n'):
+            if line:
+                logger.info('pip output: ' + str(line))
+
+    except Exception as e:
+        logger.error('Command failed: %s' % e)
+        return None, None
+
     logger.info("Running pip-sync to synchronize the environment.")
     cmd = sys.executable + ' -m piptools sync requirements.txt'
     try:
