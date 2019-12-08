@@ -78,3 +78,6 @@ class googleTranscribe:
         except exceptions.OutOfRange:
             logger.debug("googleTranscribe.transcribe OutOfRange Exception: Time Limit Exceeded. Restarting.")
             pass
+        except exceptions.DeadlineExceeded:
+            logger.debug("googleTranscribe.transcribe DeadlineExceeded Exception: Restarting.")
+            pass
