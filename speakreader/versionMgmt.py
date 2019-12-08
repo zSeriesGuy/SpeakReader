@@ -20,6 +20,7 @@ import os
 import sys
 import re
 import subprocess
+import threading
 import tarfile
 
 import speakreader
@@ -280,7 +281,7 @@ class Version(object):
 
             elif output == 'requirements.txt':
                 logger.warn('Requirements file is out of sync. Restoring to original.')
-                output, err = runGit('checkout %s/%s requirements.txt' % (speakreader.CONFIG.GIT_REMOTE), speakreader.CONFIG.GIT_BRANCH)
+                output, err = runGit('checkout %s/%s requirements.txt' % (speakreader.CONFIG.GIT_REMOTE, speakreader.CONFIG.GIT_BRANCH))
             else:
                 logger.error("Differences Found. Unable to update.")
                 logger.info('Output: ' + str(output))
