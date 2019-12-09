@@ -51,7 +51,7 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-ExecStart=/opt/SpeakReader/bin/python3 /opt/SpeakReader/start.py --config /opt/SpeakReader/config.ini --datadir /opt/SpeakReader --quiet --daemon --nolaunch
+ExecStart=/opt/SpeakReader/venv/bin/python3 /opt/SpeakReader/start.py --config /opt/SpeakReader/config.ini --datadir /opt/SpeakReader --quiet --daemon --nolaunch
 GuessMainPID=no
 Type=forking
 User=speakreader
