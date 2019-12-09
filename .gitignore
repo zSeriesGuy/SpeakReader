@@ -75,3 +75,4 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 .project
 .pydevproject
+pidfile
