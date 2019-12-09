@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.4 (2019-12-09)
+* Fix favicon handling.
+* Run pip install requirements before pip-sync.
+
 ## v1.2.3 (2019-10-21)
 * Add support to ensure only one instance of SpeakReader is running.
 * Add exception handler for Google OutOfRange exception. Streaming limit is 5 minutes.
