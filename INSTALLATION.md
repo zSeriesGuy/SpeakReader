@@ -10,14 +10,13 @@ Install the latest version of [Python 3](https://www.python.org/downloads/window
 * Extract the ZIP file.
 * Open a CMD window.
 * CD to the directory where you unzipped SpeakReader.
-* Type: `python -m venv .\`
-* Type: `.\scripts\activate`
-* Type: `python -m pip install --upgrade pip setuptools`
-* Type: `python -m pip install wheel pip-tools`
+* Type: `python3 -m venv .\venv`
+* Type: `.\venv\scripts\activate`
+* Type: `pip3 install --upgrade pip setuptools wheel pip-tools`
 * Install the appropriate PyAudio wheel package for your release of Windows and Python. Several are provided in the PyAudioWheels folder. For example, to install the 32-bit version for Python V3.7: 
     * Type: `pip3 install .\PyAudioWheels\PyAudio-0.2.11-cp37-cp37m-win32.whl`
 * Type: `pip3 install -r requirements.txt`
-* Type: `.\scripts\python start.py` to start SpeakReader.
+* Type: `.\venv\scripts\python start.py` to start SpeakReader.
 * SpeakReader will be loaded in your browser or listening on http://localhost:8880
 * You can change the port in the Settings tab of the management page or by editing config.ini.
 
@@ -43,16 +42,16 @@ SpeakReader will be installed to `/opt/SpeakReader`.
     * Ubuntu/Debian:
         * `sudo apt-get install git-core`
         * `sudo apt-get install build-essential libffi-dev libssl-dev libxml2-dev libxslt1-dev libjpeg8-dev zlib1g-dev alsa-utils portaudio19-dev`
-        * `sudo apt-get install python3 python3-venv python3-all-dev`
+        * `sudo apt-get install python3 python3-venv python3-dev`
 * Type: `cd /opt`
 * Type: `sudo git clone https://github.com/zSeriesGuy/SpeakReader.git`
 * Type: `cd SpeakReader`
-* Type: `python3 -m venv /opt/SpeakReader`
-* Type: `source /opt/SpeakReader/bin/activate`
-* Type: `python -m pip install --upgrade pip setuptools wheel pip-tools`
+* Type: `python3 -m venv /opt/SpeakReader/venv`
+* Type: `source /opt/SpeakReader/venv/bin/activate`
+* Type: `pip3 install --upgrade pip setuptools wheel pip-tools`
 * Type: `pip3 install -r /opt/SpeakReader/requirements.txt`
 * Type: `sudo usermod -aG audio {userid}` where {userid} is the user that you signed in to the terminal with.   
-* Type: `/opt/SpeakReader/bin/python3 /opt/SpeakReader/start.py` to start SpeakReader
+* Type: `/opt/SpeakReader/venv/bin/python3 /opt/SpeakReader/start.py` to start SpeakReader
 * SpeakReader will be loaded in your browser or listening on http://localhost:8880
 
 #### To run SpeakReader in the background as a Daemon on startup:

@@ -3,6 +3,7 @@
 ## v1.2.4 (2019-12-09)
 * Fix favicon handling.
 * Run pip install requirements before pip-sync.
+* Update installation instructions and init scripts
 
 ## v1.2.3 (2019-10-21)
 * Add support to ensure only one instance of SpeakReader is running.
