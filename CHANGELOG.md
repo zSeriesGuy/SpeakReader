@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.5 (2019-12-10)
+* Modify pip_sync to output messages from process in realtime.
+
 ## v1.2.4.1 (2019-12-10)
 * Upgrade packages, specifically grpcio, to fix an issue on Raspbian.
 
