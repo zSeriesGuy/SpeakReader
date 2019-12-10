@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.4.1 (2019-12-10)
+* Upgrade packages, specifically grpcio, to fix an issue on Raspbian.
+
 ## v1.2.4 (2019-12-09)
 * Fix favicon handling.
 * Run pip install requirements before pip-sync.
