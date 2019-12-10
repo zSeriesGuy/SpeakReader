@@ -41,7 +41,7 @@ SpeakReader will be installed to `/opt/SpeakReader`.
 * Install prerequisites:
     * Ubuntu/Debian:
         * `sudo apt-get install git-core`
-        * `sudo apt-get install build-essential libffi-dev libssl-dev libxml2-dev libxslt1-dev libjpeg8-dev zlib1g-dev alsa-utils portaudio19-dev`
+        * `sudo apt-get install build-essential libffi-dev libssl-dev libxml2-dev libxslt1-dev libjpeg8-dev zlib1g-dev alsa-utils libatlas-base-dev portaudio19-dev`
         * `sudo apt-get install python3 python3-venv python3-dev`
 * Type: `cd /opt`
 * Type: `sudo git clone https://github.com/zSeriesGuy/SpeakReader.git`
