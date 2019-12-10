@@ -1,5 +1,4 @@
 from queue import Queue
-import time
 
 import speakreader
 from speakreader import logger
@@ -41,47 +40,44 @@ class googleTranscribe:
             interim_results=True)
 
     def transcribe(self):
-        # Generator to return transcription results
         if not self.is_supported:
             return
-
+        # Generator to return transcription results
         logger.debug("googleTranscribe.transcribe Entering")
+        audio_generator = self.audio_device.streamGenerator()
 
-        while True:
-            audio_generator = self.audio_device.streamGenerator()
-            requests = (speech.types.StreamingRecognizeRequest(
-                audio_content=content)
-                for content in audio_generator)
-            responses = self.client.streaming_recognize(self.streaming_config, requests)
-            try:
-                for response in responses:
-                    if not response.results:
-                        continue
+        requests = (speech.types.StreamingRecognizeRequest(
+            audio_content=content)
+            for content in audio_generator)
 
-                    result = response.results[0]
+        responses = self.client.streaming_recognize(self.streaming_config, requests)
 
-                    if not result.is_final and not speakreader.CONFIG.SHOW_INTERIM_RESULTS:
-                        continue
+        try:
+            for response in responses:
+                if not response.results:
+                    continue
 
-                    if not result.alternatives:
-                        continue
+                result = response.results[0]
 
-                    if not result.is_final and result.stability < 0.75:
-                        continue
+                if not result.is_final and not speakreader.CONFIG.SHOW_INTERIM_RESULTS:
+                    continue
 
-                    transcript = {
-                        'transcript': result.alternatives[0].transcript,
-                        'is_final': result.is_final,
-                    }
+                if not result.alternatives:
+                    continue
 
-                    yield transcript
+                if not result.is_final and result.stability < 0.75:
+                    continue
 
-                logger.debug("googleTranscribe.transcribe Exiting")
-                break
+                transcript = {
+                    'transcript': result.alternatives[0].transcript,
+                    'is_final': result.is_final,
+                }
 
-            except exceptions.OutOfRange:
-                """ Google Cloud limits stream to about 5 minutes. Just loop. """
-                continue
-            except exceptions.DeadlineExceeded:
-                """ Google Cloud limits stream to about 5 minutes. Just loop. """
-                continue
+                yield transcript
+            logger.debug("googleTranscribe.transcribe Exiting")
+        except exceptions.OutOfRange:
+            logger.debug("googleTranscribe.transcribe OutOfRange Exception: Time Limit Exceeded. Restarting.")
+            pass
+        except exceptions.DeadlineExceeded:
+            logger.debug("googleTranscribe.transcribe DeadlineExceeded Exception: Restarting.")
+            pass
