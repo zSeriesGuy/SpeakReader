@@ -88,6 +88,9 @@ class Version(object):
                     logger.error('Could not retrieve branch name from git. Defaulting to master.')
                     self.BRANCH_NAME = 'master'
 
+                speakreader.CONFIG.GIT_REMOTE = self.REMOTE_NAME
+                speakreader.CONFIG.GIT_BRANCH = self.BRANCH_NAME
+
         else:
             self.INSTALL_TYPE = 'source'
             self.REMOTE_NAME = 'origin'
