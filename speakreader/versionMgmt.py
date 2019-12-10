@@ -52,7 +52,7 @@ class Version(object):
         if os.path.isdir(os.path.join(speakreader.PROG_DIR, '.git')):
             self.INSTALL_TYPE = 'git'
 
-            output, err = runGit('rev-parse HEAD')
+            output, err = self.runGit('rev-parse HEAD')
             if output:
                 if re.match('^[a-z0-9]+$', output):
                     self.INSTALLED_VERSION_HASH = output
@@ -67,7 +67,7 @@ class Version(object):
             if speakreader.CONFIG.DO_NOT_OVERRIDE_GIT_BRANCH and speakreader.CONFIG.GIT_BRANCH:
                 self.BRANCH_NAME = speakreader.CONFIG.GIT_BRANCH
             else:
-                remote_branch, err = runGit('rev-parse --abbrev-ref --symbolic-full-name @{u}')
+                remote_branch, err = self.runGit('rev-parse --abbrev-ref --symbolic-full-name @{u}')
                 remote_branch = remote_branch.rsplit('/', 1) if remote_branch else []
                 if len(remote_branch) == 2:
                     self.REMOTE_NAME, self.BRANCH_NAME = remote_branch
@@ -274,20 +274,20 @@ class Version(object):
 
         if self.INSTALL_TYPE == 'git':
 
-            output, err = runGit('diff --name-only %s/%s' % (speakreader.CONFIG.GIT_REMOTE, speakreader.CONFIG.GIT_BRANCH))
+            output, err = self.runGit('diff --name-only %s/%s' % (speakreader.CONFIG.GIT_REMOTE, speakreader.CONFIG.GIT_BRANCH))
 
             if output == '':
                 logger.debug("No differences found from the origin")
 
             elif output == 'requirements.txt':
                 logger.warn('Requirements file is out of sync. Restoring to original.')
-                output, err = runGit('checkout %s/%s requirements.txt' % (speakreader.CONFIG.GIT_REMOTE, speakreader.CONFIG.GIT_BRANCH))
+                output, err = self.runGit('checkout %s/%s requirements.txt' % (speakreader.CONFIG.GIT_REMOTE, speakreader.CONFIG.GIT_BRANCH))
             else:
                 logger.error("Differences Found. Unable to update.")
                 logger.info('Output: ' + str(output))
                 return False
 
-            output, err = runGit('pull ' + speakreader.CONFIG.GIT_REMOTE + ' ' + speakreader.CONFIG.GIT_BRANCH)
+            output, err = self.runGit('pull ' + speakreader.CONFIG.GIT_REMOTE + ' ' + speakreader.CONFIG.GIT_BRANCH)
 
             if not output:
                 logger.error('Unable to download latest version')
@@ -363,14 +363,14 @@ class Version(object):
                 logger.error("Unable to write current version to version.txt, update not complete: %s" % e)
                 return False
 
-        output, err = pip_sync()
+        self.pip_sync()
         logger.info("Update Complete")
         return True
 
     def checkout_git_branch(self):
         if self.INSTALL_TYPE == 'git':
-            output, err = runGit('fetch %s' % speakreader.CONFIG.GIT_REMOTE)
-            output, err = runGit('checkout %s' % speakreader.CONFIG.GIT_BRANCH)
+            output, err = self.runGit('fetch %s' % speakreader.CONFIG.GIT_REMOTE)
+            output, err = self.runGit('checkout %s' % speakreader.CONFIG.GIT_BRANCH)
 
             if not output:
                 logger.error('Unable to change git branch.')
@@ -381,8 +381,8 @@ class Version(object):
                     logger.error('Unable to checkout from git: ' + line)
                     logger.info('Output: ' + str(output))
 
-            output, err = runGit('pull %s %s' % (speakreader.CONFIG.GIT_REMOTE, speakreader.CONFIG.GIT_BRANCH))
-            output, err = pip_sync()
+            output, err = self.runGit('pull %s %s' % (speakreader.CONFIG.GIT_REMOTE, speakreader.CONFIG.GIT_BRANCH))
+            self.pip_sync()
 
 
     def read_changelog(self, latest_only=False, since_prev_release=False):
@@ -450,76 +450,82 @@ class Version(object):
             return '<h4>Unable to open changelog file</h4>'
 
 
-def runGit(args):
-    if speakreader.CONFIG.GIT_PATH:
-        git_locations = ['"' + speakreader.CONFIG.GIT_PATH + '"']
-    else:
-        git_locations = ['git']
+    def runGit(self, args):
+        if speakreader.CONFIG.GIT_PATH:
+            git_locations = ['"' + speakreader.CONFIG.GIT_PATH + '"']
+        else:
+            git_locations = ['git']
 
-    output = err = None
+        output = err = None
 
-    for cur_git in git_locations:
-        cmd = cur_git + ' ' + args
+        for cur_git in git_locations:
+            cmd = cur_git + ' ' + args
 
+            try:
+                logger.debug('Trying to execute: "' + cmd + '" with shell in ' + speakreader.PROG_DIR)
+                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True,
+                                     cwd=speakreader.PROG_DIR)
+                output, err = p.communicate()
+                output = output.decode('utf-8').strip()
+
+                for line in output.split('\n'):
+                    if line:
+                        logger.debug('Git output: ' + line)
+
+            except OSError:
+                logger.debug('Command failed: %s', cmd)
+                continue
+
+            if 'not found' in output or "not recognized as an internal or external command" in output:
+                logger.debug('Unable to find git with command ' + cmd)
+                output = None
+            elif 'fatal:' in output or err:
+                logger.error('Git returned bad info. Are you sure this is a git installation?')
+                output = None
+            elif output:
+                break
+
+        return (output, err)
+
+
+    def pip_sync(self):
+        """
+            Run pip install requirements first because running pip-sync will fail if pip-tools gets updated.
+        """
         try:
-            logger.debug('Trying to execute: "' + cmd + '" with shell in ' + speakreader.PROG_DIR)
-            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True,
-                                 cwd=speakreader.PROG_DIR)
-            output, err = p.communicate()
-            output = output.decode('utf-8').strip()
+            logger.info("Running pip install requirements to update the environment.")
+            cmd = sys.executable + ' -m pip install -r requirements.txt'
+            output = self._exec_command(cmd)
+            for line in output:
+                logger.info('pip output: %s' % line)
 
-            for line in output.split('\n'):
-                if line:
-                    logger.debug('Git output: ' + line)
+            logger.info("Running pip-sync to synchronize the environment.")
+            cmd = sys.executable + ' -m piptools sync requirements.txt'
+            output = self._exec_command(cmd)
+            for line in output:
+                logger.info('pip-sync output: %s' % line)
 
-        except OSError:
-            logger.debug('Command failed: %s', cmd)
-            continue
-
-        if 'not found' in output or "not recognized as an internal or external command" in output:
-            logger.debug('Unable to find git with command ' + cmd)
-            output = None
-        elif 'fatal:' in output or err:
-            logger.error('Git returned bad info. Are you sure this is a git installation?')
-            output = None
-        elif output:
-            break
-
-    return (output, err)
+        except Exception as e:
+            logger.error('Command failed: %s' % e)
+            return None, None
 
 
-def pip_sync():
-    """
-        Run pip install requirements first because running pip-sync will fail if pip-tools gets updated.
-    """
-    logger.info("Running pip install for requirements update to synchronize the environment.")
-    cmd = sys.executable + ' -m pip install -r requirements.txt'
-    try:
-        logger.debug('Trying to execute: "' + cmd + '" with shell in ' + speakreader.PROG_DIR)
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True,
-                             cwd=speakreader.PROG_DIR)
-        output, err = p.communicate()
-        for line in output.decode('utf-8').split('\n'):
-            if line:
-                logger.info('pip output: ' + str(line))
+    def _exec_command(self, cmd, cwd=None):
+        if cwd is None:
+            cwd = speakreader.PROG_DIR
+        logger.debug('Trying to execute: "' + cmd + '" with shell in ' + cwd)
+        p = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=cwd, shell=True
+        )
 
-    except Exception as e:
-        logger.error('Command failed: %s' % e)
-        return None, None
+        while True:
+            out = p.stdout.readline().decode('utf-8').replace('\r', '').replace('\n', '')
+            return_code = p.poll()
+            if out == '' and return_code is not None:
+                break
 
-    logger.info("Running pip-sync to synchronize the environment.")
-    cmd = sys.executable + ' -m piptools sync requirements.txt'
-    try:
-        logger.debug('Trying to execute: "' + cmd + '" with shell in ' + speakreader.PROG_DIR)
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True,
-                             cwd=speakreader.PROG_DIR)
-        output, err = p.communicate()
-        for line in output.decode('utf-8').split('\n'):
-            if line:
-                logger.info('pip-sync output: ' + str(line))
+            if out != '':
+                yield out
 
-    except Exception as e:
-        logger.error('Command failed: %s' % e)
-        return None, None
-
-    return (output, err)
+        if return_code:
+            raise subprocess.CalledProcessError(return_code, cmd)
