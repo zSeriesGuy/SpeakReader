@@ -49,7 +49,7 @@ pywin32==227 ; sys_platform == "win32"
 requests==2.22.0          # via google-api-core, ibm-cloud-sdk-core, ibm-watson
 rsa==4.0                  # via google-auth
 samplerate==0.1.0
-six==1.13.0               # via apscheduler, cheroot, configobj, google-api-core, google-api-python-client, google-auth, grpcio, jaraco.classes, jaraco.collections, jaraco.text, pip-tools, protobuf, python-dateutil, tempora, websocket-client
+six==1.13.0               # via apscheduler, cheroot, configobj, google-api-core, google-api-python-client, google-auth, grpcio, pip-tools, protobuf, python-dateutil, tempora, websocket-client
 tempora==1.14.1           # via portend
 tzlocal==2.0.0
 uritemplate==3.0.0        # via google-api-python-client
