@@ -1,7 +1,10 @@
 # Changelog
 
-## v1.2.4.1 (2019-12-10)
+## v1.2.5 (2019-12-10)
 * Upgrade packages, specifically grpcio, to fix an issue on Raspbian.
+* Modify pip_sync to output messages from process in realtime.
+* Modify loop to handle Google Cloud time limits on content.
+* Set GIT remote and branch based on what's installed.
 
 ## v1.2.4 (2019-12-09)
 * Fix favicon handling.
