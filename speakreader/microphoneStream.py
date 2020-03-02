@@ -190,7 +190,7 @@ class MicrophoneStream:
 
 
     def initRecording(self):
-        logger.debug("microphoneStream.initRecording Entering")
+        logger.debug("microphoneStream.initRecording ENTER")
         if speakreader.CONFIG.SAVE_RECORDINGS:
             wavfile = os.path.join(speakreader.CONFIG.RECORDINGS_FOLDER, self.recordingFilename)
             try:
@@ -208,17 +208,17 @@ class MicrophoneStream:
 
             recordingThread = Thread(target=self.saveRecording, args=(), name='recordingThread')
             recordingThread.start()
-        logger.debug("microphoneStream.initRecording Exiting")
+        logger.debug("microphoneStream.initRecording EXIT")
 
 
     def saveRecording(self):
-        logger.debug("microphoneStream.saveRecording entering")
+        logger.debug("microphoneStream.saveRecording ENTER")
         # Record the audio file
         if self._wavfile is not None:
             audioGenerator = self.recordingGenerator()
             for audioData in audioGenerator:
                 self._wavfile.writeframes(audioData)
-        logger.debug("microphoneStream.saveRecording exiting")
+        logger.debug("microphoneStream.saveRecording EXIT")
 
     def recordingGenerator(self):
         return self._generator(self._recordingBuff)
