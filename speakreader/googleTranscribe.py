@@ -69,9 +69,6 @@ class googleTranscribe:
                     if not result.alternatives:
                         continue
 
-                    if not result.is_final and result.stability < 0.75:
-                        continue
-
                     transcript = {
                         'transcript': result.alternatives[0].transcript,
                         'is_final': result.is_final,
