@@ -55,7 +55,7 @@ class ibmTranscribe:
         if not self.is_supported:
             return
         # Generator to return transcription results
-        logger.debug('ibmTranscribe.transcribe entering')
+        logger.debug('ibmTranscribe.transcribe ENTER')
 
         recognize_thread = Thread(target=self.recognize_using_websocket, args=())
         recognize_thread.start()
@@ -68,12 +68,12 @@ class ibmTranscribe:
 
         self.audio_source.completed_recording()
         recognize_thread.join()
-        logger.debug('ibmTranscribe.transcribe exiting')
+        logger.debug('ibmTranscribe.transcribe EXIT')
 
 
     # this function will initiate the recognize service and pass in the AudioSource
     def recognize_using_websocket(self, *args):
-        logger.debug("ibmTransribe.recognize_using_websocket entering")
+        logger.debug("ibmTransribe.recognize_using_websocket ENTER")
         self.speech_to_text.recognize_using_websocket(
             audio=self.audio_source,
             content_type='audio/l16; rate=%s' % self.audio_device._outputSampleRate,
@@ -85,13 +85,13 @@ class ibmTranscribe:
             word_alternatives_threshold=0.75,
             profanity_filter=bool(speakreader.CONFIG.ENABLE_CENSORSHIP),
         )
-        logger.debug("ibmTransribe.recognize_using_websocket exiting")
+        logger.debug("ibmTransribe.recognize_using_websocket EXIT")
 
 
 # define callback for the speech to text service
 class ProcessResponses(RecognizeCallback):
     def __init__(self):
-        logger.debug("ibmTranscribe.ProcessResponse.Init entering")
+        logger.debug("ibmTranscribe.ProcessResponse.Init ENTER")
         self.responseQueue = Queue(maxsize=100)
         RecognizeCallback.__init__(self)
 
