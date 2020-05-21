@@ -12,7 +12,8 @@ Install the latest version of [Python 3](https://www.python.org/downloads/window
 * CD to the directory where you unzipped SpeakReader.
 * Type: `python3 -m venv .\venv`
 * Type: `.\venv\scripts\activate`
-* Type: `pip3 install --upgrade pip setuptools wheel pip-tools`
+* Type: `python -m pip install --upgrade pip`
+* Type: `pip3 install --upgrade setuptools wheel pip-tools`
 * Install the appropriate PyAudio wheel package for your release of Windows and Python. Several are provided in the PyAudioWheels folder. For example, to install the 32-bit version for Python V3.7: 
     * Type: `pip3 install .\PyAudioWheels\PyAudio-0.2.11-cp37-cp37m-win32.whl`
 * Type: `pip3 install -r requirements.txt`

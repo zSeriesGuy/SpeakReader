@@ -651,7 +651,7 @@
 var logStream = "";
 var prev_username = "";
 var prev_hashed_password = "";
-var update_available = ${productInfo['update_available']};
+var update_available = "";
 var transcripts_table = false;
 var logs_table = false;
 
@@ -746,15 +746,22 @@ function resizeContainers() {
 
 function setLatestRelease(data) {
     $('#latest-release').html('<a class="release-url" target="_blank" href="' + data.latest_release_url + '">Update Available: ' + data.latest_release + '</a>');
-    $('#check-for-update-button').html('<span>Check for Updates</span>');
-    if ( data.update_available ) {
-        update_available = true;
-        $('#check-for-update').hide();
-        $('#update-available').show();
-    } else {
-        update_available = false;
-        $('#check-for-update').show();
-        $('#update-available').hide();
+    update_available = data.update_available;
+    $('#check-for-update').hide();
+    $('#update-available').show();
+    switch (data.update_available) {
+        case true:
+            $('#latest-release').html('<a class="release-url" target="_blank" href="' + data.latest_release_url + '">Update Available: ' + data.latest_release + '</a>');
+            break;
+        case 'release':
+            $('#latest-release').html('<a class="release-url" target="_blank" href="' + data.latest_release_url + '">Release Available: ' + data.latest_release + '</a>');
+            break;
+        case 'commit':
+            $('#latest-release').html('Updates Available');
+            break;
+        default:
+            $('#check-for-update').show();
+            $('#update-available').hide();
     }
 };
 
@@ -763,6 +770,7 @@ function checkForUpdate() {
     $.getJSON('checkForUpdate', function (data, textStatus) {
         setLatestRelease(data)
     });
+    $('#check-for-update-button').html('<span>Check for Updates</span>');
 };
 
 function postSaveChecks(jqXHR) {
@@ -784,18 +792,7 @@ function postSaveChecks(jqXHR) {
     if ( response.logout ) {
         window.location.href = "auth/logout";
     }
-    if ( $('#check_github').prop('checked') ) {
-        if ( update_available ) {
-            $('#check-for-update').hide();
-            $('#update-available').show();
-        } else {
-            $('#check-for-update').show();
-            $('#update-available').hide();
-        }
-    } else {
-        $('#check-for-update').hide();
-        $('#update-available').hide();
-    }
+    checkForUpdate();
     $('#settings-container').scrollTop(0);
 };
 
@@ -855,18 +852,7 @@ function getSettings() {
         } else {
             $('#signout-button').hide();
         }
-        if ( config.check_github ) {
-            if ( update_available ) {
-                $('#check-for-update').hide();
-                $('#update-available').show();
-            } else {
-                $('#check-for-update').show();
-                $('#update-available').hide();
-            }
-        } else {
-            $('#check-for-update').hide();
-            $('#update-available').hide();
-        }
+        checkForUpdate();
 
         initConfigCheckbox('#save_recordings');
         initConfigCheckbox('#enable_https');

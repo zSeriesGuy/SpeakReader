@@ -261,7 +261,7 @@ class Version(object):
             self.COMMITS_BEHIND = 0
 
         if self.COMMITS_BEHIND > 0:
-            logger.info('New version is available. You are %s commits behind' % self.COMMITS_BEHIND)
+            logger.info('Updates Available. You are %s commits behind' % self.COMMITS_BEHIND)
         elif self.COMMITS_BEHIND == 0:
             logger.info('SpeakReader is up to date')
 
@@ -366,6 +366,7 @@ class Version(object):
                 logger.error("Unable to write current version to version.txt, update not complete: %s" % e)
                 return False
 
+        self.pip_update()
         self.pip_sync()
         logger.info("Update Complete")
         return True
@@ -385,6 +386,7 @@ class Version(object):
                     logger.info('Output: ' + str(output))
 
             output, err = self.runGit('pull %s %s' % (speakreader.CONFIG.GIT_REMOTE, speakreader.CONFIG.GIT_BRANCH))
+            self.pip_update()
             self.pip_sync()
 
 
@@ -491,26 +493,37 @@ class Version(object):
         return (output, err)
 
 
+    """
+        Run pip install requirements first because running pip-sync will fail if pip-tools gets updated.
+    """
     def pip_sync(self):
-        """
-            Run pip install requirements first because running pip-sync will fail if pip-tools gets updated.
-        """
+        logger.info("Running pip-sync to synchronize the environment.")
         try:
-            logger.info("Running pip install requirements to update the environment.")
-            cmd = sys.executable + ' -m pip install -r requirements.txt'
-            output = self._exec_command(cmd)
-            for line in output:
-                logger.info('pip output: %s' % line)
-
-            logger.info("Running pip-sync to synchronize the environment.")
             cmd = sys.executable + ' -m piptools sync requirements.txt'
             output = self._exec_command(cmd)
             for line in output:
                 logger.info('pip-sync output: %s' % line)
+            return True
 
         except Exception as e:
             logger.error('Command failed: %s' % e)
-            return None, None
+            return False
+
+    """
+        Update the python installation tools.
+    """
+    def pip_update(self):
+        logger.info("Running pip_update to update the installation tools.")
+        try:
+            cmd = sys.executable + ' -m pip install --upgrade pip setuptools wheel pip-tools'
+            output = self._exec_command(cmd)
+            for line in output:
+                logger.info('pip_update output: %s' % line)
+            return True
+
+        except Exception as e:
+            logger.error('Command failed: %s' % e)
+            return False
 
 
     def _exec_command(self, cmd, cwd=None):

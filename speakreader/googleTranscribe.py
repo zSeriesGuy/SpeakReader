@@ -45,7 +45,7 @@ class googleTranscribe:
         if not self.is_supported:
             return
 
-        logger.debug("googleTranscribe.transcribe Entering")
+        logger.debug("googleTranscribe.transcribe ENTER")
 
         while True:
             audio_generator = self.audio_device.streamGenerator()
@@ -69,9 +69,6 @@ class googleTranscribe:
                     if not result.alternatives:
                         continue
 
-                    if not result.is_final and result.stability < 0.75:
-                        continue
-
                     transcript = {
                         'transcript': result.alternatives[0].transcript,
                         'is_final': result.is_final,
@@ -79,7 +76,7 @@ class googleTranscribe:
 
                     yield transcript
 
-                logger.debug("googleTranscribe.transcribe Exiting")
+                logger.debug("googleTranscribe.transcribe EXIT")
                 break
 
             except exceptions.OutOfRange:
