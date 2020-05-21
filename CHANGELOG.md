@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.6 (2020-05-21)
+* Upgrade packages, specifically httplib2 to address security vulnerability.
+
 ## v1.2.5 (2019-12-10)
 * Upgrade packages, specifically grpcio, to fix an issue on Raspbian.
 * Modify pip_sync to output messages from process in realtime.
