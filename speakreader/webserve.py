@@ -92,7 +92,7 @@ class WebInterface(object):
             "current_version": self.SR.versionInfo.INSTALLED_RELEASE,
             "latest_release": self.SR.versionInfo.LATEST_RELEASE,
             "latest_release_url": self.SR.versionInfo.LATEST_RELEASE_URL,
-            "update_available": "true" if self.SR.versionInfo.UPDATE_AVAILABLE else "false",
+            "update_available": self.SR.versionInfo.UPDATE_AVAILABLE,
             "google_service": self.SR.transcribeEngine.GOOGLE_SERVICE,
             "ibm_service": self.SR.transcribeEngine.IBM_SERVICE,
             "microsoft_service": self.SR.transcribeEngine.MICROSOFT_SERVICE,
@@ -270,7 +270,7 @@ class WebInterface(object):
         versionInfo = {
             "latest_release": self.SR.versionInfo.LATEST_RELEASE,
             "latest_release_url": self.SR.versionInfo.LATEST_RELEASE_URL,
-            "update_available": int(bool(self.SR.versionInfo.UPDATE_AVAILABLE)),
+            "update_available": self.SR.versionInfo.UPDATE_AVAILABLE,
         }
         # versionInfo['update_available'] = True
         return versionInfo
