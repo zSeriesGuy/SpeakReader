@@ -766,10 +766,7 @@ function setLatestRelease(data) {
 };
 
 function checkForUpdate() {
-    $('#check-for-update-button').html('<span><i class="fas fa-sync fa-spin"/> Checking</span>');
-    $.getJSON('checkForUpdate', function (data, textStatus) {
-        setLatestRelease(data)
-    });
+    $.getJSON('checkForUpdate', function (data, textStatus) { setLatestRelease(data) });
     $('#check-for-update-button').html('<span>Check for Updates</span>');
 };
 
@@ -1219,7 +1216,8 @@ $(document).ready(function() {
     });
 
     $('#check-for-update-button').click(function() {
-        checkForUpdate();
+        $('#check-for-update-button').html('<span><i class="fas fa-sync fa-spin"/> Checking</span>');
+        setTimeout(function(){checkForUpdate();}, 1000);
     });
 
     $('#http_port').change(function() {
