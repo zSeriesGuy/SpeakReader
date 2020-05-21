@@ -2,6 +2,8 @@
 
 ## v1.2.6 (2020-05-21)
 * Upgrade packages, specifically httplib2 to address security vulnerability.
+* Change how Updates Available is presented in Settings when there are commit updates.
+* Add pip-update method to version management to update the python installation tools during update.
 
 ## v1.2.5 (2019-12-10)
 * Upgrade packages, specifically grpcio, to fix an issue on Raspbian.
