@@ -757,7 +757,7 @@ function setLatestRelease(data) {
             $('#latest-release').html('<a class="release-url" target="_blank" href="' + data.latest_release_url + '">Release Available: ' + data.latest_release + '</a>');
             break;
         case 'commit':
-            $('#latest-release').html('<a class="release-url" target="_blank" href="' + data.latest_release_url + '">Updates Available</a>');
+            $('#latest-release').html('Updates Available');
             break;
         default:
             $('#check-for-update').show();
