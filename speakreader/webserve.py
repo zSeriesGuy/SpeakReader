@@ -272,7 +272,6 @@ class WebInterface(object):
             "latest_release_url": self.SR.versionInfo.LATEST_RELEASE_URL,
             "update_available": self.SR.versionInfo.UPDATE_AVAILABLE,
         }
-        # versionInfo['update_available'] = True
         return versionInfo
 
     @cherrypy.expose
