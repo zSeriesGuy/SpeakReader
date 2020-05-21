@@ -36,7 +36,7 @@ numpy==1.18.4             # via samplerate
 passlib==1.7.2            # via -r requirements.in
 pip-tools==5.1.2          # via -r requirements.in
 portend==2.6              # via -r requirements.in, cherrypy
-protobuf==3.12.1          # via google-api-core, googleapis-common-protos
+protobuf==3.11.3          # via google-api-core, googleapis-common-protos
 psutil==5.7.0             # via -r requirements.in
 pyasn1-modules==0.2.8     # via google-auth
 pyasn1==0.4.8             # via pyasn1-modules, rsa
