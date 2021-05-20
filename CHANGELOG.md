@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.2.7 (2021-05-20)
+* Add PyAudio wheels for Python 3.9.
+* Upgrade packages, specifically RSA to address security vulnerability.
+* Changes to support google-cloud-speech V2.
+* Add API service name in use to the TranscribeEngine startup message.
+
 ## v1.2.6 (2020-05-21)
 * Upgrade packages, specifically httplib2 to address security vulnerability.
 * Change how Updates Available is presented in Settings when there are commit updates.
