@@ -25,19 +25,20 @@ class googleTranscribe:
 
         self.client = speech.SpeechClient.from_service_account_json(self.credentials_json)
 
-        self.config = speech.types.RecognitionConfig(
-            encoding=speech.enums.RecognitionConfig.AudioEncoding.LINEAR16,
+        self.recognition_config = speech.RecognitionConfig(
+            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=audio_device._outputSampleRate,
-            language_code='en-US',
+            language_code="en-US",
             max_alternatives=1,
             enable_word_time_offsets=False,
             enable_automatic_punctuation=True,
             profanity_filter=bool(speakreader.CONFIG.ENABLE_CENSORSHIP),
         )
 
-        self.streaming_config = speech.types.StreamingRecognitionConfig(
-            config=self.config,
-            interim_results=True)
+        self.streaming_config = speech.StreamingRecognitionConfig(
+            config=self.recognition_config,
+            interim_results=True,
+        )
 
     def transcribe(self):
         # Generator to return transcription results
@@ -50,11 +51,13 @@ class googleTranscribe:
         while True:
             audio_generator = self.audio_device.streamGenerator()
 
-            requests = (speech.types.StreamingRecognizeRequest(
-                audio_content=content)
-                for content in audio_generator)
+            requests = (speech.StreamingRecognizeRequest(
+                    audio_content = content,
+                )
+                for content in audio_generator
+            )
 
-            responses = self.client.streaming_recognize(self.streaming_config, requests)
+            responses = self.client.streaming_recognize(requests=requests, config=self.streaming_config)
 
             try:
                 for response in responses:
