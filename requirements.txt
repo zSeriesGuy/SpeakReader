@@ -4,90 +4,105 @@
 #
 #    pip-compile
 #
-apscheduler==3.6.3
+apscheduler==3.7.0
     # via -r requirements.in
-cachetools==4.1.0
+azure-cognitiveservices-speech==1.17.0 ; sys_platform in "win32 macos" or (sys_platform == "linux" and platform_machine in "AMD64")
+    # via -r requirements.in
+cachetools==4.2.2
     # via google-auth
-certifi==2020.4.5.1
+certifi==2020.12.5
     # via requests
-cffi==1.14.0
+cffi==1.14.5
     # via samplerate
-chardet==3.0.4
+chardet==4.0.0
     # via requests
-cheroot==8.3.0
+cheroot==8.5.2
     # via cherrypy
 cherrypy==18.6.0
     # via -r requirements.in
-click==7.1.2
+click==8.0.1
     # via pip-tools
+colorama==0.4.4
+    # via click
 configobj==5.0.6
     # via -r requirements.in
-google-api-core[grpc]==1.17.0
+google-api-core[grpc]==1.27.0
     # via
     #   google-api-python-client
     #   google-cloud-speech
-google-api-python-client==1.8.3
+google-api-python-client==2.5.0
     # via -r requirements.in
-google-auth-httplib2==0.0.3
+google-auth-httplib2==0.1.0
     # via google-api-python-client
-google-auth==1.15.0
+google-auth==1.30.0
     # via
     #   google-api-core
     #   google-api-python-client
     #   google-auth-httplib2
-google-cloud-speech==1.3.2
+google-cloud-speech==2.3.0
     # via -r requirements.in
-googleapis-common-protos==1.51.0
+googleapis-common-protos==1.53.0
     # via google-api-core
-grpcio==1.29.0
+grpcio==1.36.1
     # via google-api-core
-httplib2==0.19.0
+httplib2==0.19.1
     # via
     #   -r requirements.in
     #   google-api-python-client
     #   google-auth-httplib2
-ibm-watson==4.4.1
-    # via -r requirements.in
-ibm_cloud_sdk_core==1.5.1
+ibm-cloud-sdk-core==3.10.0
     # via ibm-watson
-idna==2.9
+ibm-watson==5.1.0
+    # via -r requirements.in
+idna==2.10
     # via requests
-jaraco.classes==3.1.0
+jaraco.classes==3.2.1
     # via jaraco.collections
-jaraco.collections==3.0.0
+jaraco.collections==3.3.0
     # via cherrypy
-jaraco.functools==3.0.1
+jaraco.functools==3.3.0
     # via
     #   cheroot
     #   jaraco.text
     #   tempora
-jaraco.text==3.2.0
+jaraco.text==3.5.0
     # via jaraco.collections
-mako==1.1.2
+libcst==0.3.19
+    # via google-cloud-speech
+mako==1.1.4
     # via -r requirements.in
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via mako
-more-itertools==8.3.0
+more-itertools==8.7.0
     # via
     #   cheroot
     #   cherrypy
     #   jaraco.classes
     #   jaraco.functools
-numpy==1.18.4
+mypy-extensions==0.4.3
+    # via typing-inspect
+numpy==1.20.3
     # via samplerate
-passlib==1.7.2
+packaging==20.9
+    # via google-api-core
+passlib==1.7.4
     # via -r requirements.in
-pip-tools==5.1.2
+pep517==0.10.0
+    # via pip-tools
+pip-tools==6.1.0
     # via -r requirements.in
-portend==2.6
+portend==2.7.1
     # via
     #   -r requirements.in
     #   cherrypy
-protobuf==3.11.3
+proto-plus==1.18.1
+    # via google-cloud-speech
+protobuf==3.17.0
     # via
     #   google-api-core
     #   googleapis-common-protos
-psutil==5.7.0
+    #   proto-plus
+psutil==5.8.0
     # via -r requirements.in
 pyasn1-modules==0.2.8
     # via google-auth
@@ -99,33 +114,41 @@ pyaudio==0.2.11
     # via -r requirements.in
 pycparser==2.20
     # via cffi
-pyjwt==1.7.1
+pyjwt==2.1.0
     # via
     #   -r requirements.in
     #   ibm-cloud-sdk-core
 pyparsing==2.4.7
-    # via httplib2
+    # via
+    #   httplib2
+    #   packaging
 python-dateutil==2.8.1
     # via
     #   -r requirements.in
     #   ibm-cloud-sdk-core
     #   ibm-watson
-pytz==2020.1
+pytz==2021.1
     # via
     #   apscheduler
     #   google-api-core
     #   tempora
     #   tzlocal
-requests==2.23.0
+pywin32==300 ; sys_platform == "win32"
+    # via
+    #   -r requirements.in
+    #   cherrypy
+pyyaml==5.4.1
+    # via libcst
+requests==2.25.1
     # via
     #   google-api-core
     #   ibm-cloud-sdk-core
     #   ibm-watson
-rsa==4.0
+rsa==4.7.2
     # via google-auth
 samplerate==0.1.0
     # via -r requirements.in
-six==1.14.0
+six==1.16.0
     # via
     #   apscheduler
     #   cheroot
@@ -133,26 +156,32 @@ six==1.14.0
     #   google-api-core
     #   google-api-python-client
     #   google-auth
+    #   google-auth-httplib2
     #   grpcio
-    #   jaraco.collections
-    #   jaraco.text
-    #   pip-tools
     #   protobuf
     #   python-dateutil
     #   websocket-client
-tempora==3.0.0
+tempora==4.0.2
     # via portend
+toml==0.10.2
+    # via pep517
+typing-extensions==3.10.0.0
+    # via
+    #   libcst
+    #   typing-inspect
+typing-inspect==0.6.0
+    # via libcst
 tzlocal==2.1
     # via
     #   -r requirements.in
     #   apscheduler
 uritemplate==3.0.1
     # via google-api-python-client
-urllib3==1.25.9
+urllib3==1.26.4
     # via requests
 websocket-client==0.48.0
     # via ibm-watson
-wheel==0.34.2
+wheel==0.36.2
     # via -r requirements.in
 zc.lockfile==2.0
     # via cherrypy
