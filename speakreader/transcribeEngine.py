@@ -110,7 +110,8 @@ class TranscribeEngine:
             logger.warn("Transcribe Engine already Started")
             return
 
-        logger.info("Transcribe Engine Starting")
+        logger.info("Transcribe Engine Starting with the %s%s Speech-To-Text Service"
+            % (speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE[0].upper(), speakreader.CONFIG.SPEECH_TO_TEXT_SERVICE[1:]))
 
         FILENAME_DATESTRING = datetime.datetime.now().strftime(FILENAME_DATE_FORMAT)
         TRANSCRIPT_FILENAME = FILENAME_PREFIX + FILENAME_DATESTRING + "." + TRANSCRIPT_FILENAME_SUFFIX
