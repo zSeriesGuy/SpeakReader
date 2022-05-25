@@ -6,8 +6,6 @@
 #
 apscheduler==3.7.0
     # via -r requirements.in
-azure-cognitiveservices-speech==1.17.0 ; sys_platform in "win32 macos" or (sys_platform == "linux" and platform_machine in "AMD64")
-    # via -r requirements.in
 cachetools==4.2.2
     # via google-auth
 certifi==2020.12.5
@@ -22,8 +20,6 @@ cherrypy==18.6.0
     # via -r requirements.in
 click==8.0.1
     # via pip-tools
-colorama==0.4.4
-    # via click
 configobj==5.0.6
     # via -r requirements.in
 google-api-core[grpc]==1.27.0
@@ -32,13 +28,13 @@ google-api-core[grpc]==1.27.0
     #   google-cloud-speech
 google-api-python-client==2.5.0
     # via -r requirements.in
-google-auth-httplib2==0.1.0
-    # via google-api-python-client
 google-auth==1.30.0
     # via
     #   google-api-core
     #   google-api-python-client
     #   google-auth-httplib2
+google-auth-httplib2==0.1.0
+    # via google-api-python-client
 google-cloud-speech==2.3.0
     # via -r requirements.in
 googleapis-common-protos==1.53.0
@@ -56,17 +52,17 @@ ibm-watson==5.1.0
     # via -r requirements.in
 idna==2.10
     # via requests
-jaraco.classes==3.2.1
-    # via jaraco.collections
-jaraco.collections==3.3.0
+jaraco-classes==3.2.1
+    # via jaraco-collections
+jaraco-collections==3.3.0
     # via cherrypy
-jaraco.functools==3.3.0
+jaraco-functools==3.3.0
     # via
     #   cheroot
-    #   jaraco.text
+    #   jaraco-text
     #   tempora
-jaraco.text==3.5.0
-    # via jaraco.collections
+jaraco-text==3.5.0
+    # via jaraco-collections
 libcst==0.3.19
     # via google-cloud-speech
 mako==1.1.4
@@ -77,8 +73,8 @@ more-itertools==8.7.0
     # via
     #   cheroot
     #   cherrypy
-    #   jaraco.classes
-    #   jaraco.functools
+    #   jaraco-classes
+    #   jaraco-functools
 mypy-extensions==0.4.3
     # via typing-inspect
 numpy==1.20.3
@@ -104,17 +100,17 @@ protobuf==3.17.0
     #   proto-plus
 psutil==5.8.0
     # via -r requirements.in
-pyasn1-modules==0.2.8
-    # via google-auth
 pyasn1==0.4.8
     # via
     #   pyasn1-modules
     #   rsa
+pyasn1-modules==0.2.8
+    # via google-auth
 pyaudio==0.2.11
     # via -r requirements.in
 pycparser==2.20
     # via cffi
-pyjwt==2.1.0
+pyjwt==2.4.0
     # via
     #   -r requirements.in
     #   ibm-cloud-sdk-core
@@ -133,10 +129,6 @@ pytz==2021.1
     #   google-api-core
     #   tempora
     #   tzlocal
-pywin32==300 ; sys_platform == "win32"
-    # via
-    #   -r requirements.in
-    #   cherrypy
 pyyaml==5.4.1
     # via libcst
 requests==2.25.1
@@ -183,7 +175,7 @@ websocket-client==0.48.0
     # via ibm-watson
 wheel==0.36.2
     # via -r requirements.in
-zc.lockfile==2.0
+zc-lockfile==2.0
     # via cherrypy
 
 # The following packages are considered to be unsafe in a requirements file:
